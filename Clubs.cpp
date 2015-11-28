@@ -15,10 +15,9 @@ using namespace std;
 
 int Club::_instance_number = 0;
 
-Club::Club()
+Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))]), city_name(cities[rand() % (sizeof(cities) / sizeof(cities[0]))])
+
 {
-	club_name = club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))];
-	city_name = cities[rand() % (sizeof(cities) / sizeof(cities[0]))];
 	number_of_players = 0;
 
 	tactic[0] = -1; //Say that this position is not yet filled with players.
@@ -40,7 +39,6 @@ Club::Club()
 	_history_messages_counter = 0;
 
 	_allowed_to_play = 0; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
-	_ID = _instance_number++;
 }
 
 void Club::Increment_History_Messages_Counter()
@@ -117,14 +115,14 @@ int Club::Add_Player_to_Club(Player **player)
 	return 0;
 }
 
-void List_Players(const struct Club *club)
+void Club::List_Players()
 {
 	printf("\n---Listing players---\n\n");
 	int i;
-	for ( i = 0 ; i < club->number_of_players; ++i)
+	for ( i = 0 ; i < number_of_players; ++i)
 	{
-		printf("%s %s\nOverall: %.2f%\n", club->players[i]->name, (club->players[i])->surname, club->players[i]->overall);
-		switch (club->players[i]->position)
+		printf("%s %s\nOverall: %.2f%\n", players[i]->name, players[i]->surname, players[i]->overall);
+		switch (players[i]->position)
 			{
 			case 1:
 				printf("Defender.\n");
@@ -146,9 +144,9 @@ void List_Players(const struct Club *club)
 
 
 
-int Set_Tactics(struct Club **club)
+int Club::Set_Tactics()
 {
-	if((*club)->number_of_players < 11)
+	if(number_of_players < 11)
 	{
 		printf("Not enough players to set tactic!\n");
 		return -1;
@@ -161,18 +159,18 @@ int Set_Tactics(struct Club **club)
 	{
 		swapped = 0;
 
-		for(i = 0; i < (*club)->number_of_players - 1; ++i)
+		for(i = 0; i < number_of_players - 1; ++i)
 		{
-			if( (*club)->players[i]->overall < (*club)->players[i+1]->overall)
+			if( players[i]->overall < players[i+1]->overall)
 			{
-				struct Player *tmp = (*club)->players[i];
-				(*club)->players[i] = (*club)->players[i+1];
-				(*club)->players[i+1] = tmp;
+				struct Player *tmp = players[i];
+				players[i] = players[i+1];
+				players[i+1] = tmp;
 			}
 			else
 				++swapped;
 		}
-	} while(swapped != (*club)->number_of_players - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
+	} while(swapped != number_of_players - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
 
 //------------------------------------------------------------------------------END OF ORDERING-------------------------------------------------------------------------
 
@@ -185,43 +183,43 @@ int Set_Tactics(struct Club **club)
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 	{
-		if((*club)->players[i]->position == 1 && (current_defenders < max_defenders ))
+		if(players[i]->position == 1 && (current_defenders < max_defenders ))
 			if(  (current_defenders + 1 == max_defenders) && (current_midfilders == max_midfilders || current_attackers == max_attackers) )
 			{} //can not have two max of positions, because the third one would not get a place.
 		else
 		{
-			(*club)->defenders_in_first_squad[defender_index] = (*club)->players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
+			defenders_in_first_squad[defender_index] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
 			++current_defenders;
 			++defender_index;
-			++(*club)->number_of_defenders_in_first_squad;
+			++number_of_defenders_in_first_squad;
 		}
 
 
-		if((*club)->players[i]->position == 2 && current_midfilders < max_midfilders)
+		if(players[i]->position == 2 && current_midfilders < max_midfilders)
 			if(  (current_midfilders + 1 == max_midfilders)  && (current_attackers == max_attackers  ||  current_defenders == max_defenders) )
 				{}
 		else
 		{
-			(*club)->midfilders_in_first_squad[midfilder_index] = (*club)->players[i];
+			midfilders_in_first_squad[midfilder_index] = players[i];
 			++current_midfilders;
 			++midfilder_index;
-			++(*club)->number_of_midfilders_in_first_squad;
+			++number_of_midfilders_in_first_squad;
 		}
 
 
-		if((*club)->players[i]->position == 3 && current_attackers < max_attackers)
+		if(players[i]->position == 3 && current_attackers < max_attackers)
 			if(  (current_attackers + 1 == max_attackers) && (current_midfilders == max_midfilders || current_defenders == max_defenders) )
 				{}
 			else
 			{
-				(*club)->attackers_in_first_squad[attacker_index] = (*club)->players[i];
+				attackers_in_first_squad[attacker_index] = players[i];
 				++current_attackers;
 				++attacker_index;
-				++(*club)->number_of_attackers_in_first_squad;
+				++number_of_attackers_in_first_squad;
 			}
 
 		++i;
-	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != (*club)->number_of_players));
+	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != number_of_players));
 
 	if(current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_midfilders)
 	{
@@ -233,57 +231,57 @@ int Set_Tactics(struct Club **club)
 //---------------------------------------------------------------------END OF SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 
 
-	(*club)->tactic[0] = current_defenders; //every value in index means number of players in this position.
-	(*club)->tactic[1] = current_midfilders;
-	(*club)->tactic[2] = current_attackers;
+	tactic[0] = current_defenders; //every value in index means number of players in this position.
+	tactic[1] = current_midfilders;
+	tactic[2] = current_attackers;
 
 
 	double sum = 0;
 
 	for(i = 0; i < current_defenders; ++i)
-		sum = sum + (*club)->defenders_in_first_squad[i]->overall;
+		sum = sum + defenders_in_first_squad[i]->overall;
 	for(i = 0; i < current_midfilders; ++i)
-		sum = sum + (*club)->midfilders_in_first_squad[i]->overall;
+		sum = sum + midfilders_in_first_squad[i]->overall;
 	for(i = 0; i <current_attackers; ++i)
-		sum = sum + (*(*club)->attackers_in_first_squad[i]).overall;
+		sum = sum + (*attackers_in_first_squad[i]).overall;
 
-	(*club)->Set_Tactic_Rating(sum);
+	Set_Tactic_Rating(sum);
 
-	(*club)->Allow_Playing(); //Coming to this line, it means that we succesfully created formation, and added players.
+	Allow_Playing(); //Coming to this line, it means that we succesfully created formation, and added players.
 	return 0;
 }
 
 
-void Print_Formation(const struct Club *club)
+void Club::Print_Formation()
 {
 	printf("\n---Current formation---\n");
-	cout << club->club_name << " " << club->city_name << "plays: ";
+	cout << club_name << " " << city_name << "plays: ";
 	int i = 0;
 	for(; i < 3; ++i)
-		printf("%d ", club->tactic[i]);
+		printf("%d ", tactic[i]);
 	printf("\n");
 }
 
-void Print_First_Squad(struct Club *club)
+void Club::Print_First_Squad()
 {
 	printf("\n---First Squad---\n");
 	int i;
-	for(i = 0; i < club->number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (DEF)\n", club->defenders_in_first_squad[i]->name, club->defenders_in_first_squad[i]->surname, club->defenders_in_first_squad[i]->overall);
+		printf("Player: %s %s  Overall: %.2f%  (DEF)\n", defenders_in_first_squad[i]->name, defenders_in_first_squad[i]->surname, defenders_in_first_squad[i]->overall);
 	}
 
-	for(i = 0; i < club->number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (MID)\n", club->midfilders_in_first_squad[i]->name, club->midfilders_in_first_squad[i]->surname, club->midfilders_in_first_squad[i]->overall);
+		printf("Player: %s %s  Overall: %.2f%  (MID)\n", midfilders_in_first_squad[i]->name, midfilders_in_first_squad[i]->surname, midfilders_in_first_squad[i]->overall);
 	}
 
-	for(i = 0; i < club->number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (ATT)\n", club->attackers_in_first_squad[i]->name, club->attackers_in_first_squad[i]->surname, club->attackers_in_first_squad[i]->overall);
+		printf("Player: %s %s  Overall: %.2f%  (ATT)\n", attackers_in_first_squad[i]->name, attackers_in_first_squad[i]->surname, attackers_in_first_squad[i]->overall);
 	}
 
-	club->Print_Tactic_Rating();
+	Print_Tactic_Rating();
 	printf("\n");
 }
 

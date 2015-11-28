@@ -14,13 +14,13 @@ class Club
 private:
 	int _budget;
 	static int _instance_number;
-	int _ID;
+	const int _ID;
 	char _allowed_to_play;
 	double _tactic_rating; //Tacting rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
 	int _history_messages_counter;
 public:
-	std::string club_name;
-	std::string city_name;
+	const std::string club_name;
+	const std::string city_name;
 
 	int number_of_players; //max - 23. It's a guard to avoid overflowing struct Player players[23].
 	struct Player *players[23]; //23 players
@@ -43,6 +43,8 @@ public:
 	History *history; /* We can have 100 unique stories. Pointer because compiler said "array type has incomplete type". If the type is incomplete,
 							it means that the it has been forward-declared, but has not yet been declared fully. */
 
+
+
 	void Set_Tactic_Rating(double sum);
 	void Allow_Playing();
 
@@ -57,14 +59,14 @@ public:
 	int Get_Message_Counter();
 
 	int Get_ID();
+	int Set_Tactics();
+	void Print_Formation();
+	void Print_First_Squad();
+	void List_Players();
 
 	Club();
 };
 
-void List_Players(struct Club *club);
 
-int Set_Tactics(struct Club **club);
-void Print_Formation(struct Club *club);
-void Print_First_Squad(struct Club *club);
 
 #endif /* CLUBS_H_ */

@@ -6,11 +6,9 @@
 
 #include "Attributes.h"
 
-Player::Player()
+Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]), surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
 {
 	age = rand() % (26) + 16; //(max_number + 1 - minimum_number)) + minimum_number
-	name = names [ rand() % (sizeof(names) / sizeof(names[0])) ];
-	surname = surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ];
 	_Set_Attributes();
 	_Set_Position();
 }

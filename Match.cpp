@@ -7,11 +7,11 @@ using namespace std;
 #include "Match.h"
 #include "Table.h"
 
-void Play_Match(struct Club **club_1, struct Club **club_2, struct Table **table)
+void Play_Match(struct Club **club_1, struct Club **club_2, Table &table)
 {
 	printf("\nNow playing: [%d] vs [%d]\n", (*club_1)->Get_ID(), (*club_2)->Get_ID() );
 
-	if (Assert_Table_Full(table) != 1)
+	if ( table.Assert_Table_Full() != 1)
 	{
 		printf ("Cannot play match. League is not full yet.\n");
 		return;
@@ -68,7 +68,7 @@ void Play_Match(struct Club **club_1, struct Club **club_2, struct Table **table
 	}
 
 
-	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2, table);
+	int match_index = table.Find_Index_of_Pair_In_Kolejka(club_1, club_2);
 
 	if(match_index == -1)
 	{
@@ -76,9 +76,7 @@ void Play_Match(struct Club **club_1, struct Club **club_2, struct Table **table
 		return;
 	}
 
-	(*table)->kolejka[(*table)->current_round].match[match_index]->match_played = 1;
-
-
+	table.kolejka[table.current_round].match[match_index]->match_played = 1;
 	//Sort_Table(table);
 }
 

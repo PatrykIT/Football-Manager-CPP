@@ -49,7 +49,7 @@ private:
 public:
 	int age;
 	int position; //1 - Defender. 2 - Midfilder. 3 - Attacker
-	std::string name, surname;
+	const std::string name, surname;
 	struct Attributes attributes;
 	struct History *history[100];
 	double overall; //counted on all overalls.

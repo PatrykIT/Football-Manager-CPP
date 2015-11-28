@@ -97,8 +97,6 @@ void Start()
 
 //-----------------------------------------------------------------------------
 
-	club->Print_History();
-
 	Table *table = new Table;
 	table->Add_Club_to_Table(&club);
 	table->Add_Club_to_Table(&club_2);
@@ -111,34 +109,38 @@ void Start()
 	Add_Club_to_Table(&club_8, &table);*/
 
 
-	Set_Tactics(&club);
-	Set_Tactics(&club_2);
-	Set_Tactics(&club_3);
-	Set_Tactics(&club_4);
+	club->Set_Tactics();
+	club_2->Set_Tactics();
+	club_3->Set_Tactics();
+	club_4->Set_Tactics();
 
 	/*Set_Tactics(&club_5);
 	Set_Tactics(&club_6);
 	Set_Tactics(&club_7);
 	Set_Tactics(&club_8);*/
 
-	//Print_First_Squad(club);
-	//Print_First_Squad(club_2);
-	//Print_First_Squad(club_3);
-	//Print_First_Squad(club_4);
 
-	Schedule_Season(&table);
+	table->Schedule_Season();
 
-	Schedule_Rounds(&table);
+	table->Schedule_Rounds();
 
-	Print_Rounds(table);
-	Print_by_Clubs_paired(table);
+	table->Print_Rounds();
 
-	Play_Round(&table);
+	table->Play_Round();
 
-	Print_Table(table);
+	table->Print_Table();
 }
 
 
+
+
+/*
+ * Dokończyć  Schedule_Rounds().
+ * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
+ * Fix Sort_Table()
+ * Fix ***clubs_paired - I think it should be cut to 2 pointers. One for holding pointers to clubs, and second of course to clubs. LOL! Maybe 1 pointer would suffice? Just for pointers?
+ * Make Play_Match() nested in Table. Or just copy the function without nesting.
+ */
 
 int main()
 {
@@ -151,3 +153,12 @@ int main()
 	cout << "Bye bye." << endl;
 	return 0;
 }
+
+
+
+/*
+ * Make : tables, history of players (dates of playing in which clubs, goals scored, assists, development, fee received), transfers, player prices.
+ * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendency etc.
+ * Count attendency based on the reputation of guest team (maybe by position in table?)
+ *
+ */

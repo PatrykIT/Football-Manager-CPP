@@ -30,23 +30,21 @@ public:
 
     Table();
     void Add_Club_to_Table(Club **club);
+    void Schedule_Season();
+    int Assert_Table_Full();
+    void Schedule_Rounds();
+    void Print_Table() const;
+    void Print_Rounds() const;
+    void Play_Round();
+    int Check_if_Round_Played(int *index_of_match_not_played);
+    int Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
+    void Give_Walkover(int i);
+    int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only uniqe combinations.
+
 };
 
 void Sort_Table(struct Table **table); //Change to https://en.wikipedia.org/wiki/Quicksort#Algorithm || HeapSort || MergeSort
-void Schedule_Season(struct Table **table);
-void Schedule_Rounds(struct Table **table);
-void Print_Table(const struct Table *table);
-void Print_Rounds(const struct Table *table);
-void Play_Round(struct Table **table);
-void Give_Walkover(struct Table **table, int i);
-void Print_by_Clubs_paired(struct Table *table);
-
-
 int Check_if_All_Rounds_Played(struct Table **table);
-int Check_if_Round_Played(struct Table **table, int *index_of_match_not_played);
-int Assert_Table_Full(struct Table **table);
-int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only uniqe combinations.
-int Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2 ,struct Table **table); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
 
 
 
