@@ -9,7 +9,7 @@
 struct Pair_Clubs //pairing for matches scheduling.
 {
 	int match_played; //0 - match not played yet. 1 - match played.
-	Club ***clubs_paired; //Why is triple pointer needed?!
+	Club **clubs_paired;
 };
 
 struct Kolejka
@@ -37,9 +37,10 @@ public:
     void Print_Rounds() const;
     void Play_Round();
     int Check_if_Round_Played(int *index_of_match_not_played);
-    int Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
+    int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
     void Give_Walkover(int i);
     int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only uniqe combinations.
+    void Play_Match(Club **club_1, Club **club_2);
 
 };
 

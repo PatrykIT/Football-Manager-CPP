@@ -18,6 +18,7 @@ private:
 	char _allowed_to_play;
 	double _tactic_rating; //Tacting rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
 	int _history_messages_counter;
+
 public:
 	const std::string club_name;
 	const std::string city_name;
@@ -31,15 +32,15 @@ public:
 	Player *midfilders_in_first_squad[5];
 	Player *defenders_in_first_squad[5];
 
-	int points;
 	int goals_scored, goals_conceded;
 	int matches_played;
 	int matches_won, matches_lost, matches_drawn;
 
+	int points;
+
 	int number_of_attackers_in_first_squad;
 	int number_of_midfilders_in_first_squad;
 	int number_of_defenders_in_first_squad;
-
 	History *history; /* We can have 100 unique stories. Pointer because compiler said "array type has incomplete type". If the type is incomplete,
 							it means that the it has been forward-declared, but has not yet been declared fully. */
 
@@ -63,6 +64,9 @@ public:
 	void Print_Formation();
 	void Print_First_Squad();
 	void List_Players();
+
+	void Set_Points(int points);
+	int Get_Points;
 
 	Club();
 };
