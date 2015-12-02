@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,11 +14,14 @@ using namespace std;
 
 extern Calendar calendar;
 
-#define number_of_players 15
+int number_of_players = 15;
 
 void Start()
 {
 	//printf("\nHello! You've been given %d players, and assigned a club.\n", number_of_players);
+
+	for(int i = 0; i < number_of_free_players; ++i)
+		free_players[i] = new Player;
 
 	Club *club = new Club;
 	Player *players_1[number_of_players];
@@ -94,6 +98,7 @@ void Start()
 		Add_Player_to_Club(&players_8[i], &club_8);
 	}*/
 
+
 //-----------------------------------------------------------------------------
 
 	Table *table = new Table;
@@ -129,17 +134,19 @@ void Start()
 
 	table->Print_Table();
 
-
 }
 
+/*
+ * Option 1 (buy player). Club has a budget. When clicking option 1, i create couple of players for each position - some are free, so every club can afford it (but they're weak)
+ * Club choses which player it wants. Then I add this player to club, set tactic again, and replay the match.
+ *
+ * Sprawdź co będzie jak się kupi złych graczy ( z innych pozycji itp).
+ */
 
 
 /*
  * Dokończyć  Schedule_Rounds().
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
- * Fix Sort_Table()
- * Fix ***clubs_paired - I think it should be cut to 2 pointers. One for holding pointers to clubs, and second of course to clubs. LOL! Maybe 1 pointer would suffice? Just for pointers?
- * Make Play_Match() nested in Table. Or just copy the function without nesting.
  */
 
 int main()

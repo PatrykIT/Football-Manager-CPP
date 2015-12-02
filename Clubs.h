@@ -12,12 +12,16 @@ static std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", 
 class Club
 {
 private:
-	int _budget;
+	friend class Table;
+
+	float _budget;
 	static int _instance_number;
 	const int _ID;
 	char _allowed_to_play;
 	double _tactic_rating; //Tacting rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
 	int _history_messages_counter;
+	int points;
+
 
 public:
 	const std::string club_name;
@@ -36,7 +40,6 @@ public:
 	int matches_played;
 	int matches_won, matches_lost, matches_drawn;
 
-	int points;
 
 	int number_of_attackers_in_first_squad;
 	int number_of_midfilders_in_first_squad;
@@ -48,25 +51,22 @@ public:
 
 	void Set_Tactic_Rating(double sum);
 	void Allow_Playing();
-
 	void Print_Tactic_Rating();
 	void Increment_History_Messages_Counter();
 	void Print_History();
+	void Print_Formation();
+	void Print_First_Squad();
+	void List_Players();
+	void Print_Positions_Number();
 
 	char Check_if_Allowed_to_Play();
 	double Get_Tactic_Rating();
 
 	int Add_Player_to_Club(Player **player);
 	int Get_Message_Counter();
-
 	int Get_ID();
 	int Set_Tactics();
-	void Print_Formation();
-	void Print_First_Squad();
-	void List_Players();
-
-	void Set_Points(int points);
-	int Get_Points;
+	int Buy_Player();
 
 	Club();
 };

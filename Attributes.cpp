@@ -6,11 +6,15 @@
 
 #include "Attributes.h"
 
+int number_of_free_players = 30;
+std::vector<Player*> free_players(number_of_free_players);
+
 Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]), surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
 {
 	age = rand() % (26) + 16; //(max_number + 1 - minimum_number)) + minimum_number
 	_Set_Attributes();
 	_Set_Position();
+	_Set_Value();
 }
 
 void Player::_Set_Attributes()
@@ -141,3 +145,13 @@ void Player::Print_Attributes()
 
 }
 
+void Player::_Set_Value()
+{
+	value = overall * 100;
+}
+
+int Player::Print_Value()
+{
+	printf("Value: %.2f $\n", value);
+	return 0;
+}

@@ -5,7 +5,6 @@
 using namespace std;
 
 #include "Table.h"
-#include "Match.h"
 
 Table::Table()
 {
@@ -42,30 +41,6 @@ void Table::Add_Club_to_Table(Club **club)
 	clubs[number_of_clubs] = *club;
 
     ++number_of_clubs;
-}
-
-
-void Sort_Table(struct Table **table)
-{
-    int swapped, i;
-
-    do
-    {
-    	swapped = 0;
-
-        for(i = 0; i < (*table)->number_of_clubs - 1; ++i)
-        {
-            if(  (*(*table)->clubs[i]).points < (*(*table)->clubs[i+1]).points )
-            {
-                struct Club *tmp = (*table)->clubs[i];
-                (*table)->clubs[i] = (*table)->clubs[i+1];
-                (*table)->clubs[i+1] = tmp;
-            }
-            else
-                ++swapped;
-        }
-    } while(swapped != (*table)->number_of_clubs - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
-
 }
 
 void Table::Print_Table() const
@@ -304,48 +279,71 @@ void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
 {
 	printf("\n");
 
-	if (  (kolejka[current_round].match[i]->clubs_paired[0])->Check_if_Allowed_to_Play() == 0 && (kolejka[current_round].match[i]->clubs_paired[1])->Check_if_Allowed_to_Play() == 0 )
+	if (  kolejka[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && kolejka[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0 )
 	{
 		printf("Both clubs should give walkover, as they both cannot play.\nFor keeping it simple, walkover goes for the first team.\n");
 
-		( (kolejka[current_round].match[i]->clubs_paired[0])->matches_won)++;
-		( (kolejka[current_round].match[i]->clubs_paired[0])->goals_scored) += 3;
-		( (kolejka[current_round].match[i]->clubs_paired[0])->points) += 3;
+		kolejka[current_round].match[i]->clubs_paired[0]->matches_won++;
+		kolejka[current_round].match[i]->clubs_paired[0]->goals_scored += 3;
+		kolejka[current_round].match[i]->clubs_paired[0]->points += 3;
 
 
-		( (kolejka[current_round].match[i]->clubs_paired[1])->matches_lost)++;
-		( (kolejka[current_round].match[i]->clubs_paired[1])->goals_conceded) += 3;
+		kolejka[current_round].match[i]->clubs_paired[1]->matches_lost++;
+		kolejka[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
 
 	}
-	else if(  (kolejka[current_round].match[i]->clubs_paired[0])->Check_if_Allowed_to_Play() == 0 ) //If home club cannot play.
+	else if(  kolejka[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 ) //If home club cannot play.
 	{
-		printf("Home Club [%d] is giving a walkover to [%d].\n", (kolejka[current_round].match[i]->clubs_paired[0])->Get_ID(),
-				(kolejka[current_round].match[i]->clubs_paired[1])->Get_ID());
+		printf("Home Club [%d] is giving a walkover to [%d].\n", kolejka[current_round].match[i]->clubs_paired[0]->Get_ID(),
+				kolejka[current_round].match[i]->clubs_paired[1]->Get_ID());
 
-		( (kolejka[current_round].match[i]->clubs_paired[1])->matches_won)++;
-		( (kolejka[current_round].match[i]->clubs_paired[1])->goals_scored) += 3;
-		( (kolejka[current_round].match[i]->clubs_paired[1])->points) += 3;
+		kolejka[current_round].match[i]->clubs_paired[1]->matches_won++;
+		kolejka[current_round].match[i]->clubs_paired[1]->goals_scored += 3;
+		kolejka[current_round].match[i]->clubs_paired[1]->points += 3;
 
 
-		( (kolejka[current_round].match[i]->clubs_paired[0])->matches_lost)++;
-		( (kolejka[current_round].match[i]->clubs_paired[0])->goals_conceded) += 3;
+		kolejka[current_round].match[i]->clubs_paired[0]->matches_lost++;
+		kolejka[current_round].match[i]->clubs_paired[0]->goals_conceded += 3;
 
 	}
 	else //If away team cannot play.
 	{
-		printf("Away Club [%d] is giving a walkover to [%d].\n", (kolejka[current_round].match[i]->clubs_paired[1])->Get_ID(),
-				(kolejka[current_round].match[i]->clubs_paired[0])->Get_ID());
+		printf("Away Club [%d] is giving a walkover to [%d].\n", kolejka[current_round].match[i]->clubs_paired[1]->Get_ID(),
+				kolejka[current_round].match[i]->clubs_paired[0]->Get_ID());
 
-		( (kolejka[current_round].match[i]->clubs_paired[0])->matches_won)++;
-		( (kolejka[current_round].match[i]->clubs_paired[0])->goals_scored) += 3;
-		( (kolejka[current_round].match[i]->clubs_paired[0])->points) += 3;
+		kolejka[current_round].match[i]->clubs_paired[0]->matches_won++;
+		kolejka[current_round].match[i]->clubs_paired[0]->goals_scored += 3;
+		kolejka[current_round].match[i]->clubs_paired[0]->points += 3;
 
 
-		( (kolejka[current_round].match[i]->clubs_paired[1])->matches_lost)++;
-		( (kolejka[current_round].match[i]->clubs_paired[1])->goals_conceded) += 3;
+		kolejka[current_round].match[i]->clubs_paired[1]->matches_lost++;
+		kolejka[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
 	}
 
 	kolejka[current_round].match[i]->match_played = 1;
+}
+
+void Table::Check_which_Club_Needs_to_Buy(int i)
+{
+	printf("\n");
+
+	if ( kolejka[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && kolejka[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0 )
+	{
+		printf("Both clubs should buy.\n");
+		kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
+		kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
+	}
+	else if(  (kolejka[current_round].match[i]->clubs_paired[0])->Check_if_Allowed_to_Play() == 0 ) //If home club cannot play.
+	{
+		printf("Home Club [%d] has to buy.\n", kolejka[current_round].match[i]->clubs_paired[0]->Get_ID());
+		kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
+	}
+	else //If away team cannot play.
+	{
+		printf("Away Club [%d] has to buy.\n", kolejka[current_round].match[i]->clubs_paired[1]->Get_ID());
+		kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
+	}
+
 }
 
 void Table::Play_Round()
@@ -357,6 +355,11 @@ void Table::Play_Round()
 	 * c) funkcja Play_Match oddaje walkowera za klub który nie mógł grać.
 	 * */
 
+	if(current_round > number_of_clubs - 1 - 1) //number_of_clubs - 1 is a number of rounds to play.  -1 because current_round starts from 0.
+	{
+		cout << "Final round already reached, cannot play further." << endl;
+		return;
+	}
 	int i;
 	for(i = 0; i < number_of_clubs_in_ligue / 2; ++i)
 	{
@@ -371,10 +374,18 @@ void Table::Play_Round()
 		printf("Enter choice:\n1) Buy player to set tactic or something like that:D\n2) Play rest of the matches in future.\n3) Give walkover.\nYour choice: \t");
 
 		int choice;
-		scanf("%d", &choice);
+		cin >> choice;
 
-		if (choice == 1)
-			return;
+		if (choice == 1) //tu zrobić pętlę.
+		{
+			do
+			{
+				Check_which_Club_Needs_to_Buy(index_of_match_not_played);
+				Play_Match( &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[0]), &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[1]) );
+			}
+			while( (Check_if_Round_Played(&index_of_match_not_played) != 1) );
+
+		}
 		else if (choice == 2)
 		{
 			printf("Okay. Match will need to be replayed in future. To do: make some flag to mark that this particular match needs to be played.\n");
@@ -468,7 +479,4 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	kolejka[current_round].match[match_index]->match_played = 1;
 	//Sort_Table(table);
 }
-
-
-
 

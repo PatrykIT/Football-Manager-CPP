@@ -1,6 +1,12 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 #include <iostream>
+#include <vector>
+
+class Player;
+
+extern int number_of_free_players;
+extern std::vector<Player*> free_players;//(number_of_free_players); //10 players ready to be bought. std::<array> would be more appropriate if the size wouldn't change throughout the program.
 
 struct Attacking_Attributes
 {
@@ -46,6 +52,7 @@ class Player
 private:
 	void _Set_Attributes();
 	void _Set_Position();
+	void _Set_Value();
 public:
 	int age;
 	int position; //1 - Defender. 2 - Midfilder. 3 - Attacker
@@ -53,9 +60,11 @@ public:
 	struct Attributes attributes;
 	struct History *history[100];
 	double overall; //counted on all overalls.
+	double value;
 
 	Player();
 	void Print_Attributes();
+	int Print_Value();
 };
 
 #endif /* ATTRIBUTES_H_ */

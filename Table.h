@@ -20,6 +20,8 @@ struct Kolejka
 
 class Table
 {
+    void Play_Match(Club **club_1, Club **club_2);
+
 public:
 	Club *clubs[number_of_clubs_in_ligue];
     Pair_Clubs *pair_of_clubs;
@@ -31,20 +33,19 @@ public:
     Table();
     void Add_Club_to_Table(Club **club);
     void Schedule_Season();
-    int Assert_Table_Full();
     void Schedule_Rounds();
     void Print_Table() const;
     void Print_Rounds() const;
     void Play_Round();
+    void Give_Walkover(int i);
+    void Check_which_Club_Needs_to_Buy(int i);
+
     int Check_if_Round_Played(int *index_of_match_not_played);
     int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
-    void Give_Walkover(int i);
-    int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only uniqe combinations.
-    void Play_Match(Club **club_1, Club **club_2);
-
+    int Assert_Table_Full();
+    int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only unique combinations.
 };
 
-void Sort_Table(struct Table **table); //Change to https://en.wikipedia.org/wiki/Quicksort#Algorithm || HeapSort || MergeSort
 int Check_if_All_Rounds_Played(struct Table **table);
 
 

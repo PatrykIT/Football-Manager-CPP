@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <string>
+#include <random>
 
 #include "Clubs.h"
-#include "History.h"
 
 using namespace std;
 
@@ -27,7 +27,9 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	number_of_attackers_in_first_squad = 0;
 	number_of_midfilders_in_first_squad = 0;
 	number_of_defenders_in_first_squad = 0;
-	_budget = rand() % (100000) + 10000; //values - 10.000 - 100.000 $
+
+	_budget = 10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000))); //values 1000.0000 - 99999.999 $
+
 	_tactic_rating = 0;
 
 	points = 0;
@@ -176,10 +178,13 @@ int Club::Set_Tactics()
 
 
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
+	number_of_attackers_in_first_squad = 0, number_of_midfilders_in_first_squad = 0, number_of_defenders_in_first_squad = 0;
 	int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
 	int current_attackers = 0, current_midfilders = 0, current_defenders = 0;
 	int attacker_index = 0, midfilder_index = 0, defender_index = 0;
 	i = 0;
+
+	//NOTE: Maybe current_attackers, current mid, current def are unnecessary.
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 	{
@@ -223,7 +228,7 @@ int Club::Set_Tactics()
 
 	if(current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_midfilders)
 	{
-		printf("Couldnt set proper tatics! Not enough players for a position.\n");
+		printf("Couldn't set proper tactics! Not enough players for a position.\n");
 		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n", current_attackers, current_midfilders, current_defenders);
 		return -1;
 	}
@@ -248,6 +253,7 @@ int Club::Set_Tactics()
 	Set_Tactic_Rating(sum);
 
 	Allow_Playing(); //Coming to this line, it means that we succesfully created formation, and added players.
+
 	return 0;
 }
 
@@ -268,26 +274,101 @@ void Club::Print_First_Squad()
 	int i;
 	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (DEF)\n", defenders_in_first_squad[i]->name, defenders_in_first_squad[i]->surname, defenders_in_first_squad[i]->overall);
+		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->overall << " (DEF)" << endl;
 	}
 
 	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (MID)\n", midfilders_in_first_squad[i]->name, midfilders_in_first_squad[i]->surname, midfilders_in_first_squad[i]->overall);
+		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->overall << " (MID)" << endl;
 	}
 
 	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
 	{
-		printf("Player: %s %s  Overall: %.2f%  (ATT)\n", attackers_in_first_squad[i]->name, attackers_in_first_squad[i]->surname, attackers_in_first_squad[i]->overall);
+		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->overall << " (ATT)" << endl;
 	}
 
 	Print_Tactic_Rating();
 	printf("\n");
 }
 
+int Club::Buy_Player()
+{
+	if (number_of_players >= 23)
+	{
+		cout << "Squad is full. Cannot add another player." << endl;
+		return -1;
+	}
+
+	Print_Positions_Number();
+
+	int position_to_buy;
+	cout << endl << "What position would you like to buy? 1 - Def. 2 - Mid. 3 - Att." << endl <<"Choice: \t";
+
+	do
+	{
+		cin >> position_to_buy;
+	} while(position_to_buy < 1 && position_to_buy > 3);
+
+	printf("\t--- Current budget: %f$ ---\n", _budget);
+	while(1) //Infinite loop, in case a player never decides - he will have to. :)
+	{
+		bool bought = false;
+
+		for(int i = 0; i < number_of_free_players; ++i) //Sprawdzić przypadek, kiedy brakuje np. 2 zawodników. Może za drugim zakupem zabraknąć kasy, wtedy walkower leci.
+		{
+			if(free_players.at(i)->position == position_to_buy && _budget > free_players[i]->value) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
+			{
+				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->overall <<"%" << endl;
+				cout << "He costs: " << free_players[i]->Print_Value() << endl; //Print Value() cannot be void because "forming reference to void" O.o   Check this out!
+				cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
+				char buy; cin >> buy;
+
+				if (buy == 'Y' || buy == 'y')
+				{
+					int ret = Add_Player_to_Club( &free_players[i]);
+
+					if(ret == 0)
+					{
+						printf("Budget before: %f\n", _budget);
+
+						bought = true;
+						_budget = _budget - free_players[i]->value;
+
+						printf("Budget after: %f\n", _budget);
+					}
+
+					break;
+				}
+				else
+				{
+					continue;
+				}
+			}
+			else
+			{
+				printf ("Searching..\n");
+				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->position << " | Value: " << free_players[i]->value << "$" << endl;
+			}
+		}
+		if(bought == true)
+		{
+			printf("Player bought.\n");
+			Set_Tactics();
+			this->Print_First_Squad();
+			break; //Exit infinite loop
+		}
+	}
+
+	return 0;
+}
 
 
-
+void Club::Print_Positions_Number()
+{
+	cout << "Current positions in first squad: " << endl;
+	cout << "Attackers: " << number_of_attackers_in_first_squad << endl << "Midfielders: " << number_of_midfilders_in_first_squad << endl <<
+			"Defenders: " << number_of_defenders_in_first_squad << endl;
+}
 
 
 
