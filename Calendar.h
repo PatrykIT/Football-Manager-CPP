@@ -12,6 +12,7 @@ public:
 
 	void Set_Current_Date();
 	void Print_Date();
+	void Travel_Calendar(int days);
 	std::string Add_Calendar_Date_To_History_Message();
 };
 

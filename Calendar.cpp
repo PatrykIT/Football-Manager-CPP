@@ -29,6 +29,18 @@ void Calendar::Print_Date()
 			calendar.hour, calendar.minute, calendar.seconde);
 }
 
+void Calendar::Travel_Calendar(int days)
+{
+	if(calendar.day_of_a_month + days > 31)
+	{
+		calendar.day_of_a_month += days;
+
+		int rest_of_days = calendar.day_of_a_month - 31;
+		calendar.month++;
+		calendar.day_of_a_month = 1 + rest_of_days;
+	}
+}
+
 std::string Calendar::Add_Calendar_Date_To_History_Message()
 {
 	calendar.Set_Current_Date();

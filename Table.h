@@ -31,6 +31,8 @@ public:
     int number_of_clubs;
 
     Table();
+    ~Table();
+
     void Add_Club_to_Table(Club **club);
     void Schedule_Season();
     void Schedule_Rounds();
@@ -38,7 +40,7 @@ public:
     void Print_Rounds() const;
     void Play_Round();
     void Give_Walkover(int i);
-    void Check_which_Club_Needs_to_Buy(int i);
+    int Check_which_Club_Needs_to_Buy(int i);
 
     int Check_if_Round_Played(int *index_of_match_not_played);
     int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.

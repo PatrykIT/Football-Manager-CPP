@@ -34,7 +34,7 @@ void Player::_Set_Attributes()
 		attribute_value = rand() %60 + 40; //40 - 99 values.
 		sum_of_attributes += attribute_value;
 
-		*(int*)pointer_to_struct = attribute_value; //seting an attribute to a given value.
+		*(int*)pointer_to_struct = attribute_value; //setting an attribute to a given value.
 		pointer_to_struct += sizeof(int);
 	}
 

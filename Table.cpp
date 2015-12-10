@@ -43,6 +43,23 @@ void Table::Add_Club_to_Table(Club **club)
     ++number_of_clubs;
 }
 
+Table::~Table()
+{
+	delete []pair_of_clubs;
+	int i;
+
+	const int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
+	for(i = 0; i < all_unique_combinations_of_matches; ++i)
+	{
+		free (pair_of_clubs[i].clubs_paired);
+	}
+
+	for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
+	{
+		free (kolejka[i].match);
+	}
+}
+
 void Table::Print_Table() const
 {
     printf("\n\t---Table---\n");
@@ -323,26 +340,29 @@ void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
 	kolejka[current_round].match[i]->match_played = 1;
 }
 
-void Table::Check_which_Club_Needs_to_Buy(int i)
+int Table::Check_which_Club_Needs_to_Buy(int i)
 {
 	printf("\n");
+	int bought;
 
 	if ( kolejka[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && kolejka[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0 )
 	{
 		printf("Both clubs should buy.\n");
-		kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
-		kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
+		bought = kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
+		bought = kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
 	}
 	else if(  (kolejka[current_round].match[i]->clubs_paired[0])->Check_if_Allowed_to_Play() == 0 ) //If home club cannot play.
 	{
 		printf("Home Club [%d] has to buy.\n", kolejka[current_round].match[i]->clubs_paired[0]->Get_ID());
-		kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
+		bought = kolejka[current_round].match[i]->clubs_paired[0]->Buy_Player();
 	}
 	else //If away team cannot play.
 	{
 		printf("Away Club [%d] has to buy.\n", kolejka[current_round].match[i]->clubs_paired[1]->Get_ID());
-		kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
+		bought = kolejka[current_round].match[i]->clubs_paired[1]->Buy_Player();
 	}
+
+	return bought; //successfully bought a player.
 
 }
 
@@ -360,6 +380,7 @@ void Table::Play_Round()
 		cout << "Final round already reached, cannot play further." << endl;
 		return;
 	}
+
 	int i;
 	for(i = 0; i < number_of_clubs_in_ligue / 2; ++i)
 	{
@@ -376,12 +397,15 @@ void Table::Play_Round()
 		int choice;
 		cin >> choice;
 
-		if (choice == 1) //tu zrobić pętlę.
+		if (choice == 1)
 		{
 			do
 			{
-				Check_which_Club_Needs_to_Buy(index_of_match_not_played);
-				Play_Match( &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[0]), &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[1]) );
+				if ( Check_which_Club_Needs_to_Buy(index_of_match_not_played) == 1) //succesfull buying of a player
+					Play_Match( &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[0]), &(kolejka[current_round].match[index_of_match_not_played]->clubs_paired[1]) );
+				else
+					Give_Walkover(index_of_match_not_played);
+
 			}
 			while( (Check_if_Round_Played(&index_of_match_not_played) != 1) );
 

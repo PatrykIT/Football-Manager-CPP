@@ -141,12 +141,14 @@ void Start()
  * Club choses which player it wants. Then I add this player to club, set tactic again, and replay the match.
  *
  * Sprawdź co będzie jak się kupi złych graczy ( z innych pozycji itp).
+ * Sprawdź co będzie jak brakuje ponad 1 gracza.
  */
 
 
 /*
  * Dokończyć  Schedule_Rounds().
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
+ * Add date traversal after playing round. Finish Travel_Calendar()
  */
 
 int main()
@@ -164,8 +166,10 @@ int main()
 
 
 /*
- * Make : tables, history of players (dates of playing in which clubs, goals scored, assists, development, fee received), transfers, player prices.
+ * Make : history of players (dates of playing in which clubs, goals scored, assists, development, fee received).
  * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendency etc.
  * Count attendency based on the reputation of guest team (maybe by position in table?)
  *
+ * Make it on-line - Two persons (client - server) can play in the same league.
+ * Add save - load function.
  */

@@ -24,6 +24,9 @@ private:
 
 
 public:
+	Club();
+	~Club();
+
 	const std::string club_name;
 	const std::string city_name;
 
@@ -68,7 +71,6 @@ public:
 	int Set_Tactics();
 	int Buy_Player();
 
-	Club();
 };
 
 

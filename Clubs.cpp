@@ -43,6 +43,11 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_allowed_to_play = 0; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
 }
 
+Club::~Club()
+{
+	delete history;
+}
+
 void Club::Increment_History_Messages_Counter()
 {
 	++_history_messages_counter;
@@ -226,7 +231,8 @@ int Club::Set_Tactics()
 		++i;
 	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != number_of_players));
 
-	if(current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_midfilders)
+	if( (current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_defenders) || (current_attackers +
+			current_midfilders + current_defenders != 10 ))
 	{
 		printf("Couldn't set proper tactics! Not enough players for a position.\n");
 		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n", current_attackers, current_midfilders, current_defenders);
@@ -252,7 +258,7 @@ int Club::Set_Tactics()
 
 	Set_Tactic_Rating(sum);
 
-	Allow_Playing(); //Coming to this line, it means that we succesfully created formation, and added players.
+	Allow_Playing(); //Coming to this line, it means that we successfully created formation, and added players.
 
 	return 0;
 }
@@ -307,9 +313,11 @@ int Club::Buy_Player()
 	do
 	{
 		cin >> position_to_buy;
-	} while(position_to_buy < 1 && position_to_buy > 3);
+	}
+	while(position_to_buy < 1 && position_to_buy > 3);
 
 	printf("\t--- Current budget: %f$ ---\n", _budget);
+
 	while(1) //Infinite loop, in case a player never decides - he will have to. :)
 	{
 		bool bought = false;
@@ -336,6 +344,11 @@ int Club::Buy_Player()
 
 						printf("Budget after: %f\n", _budget);
 					}
+					else
+					{
+						cout << "Cannot add new player." << endl;
+						return -1;
+					}
 
 					break;
 				}
@@ -350,6 +363,7 @@ int Club::Buy_Player()
 				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->position << " | Value: " << free_players[i]->value << "$" << endl;
 			}
 		}
+
 		if(bought == true)
 		{
 			printf("Player bought.\n");
@@ -357,9 +371,14 @@ int Club::Buy_Player()
 			this->Print_First_Squad();
 			break; //Exit infinite loop
 		}
+		else //Searched all players, didn't buy anyone.
+		{
+			cout << "Searched whole transfer list. You haven't decided, or your budget is too little. Giving walkower." << endl; //Tutaj dodać zapytanie, czy chciałbym kogoś sprzedać.
+			return -1;
+		}
 	}
 
-	return 0;
+	return 1; //successfully bought a player.
 }
 
 
