@@ -98,11 +98,12 @@ int Club::Get_Message_Counter()
 	return _history_messages_counter;
 }
 
-int Club::Add_Player_to_Club(Player **player)
+
+int Club::Add_Player_to_Club(Player &player)
 {
 	if( number_of_players < 23 )
 	{
-		players[number_of_players] = *player; //looking fantastic, haha! :D
+		players[number_of_players] = &player;
 	}
 	else
 	{
@@ -112,7 +113,7 @@ int Club::Add_Player_to_Club(Player **player)
 
 
 	string tmp = "Bought ";
-	tmp.append((*player)->name).append(" ").append((*player)->surname);
+	tmp.append((player).name).append(" ").append((player).surname);
 
 
 	history->message[_history_messages_counter] = tmp;
@@ -121,6 +122,9 @@ int Club::Add_Player_to_Club(Player **player)
 	++number_of_players;
 	return 0;
 }
+
+
+
 
 void Club::List_Players()
 {
@@ -276,7 +280,7 @@ void Club::Print_Formation()
 
 void Club::Print_First_Squad()
 {
-	printf("\n---First Squad---\n");
+	printf("\n---First Squad [%d]---\n", _ID);
 	int i;
 	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
@@ -333,7 +337,8 @@ int Club::Buy_Player()
 
 				if (buy == 'Y' || buy == 'y')
 				{
-					int ret = Add_Player_to_Club( &free_players[i]);
+					//int ret = Add_Player_to_Club( &free_players[i] );
+					int ret = Add_Player_to_Club( *free_players[i] );
 
 					if(ret == 0)
 					{

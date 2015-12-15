@@ -20,17 +20,18 @@ void Start()
 {
 	//printf("\nHello! You've been given %d players, and assigned a club.\n", number_of_players);
 
-	for(int i = 0; i < number_of_free_players; ++i)
+	int i;
+
+	for(i = 0; i < number_of_free_players; ++i)
 		free_players[i] = new Player;
 
 	Club *club = new Club;
 	Player *players_1[number_of_players];
 
-	int i;
 	for (i = 0; i < number_of_players; ++i)
 	{
 		players_1[i] = new Player;
-		club->Add_Player_to_Club(&players_1[i]);
+		club->Add_Player_to_Club(*players_1[i]);
 	}
 
 //--------------------------CREATING 7 RIVAL CLUBS---------------------------
@@ -41,7 +42,7 @@ void Start()
 	for (i = 0; i < number_of_players; ++i)
 	{
 		players_2[i] = new Player;
-		club_2->Add_Player_to_Club(&players_2[i]);
+		club_2->Add_Player_to_Club(*players_2[i]);
 	}
 
 	Club *club_3 = new Club;
@@ -50,7 +51,7 @@ void Start()
 	for (i = 0; i < number_of_players; ++i)
 	{
 		players_3[i] = new Player;
-		club_3->Add_Player_to_Club(&players_3[i]);
+		club_3->Add_Player_to_Club(*players_3[i]);
 	}
 
 	Club *club_4 = new Club;
@@ -59,7 +60,7 @@ void Start()
 	for (i = 0; i < number_of_players; ++i)
 	{
 		players_4[i] = new Player;
-		club_4->Add_Player_to_Club(&players_4[i]);
+		club_4->Add_Player_to_Club(*players_4[i]);
 	}
 
 	/*struct Club *club_5 = Create_Club();
@@ -134,21 +135,32 @@ void Start()
 
 	table->Print_Table();
 
-}
 
-/*
- * Option 1 (buy player). Club has a budget. When clicking option 1, i create couple of players for each position - some are free, so every club can afford it (but they're weak)
- * Club choses which player it wants. Then I add this player to club, set tactic again, and replay the match.
- *
- * Sprawdź co będzie jak się kupi złych graczy ( z innych pozycji itp).
- * Sprawdź co będzie jak brakuje ponad 1 gracza.
- */
+
+
+
+	for(i = 0; i < number_of_free_players; ++i)
+		delete free_players[i];
+
+	for(i = 0; i < number_of_players; ++i)
+	{
+		delete players_1[i]; delete players_2[i]; delete players_3[i]; delete players_4[i];
+	}
+
+	delete club; delete club_2; delete club_3; delete club_4;
+	delete table;
+
+}
 
 
 /*
  * Dokończyć  Schedule_Rounds().
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Add date traversal after playing round. Finish Travel_Calendar()
+ * Transform to smart pointers.
+ * Add option to sell players.
+ * Fix Rating of a squad: 0  ?! Must be fixed!
+ * Fix random values of a players - they're too similar, most clubs have overalls in the same % area.
  */
 
 int main()
@@ -167,9 +179,10 @@ int main()
 
 /*
  * Make : history of players (dates of playing in which clubs, goals scored, assists, development, fee received).
- * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendency etc.
+ * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendance etc.
  * Count attendency based on the reputation of guest team (maybe by position in table?)
  *
  * Make it on-line - Two persons (client - server) can play in the same league.
  * Add save - load function.
+ * Create morale of players, and dialogues of them with You. Every dialogue affects morale, which affects performance.
  */

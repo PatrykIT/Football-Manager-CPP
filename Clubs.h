@@ -65,7 +65,7 @@ public:
 	char Check_if_Allowed_to_Play();
 	double Get_Tactic_Rating();
 
-	int Add_Player_to_Club(Player **player);
+	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter();
 	int Get_ID();
 	int Set_Tactics();

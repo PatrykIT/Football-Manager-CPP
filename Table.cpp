@@ -451,9 +451,10 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		return;
 	}
 
-	if((*club_1)->Get_Tactic_Rating() > (*club_2)->Get_Tactic_Rating())
+	if((*club_1)->Get_Tactic_Rating() > (*club_2)->Get_Tactic_Rating() + 1)
 	{
-		cout << (*club_1)->club_name << " " << (*club_1)->city_name << " won!" << endl ;
+		cout << (*club_1)->club_name << " " << (*club_1)->city_name << " won!" << endl;
+		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
 
 		(*club_1)->points += 3;
 
@@ -465,9 +466,11 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		++(*club_2)->matches_lost;
 
 	}
-	else if((*club_2)->Get_Tactic_Rating() > (*club_1)->Get_Tactic_Rating())
+
+	else if((*club_2)->Get_Tactic_Rating() > (*club_1)->Get_Tactic_Rating() + 1)
 	{
-		cout << (*club_2)->club_name << " " << (*club_2)->city_name << " won!" << endl ;
+		cout << (*club_2)->club_name << " " << (*club_2)->city_name << " won!" << endl;
+		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
 
 		(*club_2)->points += 3;
 
@@ -480,7 +483,7 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	else
 	{
 		printf("There was a draw!\n");
-
+		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
 		(*club_1)->points += 1;
 		(*club_2)->points += 1;
 
