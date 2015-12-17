@@ -37,7 +37,8 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	matches_played = 0;
 	matches_won = 0, matches_lost = 0, matches_drawn = 0;
 
-	history = new History;
+	number_of_stories = 50;
+	_history = new History[number_of_stories];
 	_history_messages_counter = 0;
 
 	_allowed_to_play = 0; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
@@ -45,12 +46,30 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 
 Club::~Club()
 {
-	delete history;
+	delete []_history;
 }
 
 void Club::Increment_History_Messages_Counter()
 {
 	++_history_messages_counter;
+}
+
+int Club::Get_Message_Counter()
+{
+	return _history_messages_counter;
+}
+
+void Club::Resize_History()
+{
+	number_of_stories = number_of_stories * 2;
+
+	History *tmp = new History[number_of_stories];
+	copy(_history, _history + _history_messages_counter, tmp);
+
+	delete []_history;
+
+	_history = tmp;
+
 }
 
 void Club::Set_Tactic_Rating(double sum)
@@ -73,7 +92,7 @@ void Club::Print_History()
 	cout << endl << "\t --- Club History ---" << endl;
 	for(int i = 0; i < Get_Message_Counter(); ++i)
 	{
-		cout << history->message[i] << endl;
+		cout << _history[i].message << endl;
 	}
 	cout << endl << endl;
 }
@@ -93,10 +112,6 @@ double Club::Get_Tactic_Rating()
 	return _tactic_rating;
 }
 
-int Club::Get_Message_Counter()
-{
-	return _history_messages_counter;
-}
 
 
 int Club::Add_Player_to_Club(Player &player)
@@ -116,8 +131,8 @@ int Club::Add_Player_to_Club(Player &player)
 	tmp.append((player).name).append(" ").append((player).surname);
 
 
-	history->message[_history_messages_counter] = tmp;
-	history->Save_History(*this);
+	_history[_history_messages_counter].message = tmp;
+	_history->Save_History(*this);
 
 	++number_of_players;
 	return 0;

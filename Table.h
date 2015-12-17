@@ -20,14 +20,16 @@ struct Kolejka
 
 class Table
 {
-    void Play_Match(Club **club_1, Club **club_2);
-
-public:
+private:
+	void Play_Match(Club **club_1, Club **club_2);
 	Club *clubs[number_of_clubs_in_ligue];
     Pair_Clubs *pair_of_clubs;
     Kolejka *kolejka;
 
-	int current_round;
+    void Schedule_Rounds();
+public:
+
+    int current_round;
     int number_of_clubs;
 
     Table();
@@ -35,7 +37,6 @@ public:
 
     void Add_Club_to_Table(Club **club);
     void Schedule_Season();
-    void Schedule_Rounds();
     void Print_Table() const;
     void Print_Rounds() const;
     void Play_Round();
@@ -47,9 +48,5 @@ public:
     int Assert_Table_Full();
     int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only unique combinations.
 };
-
-int Check_if_All_Rounds_Played(struct Table **table);
-
-
 
 #endif /* TABLE_H_ */

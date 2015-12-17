@@ -12,7 +12,7 @@ using namespace std;
 #include "Table.h"
 #include "Calendar.h"
 
-extern Calendar calendar;
+Calendar *calendar = Calendar::get();
 
 int number_of_players = 15;
 
@@ -26,7 +26,7 @@ void Start()
 		free_players[i] = new Player;
 
 	Club *club = new Club;
-	Player *players_1[number_of_players];
+	Player *players_1[number_of_players]; //redundant pointer?
 
 	for (i = 0; i < number_of_players; ++i)
 	{
@@ -34,7 +34,7 @@ void Start()
 		club->Add_Player_to_Club(*players_1[i]);
 	}
 
-//--------------------------CREATING 7 RIVAL CLUBS---------------------------
+//--------------------------CREATING 7 RIVAL CLUBS--------------------------- (From old C version of this program, will edit this later)
 
 	Club *club_2 = new Club;
 	struct Player *players_2[number_of_players];
@@ -127,8 +127,6 @@ void Start()
 
 	table->Schedule_Season();
 
-	table->Schedule_Rounds();
-
 	table->Print_Rounds();
 
 	table->Play_Round();
@@ -136,7 +134,7 @@ void Start()
 	table->Print_Table();
 
 
-
+	club->Print_History(); club_2->Print_History(); club_3->Print_History(); club_4->Print_History();
 
 
 	for(i = 0; i < number_of_free_players; ++i)
@@ -161,16 +159,18 @@ void Start()
  * Add option to sell players.
  * Fix Rating of a squad: 0  ?! Must be fixed!
  * Fix random values of a players - they're too similar, most clubs have overalls in the same % area.
+ *
+ * Ogarnij czy singleton dobrze działa.
  */
 
 int main()
 {
 	srand(time(NULL));
-	calendar.Set_Current_Date();
-	calendar.Print_Date();
-
+	calendar->Set_Current_Date();
+	calendar->Print_Date();
 	Start();
 
+	delete calendar;
 	cout << "Bye bye." << endl;
 	return 0;
 }
@@ -185,4 +185,5 @@ int main()
  * Make it on-line - Two persons (client - server) can play in the same league.
  * Add save - load function.
  * Create morale of players, and dialogues of them with You. Every dialogue affects morale, which affects performance.
+ * Players should improve / decline with time.
  */

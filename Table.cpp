@@ -58,6 +58,8 @@ Table::~Table()
 	{
 		free (kolejka[i].match);
 	}
+
+	delete []kolejka;
 }
 
 void Table::Print_Table() const
@@ -113,6 +115,8 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 	 * So: a=1, x=2. Merge {1-2}. ++x. Merge {1-3}. ++x. Merge {1-4}. Next ->	++a, x = last_val_of_x + 1. So: a=2, x=3. Merge {2-3}. ++x. Merge {2-4}.
 	 * Next -> ++a, x = last_val + 1. So: a=3, x=4. Merge {3-4}.		DONE! ;)
 	 */
+
+	Schedule_Rounds();
 }
 
 void Table::Schedule_Rounds()
@@ -230,27 +234,6 @@ int Table::Assert_Table_Full()
 }
 
 
-
-int Check_if_All_Rounds_Played(struct Table **table)
-{
-	int i;
-	int current_round = (*table)->current_round;
-
-	for(current_round = 0; current_round < number_of_clubs_in_ligue - 1; ++current_round)
-	{
-		for(i = 0; i < number_of_clubs_in_ligue / 2 ; ++i)
-		{
-			if((*table)->kolejka[current_round].match[i]->match_played == 0)
-			{
-				printf("Match not played! [%d] vs [%d]\n", ((*table)->kolejka[current_round].match[i]->clubs_paired[0])->Get_ID(),
-						((*table)->kolejka[current_round].match[i]->clubs_paired[1])->Get_ID());
-				return -1;
-			}
-		}
-	}
-
-	return 1; //Coming here, means all matches were played in the round.
-}
 
 
 int Table::Check_if_Round_Played(int *index_of_match_not_played)

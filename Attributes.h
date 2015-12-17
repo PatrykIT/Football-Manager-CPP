@@ -2,7 +2,6 @@
 #define ATTRIBUTES_H_
 #include <iostream>
 #include <vector>
-#include <memory>
 class Player;
 
 extern int number_of_free_players;
