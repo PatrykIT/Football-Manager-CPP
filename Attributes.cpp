@@ -110,7 +110,7 @@ void Player::_Set_Position()
 		position = 1;
 }
 
-void Player::Print_Attributes()
+void Player::Print_Attributes() const
 {
 	printf("\n");
 	//------------------------------------------ATTACKING----------------------------------------------------
@@ -151,7 +151,7 @@ void Player::_Set_Value()
 	value = overall * 100;
 }
 
-int Player::Print_Value()
+int Player::Print_Value() const
 {
 	printf("Value: %.2f $\n", value);
 	return 0;

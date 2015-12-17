@@ -54,7 +54,7 @@ void Club::Increment_History_Messages_Counter()
 	++_history_messages_counter;
 }
 
-int Club::Get_Message_Counter()
+int Club::Get_Message_Counter() const
 {
 	return _history_messages_counter;
 }
@@ -82,12 +82,12 @@ void Club::Allow_Playing()
 	_allowed_to_play = 1;
 }
 
-void Club::Print_Tactic_Rating()
+void Club::Print_Tactic_Rating() const
 {
 	cout << "\nRating of a squad: " << _tactic_rating << endl;
 }
 
-void Club::Print_History()
+void Club::Print_History() const
 {
 	cout << endl << "\t --- Club History ---" << endl;
 	for(int i = 0; i < Get_Message_Counter(); ++i)
@@ -97,17 +97,17 @@ void Club::Print_History()
 	cout << endl << endl;
 }
 
-int Club::Get_ID()
+int Club::Get_ID() const
 {
 	return _ID;
 }
 
-char Club::Check_if_Allowed_to_Play()
+char Club::Check_if_Allowed_to_Play() const
 {
 	return _allowed_to_play;
 }
 
-double Club::Get_Tactic_Rating()
+double Club::Get_Tactic_Rating() const
 {
 	return _tactic_rating;
 }
@@ -141,7 +141,7 @@ int Club::Add_Player_to_Club(Player &player)
 
 
 
-void Club::List_Players()
+void Club::List_Players() const
 {
 	printf("\n---Listing players---\n\n");
 	int i;
@@ -283,7 +283,7 @@ int Club::Set_Tactics()
 }
 
 
-void Club::Print_Formation()
+void Club::Print_Formation() const
 {
 	printf("\n---Current formation---\n");
 	cout << club_name << " " << city_name << "plays: ";
@@ -293,7 +293,7 @@ void Club::Print_Formation()
 	printf("\n");
 }
 
-void Club::Print_First_Squad()
+void Club::Print_First_Squad() const
 {
 	printf("\n---First Squad [%d]---\n", _ID);
 	int i;
@@ -402,7 +402,7 @@ int Club::Buy_Player()
 }
 
 
-void Club::Print_Positions_Number()
+void Club::Print_Positions_Number() const
 {
 	cout << "Current positions in first squad: " << endl;
 	cout << "Attackers: " << number_of_attackers_in_first_squad << endl << "Midfielders: " << number_of_midfilders_in_first_squad << endl <<

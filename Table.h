@@ -27,6 +27,13 @@ private:
     Kolejka *kolejka;
 
     void Schedule_Rounds();
+    void Give_Walkover(int i);
+
+    int Assert_Table_Full() const;
+    int Check_if_Round_Played(int *index_of_match_not_played) const;
+    int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2) const; //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
+    int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
+    int Check_which_Club_Needs_to_Buy(int i) const;
 public:
 
     int current_round;
@@ -40,13 +47,7 @@ public:
     void Print_Table() const;
     void Print_Rounds() const;
     void Play_Round();
-    void Give_Walkover(int i);
-    int Check_which_Club_Needs_to_Buy(int i);
 
-    int Check_if_Round_Played(int *index_of_match_not_played);
-    int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2); //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
-    int Assert_Table_Full();
-    int Count_Combinations(int n, int k); //Counts combinations WITHOUT repetitions! So only unique combinations.
 };
 
 #endif /* TABLE_H_ */

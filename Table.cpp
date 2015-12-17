@@ -158,7 +158,7 @@ void Table::Schedule_Rounds()
 }
 
 
-int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2)
+int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2) const
 {
 	//Returns index of paired clubs.
 
@@ -176,7 +176,7 @@ int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **clu
 }
 
 
-int Table::Count_Combinations(int n, int k)
+int Table::Count_Combinations(int n, int k) const
 {
 
 	/*
@@ -225,7 +225,7 @@ int Table::Count_Combinations(int n, int k)
 }
 
 
-int Table::Assert_Table_Full()
+int Table::Assert_Table_Full() const
 {
 	if( number_of_clubs == number_of_clubs_in_ligue )
 		return 1;
@@ -236,7 +236,7 @@ int Table::Assert_Table_Full()
 
 
 
-int Table::Check_if_Round_Played(int *index_of_match_not_played)
+int Table::Check_if_Round_Played(int *index_of_match_not_played) const
 {
 	printf("\n\tChecking if round was played fully:\n");
 	int i;
@@ -323,7 +323,7 @@ void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
 	kolejka[current_round].match[i]->match_played = 1;
 }
 
-int Table::Check_which_Club_Needs_to_Buy(int i)
+int Table::Check_which_Club_Needs_to_Buy(int i) const
 {
 	printf("\n");
 	int bought;

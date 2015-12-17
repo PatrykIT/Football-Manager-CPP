@@ -134,7 +134,7 @@ void Start()
 	table->Print_Table();
 
 
-	club->Print_History(); club_2->Print_History(); club_3->Print_History(); club_4->Print_History();
+	//club->Print_History(); club_2->Print_History(); club_3->Print_History(); club_4->Print_History();
 
 
 	for(i = 0; i < number_of_free_players; ++i)

@@ -17,7 +17,7 @@ public:
 	int hour, minute, seconde,  day_of_a_week,  day_of_a_month, month, year;
 
 	void Set_Current_Date();
-	void Print_Date();
+	void Print_Date() const;
 	void Travel_Calendar(int days);
 
 	static Calendar *get();

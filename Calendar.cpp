@@ -21,7 +21,7 @@ void Calendar::Set_Current_Date()
 }
 
 
-void Calendar::Print_Date()
+void Calendar::Print_Date() const
 {
 	printf ("Todays date: %d.%d.%d\n\t     %d:%d:%d\n", day_of_a_month, month, year,
 			hour, minute, seconde);

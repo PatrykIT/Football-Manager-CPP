@@ -62,8 +62,8 @@ public:
 	double value;
 
 	Player();
-	void Print_Attributes();
-	int Print_Value();
+	void Print_Attributes() const;
+	int Print_Value() const;
 };
 
 #endif /* ATTRIBUTES_H_ */

@@ -41,10 +41,11 @@ private:
 	void Set_Tactic_Rating(double sum);
 	void Allow_Playing();
 	void Resize_History();
+	void Increment_History_Messages_Counter();
 
-	char Check_if_Allowed_to_Play();
+	char Check_if_Allowed_to_Play() const;
 
-	int Get_ID();
+	int Get_ID() const;
 	int Buy_Player();
 
 	History *_history;
@@ -59,19 +60,18 @@ public:
 	const std::string club_name;
 	const std::string city_name;
 
-	void Print_Tactic_Rating();
-	void Increment_History_Messages_Counter();
-	void Print_History();
-	void Print_Formation();
-	void Print_First_Squad();
-	void List_Players();
-	void Print_Positions_Number();
+	void Print_Tactic_Rating() const;
+	void Print_History() const;
+	void Print_Formation() const;
+	void Print_First_Squad() const;
+	void List_Players() const;
+	void Print_Positions_Number() const;
 
-	int Set_Tactics();
 	int Add_Player_to_Club(Player &player);
-	int Get_Message_Counter();
+	int Get_Message_Counter() const;
+	int Set_Tactics();
 
-	double Get_Tactic_Rating();
+	double Get_Tactic_Rating() const;
 };
 
 
