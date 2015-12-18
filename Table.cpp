@@ -487,6 +487,5 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	}
 
 	kolejka[current_round].match[match_index]->match_played = 1;
-	//Sort_Table(table);
 }
 

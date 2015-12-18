@@ -9,8 +9,7 @@ extern std::vector<Player*> free_players;//(number_of_free_players); //10 player
 
 struct Attacking_Attributes
 {
-	int ball_control, dribbling, crossing, passing, first_touch, shooting, finishing;
-	int weak_foot; //from 1 to 5.
+	int ball_control, dribbling, crossing, passing, first_touch, shooting, finishing, weak_foot;
 	double overall;
 };
 

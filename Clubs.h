@@ -15,7 +15,6 @@ private:
 	friend class Table;
 	friend class History;
 
-	float _budget;
 	static int _instance_number;
 	const int _ID;
 	char _allowed_to_play;
@@ -54,6 +53,8 @@ private:
 	int	number_of_stories;
 
 public:
+	int Sell_Player();
+	float _budget;
 	Club();
 	~Club();
 
@@ -64,6 +65,7 @@ public:
 	void Print_History() const;
 	void Print_Formation() const;
 	void Print_First_Squad() const;
+	void Print_Whole_Squad() const;
 	void List_Players() const;
 	void Print_Positions_Number() const;
 

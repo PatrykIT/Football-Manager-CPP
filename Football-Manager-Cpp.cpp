@@ -113,7 +113,7 @@ void Start()
 	Add_Club_to_Table(&club_7, &table);
 	Add_Club_to_Table(&club_8, &table);*/
 
-
+	club->_budget = 70; club_2->_budget = 70; club_3->_budget = 70; club_4->_budget = 70;
 	club->Set_Tactics();
 	club_2->Set_Tactics();
 	club_3->Set_Tactics();
@@ -133,7 +133,13 @@ void Start()
 
 	table->Print_Table();
 
+	//club->Print_First_Squad();
+	//club->Print_Whole_Squad();
 
+	//club->Sell_Player();
+
+	//club->Print_First_Squad();
+	//club->Print_Whole_Squad();
 	//club->Print_History(); club_2->Print_History(); club_3->Print_History(); club_4->Print_History();
 
 
@@ -156,11 +162,11 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
- * Add option to sell players.
  * Fix Rating of a squad: 0  ?! Must be fixed!
  * Fix random values of a players - they're too similar, most clubs have overalls in the same % area.
- *
- * Ogarnij czy singleton dobrze działa.
+ * Finish Measure_Time()
+ * Set_Tactics - change to QuickSort
+ * Fix erasing from free_players.
  */
 
 int main()

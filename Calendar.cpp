@@ -1,7 +1,6 @@
 #include "Calendar.h"
 
 Calendar* Calendar::calendar = NULL;
-bool Calendar::calendar_present = false;
 
 void Calendar::Set_Current_Date()
 {
@@ -59,10 +58,9 @@ Calendar::Calendar()
 
 Calendar* Calendar::get()
 {
-	if(calendar_present == false)
+	if(calendar == NULL)
 	{
-		calendar = new Calendar();
-		calendar_present = true;
+		calendar = new Calendar;
 		return calendar;
 	}
 
