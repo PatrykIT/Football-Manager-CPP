@@ -12,7 +12,7 @@ private:
 
 	static Calendar *calendar;
 	Calendar();
-	int hour, minute, seconde,  day_of_a_week,  day_of_a_month, month, year;
+	int hour, minute, seconde, day_of_a_week, day_of_a_month, month, year;
 
 public:
 

@@ -11,7 +11,7 @@ std::vector<Player*> free_players(30); //free agents - players without clubs, re
 
 Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]), surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
 {
-	age = rand() % (26) + 16; //(max_number + 1 - minimum_number)) + minimum_number
+	_age = rand() % (26) + 16; //(max_number + 1 - minimum_number)) + minimum_number
 	_Set_Attributes();
 	_Set_Position();
 	_Set_Value();
@@ -19,13 +19,13 @@ Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
 
 Player& Player::operator =(const Player &other)
 {
-	age = other.age;
-	position = other.position;
+	_age = other._age;
+	_position = other._position;
 	name = other.name;
 	surname = other.surname;
 	attributes = other.attributes;
-	overall = other.overall;
-	value = other.value;
+	_overall = other._overall;
+	_value = other._value;
 
 	return *this;
 }
@@ -109,18 +109,18 @@ void Player::_Set_Attributes()
 
 
 
-	overall = (double) (attributes.attacking_attributes.overall + attributes.defending_attributes.overall + attributes.psyhical_attributes.overall +
+	_overall = (double) (attributes.attacking_attributes.overall + attributes.defending_attributes.overall + attributes.psyhical_attributes.overall +
 			attributes.mental_attributes.overall ) / 4;
 }
 
 void Player::_Set_Position()
 {
 	if( attributes.attacking_attributes.overall - 10 > attributes.defending_attributes.overall ) //Has big advantage of a attacking skills.
-		position = 3;
+		_position = 3;
 	else if (attributes.attacking_attributes.overall > attributes.defending_attributes.overall) //Similar skills.
-		position = 2;
+		_position = 2;
 	else 																						//Better as a defender.
-		position = 1;
+		_position = 1;
 }
 
 void Player::Print_Attributes() const
@@ -138,9 +138,9 @@ void Player::Print_Attributes() const
 
 	printf("Physical overall: %.2f\n", attributes.psyhical_attributes.overall); */
 
-	printf("Overall: %.2f%\n", overall);
+	printf("Overall: %.2f%\n", _overall);
 
-	switch (position)
+	switch (_position)
 	{
 	case 1:
 		printf("Defender.\n");
@@ -161,11 +161,31 @@ void Player::Print_Attributes() const
 
 void Player::_Set_Value()
 {
-	value = overall * 100;
+	_value = _overall * 100;
 }
 
 int Player::Print_Value() const
 {
-	printf("Value: %.2f $\n", value);
+	printf("Value: %.2f $\n", _value);
 	return 0;
+}
+
+int Player::Get_Age() const
+{
+	return _age;
+}
+
+int Player::Get_Position() const
+{
+	return _position;
+}
+
+double Player::Get_Overall() const
+{
+	return _overall;
+}
+
+double Player::Get_Value() const
+{
+	return _value;
 }

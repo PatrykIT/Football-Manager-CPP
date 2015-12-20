@@ -147,7 +147,7 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
- * Fix Rating of a squad: 0  ?! Must be fixed!
+ * Fix he costs: 0  ?! Must be fixed!
  * Finish Measure_Time()
  * Set_Tactics - change to QuickSort
  */

@@ -153,8 +153,8 @@ void Club::List_Players() const
 	int i;
 	for ( i = 0 ; i < number_of_players; ++i)
 	{
-		printf("%s %s\nOverall: %.2f%\n", players[i]->name, players[i]->surname, players[i]->overall);
-		switch (players[i]->position)
+		printf("%s %s\nOverall: %.2f%\n", players[i]->name, players[i]->surname, players[i]->Get_Overall());
+		switch (players[i]->Get_Position())
 			{
 			case 1:
 				printf("Defender.\n");
@@ -193,7 +193,7 @@ int Club::Set_Tactics()
 
 		for(i = 0; i < number_of_players - 1; ++i)
 		{
-			if( players[i]->overall < players[i+1]->overall)
+			if( players[i]->Get_Overall() < players[i+1]->Get_Overall())
 			{
 				struct Player *tmp = players[i];
 				players[i] = players[i+1];
@@ -218,7 +218,7 @@ int Club::Set_Tactics()
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 	{
-		if(players[i]->position == 1 && (current_defenders < max_defenders ))
+		if(players[i]->Get_Position() == 1 && (current_defenders < max_defenders ))
 			if(  (current_defenders + 1 == max_defenders) && (current_midfilders == max_midfilders || current_attackers == max_attackers) )
 			{} //can not have two max of positions, because the third one would not get a place.
 		else
@@ -230,7 +230,7 @@ int Club::Set_Tactics()
 		}
 
 
-		if(players[i]->position == 2 && current_midfilders < max_midfilders)
+		if(players[i]->Get_Position() == 2 && current_midfilders < max_midfilders)
 			if(  (current_midfilders + 1 == max_midfilders)  && (current_attackers == max_attackers  ||  current_defenders == max_defenders) )
 				{}
 		else
@@ -242,7 +242,7 @@ int Club::Set_Tactics()
 		}
 
 
-		if(players[i]->position == 3 && current_attackers < max_attackers)
+		if(players[i]->Get_Position() == 3 && current_attackers < max_attackers)
 			if(  (current_attackers + 1 == max_attackers) && (current_midfilders == max_midfilders || current_defenders == max_defenders) )
 				{}
 			else
@@ -276,11 +276,11 @@ int Club::Set_Tactics()
 	double sum = 0;
 
 	for(i = 0; i < current_defenders; ++i)
-		sum = sum + defenders_in_first_squad[i]->overall;
+		sum = sum + defenders_in_first_squad[i]->Get_Overall();
 	for(i = 0; i < current_midfilders; ++i)
-		sum = sum + midfilders_in_first_squad[i]->overall;
+		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
 	for(i = 0; i <current_attackers; ++i)
-		sum = sum + (*attackers_in_first_squad[i]).overall;
+		sum = sum + (*attackers_in_first_squad[i]).Get_Overall();
 
 	Set_Tactic_Rating(sum);
 
@@ -306,17 +306,17 @@ void Club::Print_First_Squad() const
 	int i;
 	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
-		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->overall << " (DEF)" << endl;
+		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->Get_Overall() << " (DEF)" << endl;
 	}
 
 	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
 	{
-		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->overall << " (MID)" << endl;
+		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->Get_Overall() << " (MID)" << endl;
 	}
 
 	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
 	{
-		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->overall << " (ATT)" << endl;
+		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->Get_Overall() << " (ATT)" << endl;
 	}
 
 	Print_Tactic_Rating();
@@ -328,7 +328,8 @@ void Club::Print_Whole_Squad() const
 	printf("\n---Whole Squad [%d]---\n", _ID);
 	for(int i = 0; i < number_of_players; ++i)
 	{
-		cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->overall << " | Position: " << players[i]->position << " | Value: " << players[i]->value << "$" << endl;
+		cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " | Position: " << players[i]->Get_Position()
+				<< " | Value: " << players[i]->Get_Value() << "$" << endl;
 	}
 
 }
@@ -360,16 +361,16 @@ int Club::Buy_Player()
 
 		for(unsigned int i = 0; i < free_players.size(); ++i)
 		{
-			if (free_players.at(i)->position == position_to_buy)
+			if (free_players.at(i)->Get_Position() == position_to_buy)
 			{
-				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->overall <<"%" << endl;
+				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl;
 				cout << "He costs: " << free_players[i]->Print_Value() << endl; //Print Value() cannot be void because "forming reference to void" O.o   Check this out!
 				cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
 				char buy; cin >> buy;
 
 				if (buy == 'Y' || buy == 'y')
 				{
-					if (_budget < free_players[i]->value) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
+					if (_budget < free_players[i]->Get_Value()) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
 					{
 						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\n Y or N:\t", _budget);
 
@@ -379,7 +380,7 @@ int Club::Buy_Player()
 						{
 							int ret = Sell_Player();
 
-							if (ret == 0 && _budget >= free_players[i]->value)
+							if (ret == 0 && _budget >= free_players[i]->Get_Value())
 								{} //continue with the flow of the program
 							else
 								continue;
@@ -396,7 +397,7 @@ int Club::Buy_Player()
 						cout << "Player bought." << endl;
 
 						cout << "Budget before: " << _budget << endl;
-						_budget = _budget - free_players[i]->value;
+						_budget = _budget - free_players[i]->Get_Value();
 						cout << "Budget after: " << _budget << endl;
 
 						free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
@@ -413,7 +414,8 @@ int Club::Buy_Player()
 			else
 			{
 				cout << "Searching.." << endl;
-				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->position << " | Value: " << free_players[i]->value << "$" << endl;
+				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->Get_Position()
+						<< " | Value: " <<  free_players[i]->Get_Value() << "$" << endl;
 			}
 		}
 
@@ -461,7 +463,7 @@ int Club::Sell_Player()
 	}
 	while (confirm != 'Y' && confirm != 'y');
 
-	_budget += players[player_to_sell]->value;
+	_budget += players[player_to_sell]->Get_Value();
 
 	free_players.push_back(players[player_to_sell]);
 
