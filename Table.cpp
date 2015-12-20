@@ -18,13 +18,15 @@ Table::Table()
 	for(i = 0; i < all_unique_combinations_of_matches; ++i)
 	{
 		pair_of_clubs[i] = (struct Pair_Clubs) {0}; // Match not played.  //C99. style! :)
-		pair_of_clubs[i].clubs_paired = (Club**) malloc (sizeof (Club**)); //Always 2 clubs as a pair.
+		//pair_of_clubs[i].clubs_paired = (Club**) malloc (sizeof (Club**)); //Always 2 clubs as a pair.
+		pair_of_clubs[i].clubs_paired = new Club*[sizeof(Club**)]; //Always 2 clubs as a pair.
 	}
 
 	kolejka = new Kolejka[number_of_clubs_in_ligue - 1];
 
 	for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
-		kolejka[i].match = (Pair_Clubs**) malloc (sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)); //(sizeof(struct Pair_Clubs) would be bad, because it wouldnt be array of pointer addresses.
+		//kolejka[i].match = (Pair_Clubs**) malloc (sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)); //(sizeof(struct Pair_Clubs) would be bad, because it wouldnt be array of pointer addresses.
+		kolejka[i].match = new Pair_Clubs*[sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)]; //(sizeof(struct Pair_Clubs) would be bad, because it wouldnt be array of pointer addresses.
 
 	current_round = 0;
 }
@@ -51,12 +53,12 @@ Table::~Table()
 	const int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
 	for(i = 0; i < all_unique_combinations_of_matches; ++i)
 	{
-		free (pair_of_clubs[i].clubs_paired);
+		delete []pair_of_clubs[i].clubs_paired;
 	}
 
 	for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
 	{
-		free (kolejka[i].match);
+		delete []kolejka[i].match;
 	}
 
 	delete []kolejka;
@@ -487,6 +489,5 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	}
 
 	kolejka[current_round].match[match_index]->match_played = 1;
-	//Sort_Table(table);
 }
 

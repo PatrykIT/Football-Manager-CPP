@@ -46,6 +46,12 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 
 Club::~Club()
 {
+	for(int i = 0; i < number_of_players; ++i)
+	{
+		delete players[i];
+		players[i] = NULL;
+	}
+
 	delete []_history;
 }
 
@@ -253,10 +259,11 @@ int Club::Set_Tactics()
 	if( (current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_defenders) || (current_attackers +
 			current_midfilders + current_defenders != 10 ))
 	{
-		printf("Couldn't set proper tactics! Not enough players for a position.\n");
-		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n", current_attackers, current_midfilders, current_defenders);
+		printf("\nCouldn't set proper tactics! Not enough players for a position. [%d]\n", _ID);
+		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", current_attackers, current_midfilders, current_defenders);
 		return -1;
 	}
+
 
 //---------------------------------------------------------------------END OF SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 
@@ -316,6 +323,16 @@ void Club::Print_First_Squad() const
 	printf("\n");
 }
 
+void Club::Print_Whole_Squad() const
+{
+	printf("\n---Whole Squad [%d]---\n", _ID);
+	for(int i = 0; i < number_of_players; ++i)
+	{
+		cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->overall << " | Position: " << players[i]->position << " | Value: " << players[i]->value << "$" << endl;
+	}
+
+}
+
 int Club::Buy_Player()
 {
 	if (number_of_players >= 23)
@@ -341,9 +358,9 @@ int Club::Buy_Player()
 	{
 		bool bought = false;
 
-		for(int i = 0; i < number_of_free_players; ++i) //Sprawdzić przypadek, kiedy brakuje np. 2 zawodników. Może za drugim zakupem zabraknąć kasy, wtedy walkower leci.
+		for(unsigned int i = 0; i < free_players.size(); ++i)
 		{
-			if(free_players.at(i)->position == position_to_buy && _budget > free_players[i]->value) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
+			if (free_players.at(i)->position == position_to_buy)
 			{
 				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->overall <<"%" << endl;
 				cout << "He costs: " << free_players[i]->Print_Value() << endl; //Print Value() cannot be void because "forming reference to void" O.o   Check this out!
@@ -352,17 +369,37 @@ int Club::Buy_Player()
 
 				if (buy == 'Y' || buy == 'y')
 				{
-					//int ret = Add_Player_to_Club( &free_players[i] );
+					if (_budget < free_players[i]->value) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
+					{
+						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\n Y or N:\t", _budget);
+
+						char sell;
+						cin >> sell;
+						if (sell == 'y' || sell == 'Y')
+						{
+							int ret = Sell_Player();
+
+							if (ret == 0 && _budget >= free_players[i]->value)
+								{} //continue with the flow of the program
+							else
+								continue;
+						}
+						else //means keep looking
+							continue;
+					}
+
 					int ret = Add_Player_to_Club( *free_players[i] );
 
 					if(ret == 0)
 					{
-						printf("Budget before: %f\n", _budget);
-
 						bought = true;
-						_budget = _budget - free_players[i]->value;
+						cout << "Player bought." << endl;
 
-						printf("Budget after: %f\n", _budget);
+						cout << "Budget before: " << _budget << endl;
+						_budget = _budget - free_players[i]->value;
+						cout << "Budget after: " << _budget << endl;
+
+						free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
 					}
 					else
 					{
@@ -372,28 +409,24 @@ int Club::Buy_Player()
 
 					break;
 				}
-				else
-				{
-					continue;
-				}
 			}
 			else
 			{
-				printf ("Searching..\n");
+				cout << "Searching.." << endl;
 				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->position << " | Value: " << free_players[i]->value << "$" << endl;
 			}
 		}
 
-		if(bought == true)
+		if (bought == true)
 		{
-			printf("Player bought.\n");
 			Set_Tactics();
-			this->Print_First_Squad();
+			Print_First_Squad();
+
 			break; //Exit infinite loop
 		}
 		else //Searched all players, didn't buy anyone.
 		{
-			cout << "Searched whole transfer list. You haven't decided, or your budget is too little. Giving walkower." << endl; //Tutaj dodać zapytanie, czy chciałbym kogoś sprzedać.
+			cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
 			return -1;
 		}
 	}
@@ -401,14 +434,65 @@ int Club::Buy_Player()
 	return 1; //successfully bought a player.
 }
 
+int Club::Sell_Player()
+{
+	if (number_of_players < 12)
+	{
+		cout << "Only " << number_of_players << " in squad. Cannot sell." << endl;
+		return -1;
+	}
+
+	Print_Whole_Squad();
+
+	int player_to_sell;
+	char confirm;
+
+	do
+	{
+		do
+		{
+			cout << endl << "Which player would you like to sell?\nNr:\t ";
+			cin >> player_to_sell;
+		}
+		while (player_to_sell < 0 || player_to_sell > number_of_players - 1);
+
+		cout << "You chose: " << players[player_to_sell]->name << " " << players[player_to_sell]->surname << endl << "Are you sure you want this player sold? Y or N" << endl;
+		cin >> confirm;
+	}
+	while (confirm != 'Y' && confirm != 'y');
+
+	_budget += players[player_to_sell]->value;
+
+	free_players.push_back(players[player_to_sell]);
+
+	for(int i = player_to_sell; i < number_of_players - 1; ++i) //reshuffle players by one element to the left
+	{
+		players[i] = players[i + 1];
+	}
+	players[number_of_players - 1] = NULL; //Because at the end of copying, we have two same elements.
+
+
+
+	cout << "Player sold." << endl;
+	--number_of_players;
+
+	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
+		Set_Tactics();
+
+	return 0; //successfully sold a player.
+}
 
 void Club::Print_Positions_Number() const
 {
-	cout << "Current positions in first squad: " << endl;
+	printf("Current positions in first squad [%d]:\n", _ID);
 	cout << "Attackers: " << number_of_attackers_in_first_squad << endl << "Midfielders: " << number_of_midfilders_in_first_squad << endl <<
 			"Defenders: " << number_of_defenders_in_first_squad << endl;
 }
 
+int Club::Get_Number_of_Players()
+{
+	return number_of_players;
+}
 
 
 

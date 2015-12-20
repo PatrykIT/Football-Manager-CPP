@@ -20,9 +20,9 @@ void Start()
 {
 	//printf("\nHello! You've been given %d players, and assigned a club.\n", number_of_players);
 
-	int i;
+	unsigned int i;
 
-	for(i = 0; i < number_of_free_players; ++i)
+	for(i = 0; i < free_players.size(); ++i)
 		free_players[i] = new Player;
 
 	Club *club = new Club;
@@ -113,7 +113,6 @@ void Start()
 	Add_Club_to_Table(&club_7, &table);
 	Add_Club_to_Table(&club_8, &table);*/
 
-
 	club->Set_Tactics();
 	club_2->Set_Tactics();
 	club_3->Set_Tactics();
@@ -134,16 +133,8 @@ void Start()
 	table->Print_Table();
 
 
-	//club->Print_History(); club_2->Print_History(); club_3->Print_History(); club_4->Print_History();
-
-
-	for(i = 0; i < number_of_free_players; ++i)
-		delete free_players[i];
-
-	for(i = 0; i < number_of_players; ++i)
-	{
-		delete players_1[i]; delete players_2[i]; delete players_3[i]; delete players_4[i];
-	}
+	for(i = 0; i < free_players.size(); ++i)
+			delete free_players[i];
 
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
@@ -156,11 +147,9 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
- * Add option to sell players.
  * Fix Rating of a squad: 0  ?! Must be fixed!
- * Fix random values of a players - they're too similar, most clubs have overalls in the same % area.
- *
- * Ogarnij czy singleton dobrze działa.
+ * Finish Measure_Time()
+ * Set_Tactics - change to QuickSort
  */
 
 int main()

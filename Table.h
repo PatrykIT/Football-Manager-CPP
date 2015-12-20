@@ -9,7 +9,7 @@
 struct Pair_Clubs //pairing for matches scheduling.
 {
 	int match_played; //0 - match not played yet. 1 - match played.
-	Club **clubs_paired;
+	Club **clubs_paired; //change to arr [2]
 };
 
 struct Kolejka

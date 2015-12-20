@@ -8,7 +8,6 @@ extern Calendar *calendar;
 
 void History::Save_History(Club &club)
 {
-	//calendar.Set_Current_Date();
 	calendar->Set_Current_Date();
 
 	std::string date = "";
@@ -16,18 +15,15 @@ void History::Save_History(Club &club)
 
 	date += " on a day: ";
 
-	//calendar_string.append(std::to_string(calendar.day_of_a_month));
 	calendar_string.append(std::to_string(calendar->day_of_a_month));
 	date.append(calendar_string + ".");
 	calendar_string.clear();
 
-	//calendar_string.append(std::to_string(calendar.month));
 	calendar_string.append(std::to_string(calendar->month));
 	date.append(calendar_string + ".");
 	calendar_string.clear();
 
 
-	//calendar_string.append(std::to_string(calendar.year)) ;
 	calendar_string.append(std::to_string(calendar->year));
 	date.append(calendar_string);
 	calendar_string.clear();

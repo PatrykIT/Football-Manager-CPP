@@ -7,8 +7,7 @@
 
 #include "Attributes.h"
 
-int number_of_free_players = 30;
-std::vector<Player*> free_players(number_of_free_players);
+std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
 
 Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]), surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
 {
@@ -17,6 +16,20 @@ Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
 	_Set_Position();
 	_Set_Value();
 }
+
+Player& Player::operator =(const Player &other)
+{
+	age = other.age;
+	position = other.position;
+	name = other.name;
+	surname = other.surname;
+	attributes = other.attributes;
+	overall = other.overall;
+	value = other.value;
+
+	return *this;
+}
+
 
 void Player::_Set_Attributes()
 {
@@ -106,7 +119,7 @@ void Player::_Set_Position()
 		position = 3;
 	else if (attributes.attacking_attributes.overall > attributes.defending_attributes.overall) //Similar skills.
 		position = 2;
-	else 																											//Better as a defender.
+	else 																						//Better as a defender.
 		position = 1;
 }
 

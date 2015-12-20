@@ -5,6 +5,7 @@
 #include "Attributes.h"
 #include "History.h"
 
+class History;
 static std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico" }; //8
 static std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", "Poznan",  "Warszawa", "Cordoba"}; //8
 
@@ -15,14 +16,14 @@ private:
 	friend class Table;
 	friend class History;
 
-	float _budget;
 	static int _instance_number;
 	const int _ID;
 	char _allowed_to_play;
 	double _tactic_rating; //Tacting rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
+	int number_of_players; //max - 23. It's a guard to avoid overflowing struct Player players[23].
+	float _budget;
 
 	int points;
-	int number_of_players; //max - 23. It's a guard to avoid overflowing struct Player players[23].
 	int goals_scored, goals_conceded;
 	int matches_played;
 	int matches_won, matches_lost, matches_drawn;
@@ -47,6 +48,7 @@ private:
 
 	int Get_ID() const;
 	int Buy_Player();
+	int Sell_Player();
 
 	History *_history;
 
@@ -64,12 +66,14 @@ public:
 	void Print_History() const;
 	void Print_Formation() const;
 	void Print_First_Squad() const;
+	void Print_Whole_Squad() const;
 	void List_Players() const;
 	void Print_Positions_Number() const;
 
 	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter() const;
 	int Set_Tactics();
+	int Get_Number_of_Players();
 
 	double Get_Tactic_Rating() const;
 };
