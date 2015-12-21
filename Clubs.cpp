@@ -136,7 +136,6 @@ int Club::Add_Player_to_Club(Player &player)
 	string tmp = "Bought ";
 	tmp.append((player).name).append(" ").append((player).surname);
 
-
 	_history[_history_messages_counter].message = tmp;
 	_history->Save_History(*this);
 
@@ -467,6 +466,12 @@ int Club::Sell_Player()
 
 	free_players.push_back(players[player_to_sell]);
 
+	string tmp = "Sold ";
+	tmp.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
+
+	_history[_history_messages_counter].message = tmp;
+	_history->Save_History(*this);
+
 	for(int i = player_to_sell; i < number_of_players - 1; ++i) //reshuffle players by one element to the left
 	{
 		players[i] = players[i + 1];
@@ -495,6 +500,4 @@ int Club::Get_Number_of_Players()
 {
 	return number_of_players;
 }
-
-
 

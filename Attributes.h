@@ -4,8 +4,7 @@
 #include <vector>
 class Player;
 
-extern int number_of_free_players;
-extern std::vector<Player*> free_players;//(number_of_free_players); //10 players ready to be bought. std::<array> would be more appropriate if the size wouldn't change throughout the program.
+extern std::vector<Player*> free_players;
 
 static std::string names[] = { "Cristiano", "Adu", "Patrick", "Sergio", "Raphael", "Karim", "Gareth", "Luis", "Andres", "Willian", "Oscar" };
 static std::string surnames[] = { "Ronaldo", "Costacurta", "Cyrklaff", "Ramos", "Varane", "Benzema", "Bale", "Suarez", "Iniesta", "Romero", "Gaucho" };
@@ -44,17 +43,19 @@ private:
 		} mental_attributes;
 	};
 
+	Attributes attributes;
+
 	int _age;
 	int _position; //1 - Defender. 2 - Midfilder. 3 - Attacker
 	double _overall; //counted on all overalls.
 	double _value;
 
 public:
-	std::string name, surname;
-
-	Attributes attributes;
 	Player();
 	Player& operator =(const Player &other);
+
+	std::string name, surname;
+
 
 	void Print_Attributes() const;
 

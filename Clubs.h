@@ -55,10 +55,12 @@ private:
 	int _history_messages_counter;
 	int	number_of_stories;
 
+	Club(const Club& other);
+	Club& operator=(const Club& other);
+
 public:
 	Club();
 	~Club();
-
 	const std::string club_name;
 	const std::string city_name;
 

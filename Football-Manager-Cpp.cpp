@@ -20,10 +20,10 @@ void Start()
 {
 	//printf("\nHello! You've been given %d players, and assigned a club.\n", number_of_players);
 
-	unsigned int i;
+	int i;
 
-	for(i = 0; i < free_players.size(); ++i)
-		free_players[i] = new Player;
+	for(unsigned j = 0; j < free_players.size(); ++j)
+		free_players[j] = new Player;
 
 	Club *club = new Club;
 	Player *players_1[number_of_players]; //redundant pointer?
@@ -123,7 +123,6 @@ void Start()
 	Set_Tactics(&club_7);
 	Set_Tactics(&club_8);*/
 
-
 	table->Schedule_Season();
 
 	table->Print_Rounds();
@@ -132,9 +131,10 @@ void Start()
 
 	table->Print_Table();
 
+	club->Print_History(); club_2->Print_History();
 
-	for(i = 0; i < free_players.size(); ++i)
-			delete free_players[i];
+	for(unsigned j = 0; j < free_players.size(); ++j)
+			delete free_players[j];
 
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
@@ -148,14 +148,13 @@ void Start()
  * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
  * Fix he costs: 0  ?! Must be fixed!
- * Finish Measure_Time()
  * Set_Tactics - change to QuickSort
+ * Player::Print_Value() - change to void, and fix the problem with vector.
  */
 
 int main()
 {
 	srand(time(NULL));
-	calendar->Set_Current_Date();
 	calendar->Print_Date();
 	Start();
 

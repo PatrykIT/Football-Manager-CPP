@@ -1,6 +1,5 @@
 #include "History.h"
 
-//extern Calendar calendar;
 extern Calendar *calendar;
 
 #include <iostream>
@@ -28,6 +27,17 @@ void History::Save_History(Club &club)
 	date.append(calendar_string);
 	calendar_string.clear();
 
+	calendar_string.append(" ").append(std::to_string(calendar->hour));
+	date.append(calendar_string + ":");
+	calendar_string.clear();
+
+	calendar_string.append(std::to_string(calendar->minute));
+	date.append(calendar_string + ":");
+	calendar_string.clear();
+
+	calendar_string.append(std::to_string(calendar->seconde));
+	date.append(calendar_string);
+	calendar_string.clear();
 
 	club._history[club.Get_Message_Counter()].message.append(date);
 
