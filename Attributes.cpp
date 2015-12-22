@@ -164,10 +164,9 @@ void Player::_Set_Value()
 	_value = _overall * 100;
 }
 
-int Player::Print_Value() const
+void Player::Print_Value() const
 {
 	printf("Value: %.2f $\n", _value);
-	return _value;
 }
 
 int Player::Get_Age() const

@@ -112,7 +112,6 @@ void Start()
 	Add_Club_to_Table(&club_6, &table);
 	Add_Club_to_Table(&club_7, &table);
 	Add_Club_to_Table(&club_8, &table);*/
-
 	club->Set_Tactics();
 	club_2->Set_Tactics();
 	club_3->Set_Tactics();
@@ -131,11 +130,6 @@ void Start()
 
 	table->Print_Table();
 
-	club->Print_History(); club_2->Print_History();
-
-	for(unsigned j = 0; j < free_players.size(); ++j)
-			delete free_players[j];
-
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
 
@@ -147,9 +141,7 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
- * Fix he costs: 0  ?! Must be fixed!
  * Set_Tactics - change to QuickSort
- * Player::Print_Value() - change to void, and fix the problem with vector.
  */
 
 int main()
@@ -157,8 +149,14 @@ int main()
 	srand(time(NULL));
 	calendar->Print_Date();
 	Start();
+	calendar->Print_Date();
 
+
+	for(unsigned j = 0; j < free_players.size(); ++j)
+			delete free_players[j];
 	delete calendar;
+
+
 	cout << "Bye bye." << endl;
 	return 0;
 }

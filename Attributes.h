@@ -58,8 +58,8 @@ public:
 
 
 	void Print_Attributes() const;
+	void Print_Value() const;
 
-	int Print_Value() const;
 	int Get_Age() const;
 	int Get_Position() const;
 

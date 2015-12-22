@@ -6,6 +6,7 @@ using namespace std;
 
 #include "Table.h"
 
+
 Table::Table()
 {
 	pair_of_clubs = new Pair_Clubs[Count_Combinations(number_of_clubs_in_ligue, 2)];
@@ -111,7 +112,7 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 	Schedule_Rounds();
 }
 
-void Table::Schedule_Rounds()
+void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be scheduled, will fix that later (it is easier to debug with only 4 teams than 20 ;) )
 {
 
 	cout << endl << "Scheduling rounds: " << endl;
@@ -402,6 +403,7 @@ void Table::Play_Round()
 	}
 
 	++current_round;
+	Calendar::get()->Travel_Calendar(7);
 }
 
 

@@ -16,7 +16,7 @@ private:
 
 	struct Round
 	{
-		Pair_Clubs **match; //this is a match.
+		Pair_Clubs **match; //this is an array of matches
 		int matches_played; //if matches_played == number of clubs in league / 2, means whole round was played.
 	} *round;
 
@@ -30,7 +30,7 @@ private:
     int Check_if_Round_Played(int *index_of_match_not_played) const;
     int Find_Index_of_Pair_In_Kolejka(Club **club_1, Club **club_2) const; //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
     int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
-    int Check_which_Club_Needs_to_Buy(int i) const;
+    int Check_which_Club_Needs_to_Buy(int i) const; //Checks which club lacks players.
 
     Table(const Table& other);
     Table& operator=(const Table& other);
@@ -41,7 +41,6 @@ public:
 
     int current_round;
     int number_of_clubs;
-
 
     void Add_Club_to_Table(Club **club);
     void Schedule_Season();

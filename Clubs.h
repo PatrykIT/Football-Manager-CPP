@@ -75,7 +75,7 @@ public:
 	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter() const;
 	int Set_Tactics();
-	int Get_Number_of_Players();
+	int Get_Number_of_Players() const;
 
 	double Get_Tactic_Rating() const;
 };

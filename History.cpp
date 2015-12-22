@@ -7,7 +7,7 @@ extern Calendar *calendar;
 
 void History::Save_History(Club &club)
 {
-	calendar->Set_Current_Date();
+	calendar->Set_Hour();
 
 	std::string date = "";
 	std::string calendar_string = "";

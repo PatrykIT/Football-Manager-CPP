@@ -48,7 +48,7 @@ Club::~Club()
 {
 	for(int i = 0; i < number_of_players; ++i)
 	{
-		delete players[i];
+		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
 		players[i] = NULL;
 	}
 
@@ -362,8 +362,7 @@ int Club::Buy_Player()
 		{
 			if (free_players.at(i)->Get_Position() == position_to_buy)
 			{
-				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl;
-				cout << "He costs: " << free_players[i]->Print_Value() << endl; //Print Value() cannot be void because "forming reference to void" O.o   Check this out!
+				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl; free_players[i]->Print_Value();
 				cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
 				char buy; cin >> buy;
 
@@ -496,7 +495,7 @@ void Club::Print_Positions_Number() const
 			"Defenders: " << number_of_defenders_in_first_squad << endl;
 }
 
-int Club::Get_Number_of_Players()
+int Club::Get_Number_of_Players() const
 {
 	return number_of_players;
 }
