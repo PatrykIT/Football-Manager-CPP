@@ -30,7 +30,10 @@ void Calendar::Travel_Calendar(int days)
 	if(day_of_a_month + days > 31) //because there can't be 32th day of a month (or more)
 	{
 		if(month == 12)
+		{
+			++year;
 			month = 1;
+		}
 		else
 			++month;
 
