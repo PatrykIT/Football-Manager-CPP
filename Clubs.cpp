@@ -379,7 +379,7 @@ int Club::Buy_Player()
 							int ret = Sell_Player();
 
 							if (ret == 0 && _budget >= free_players[i]->Get_Value())
-								{} //continue with the flow of the program
+								{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)_
 							else
 								continue;
 						}
@@ -461,15 +461,17 @@ int Club::Sell_Player()
 	}
 	while (confirm != 'Y' && confirm != 'y');
 
-	_budget += players[player_to_sell]->Get_Value();
 
 	free_players.push_back(players[player_to_sell]);
+	_budget += players[player_to_sell]->Get_Value();
 
 	string tmp = "Sold ";
 	tmp.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
 
 	_history[_history_messages_counter].message = tmp;
 	_history->Save_History(*this);
+
+
 
 	for(int i = player_to_sell; i < number_of_players - 1; ++i) //reshuffle players by one element to the left
 	{

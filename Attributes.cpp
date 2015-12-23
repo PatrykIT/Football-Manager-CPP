@@ -15,6 +15,9 @@ Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
 	_Set_Attributes();
 	_Set_Position();
 	_Set_Value();
+
+	psyche.morale = 50; //Middle.
+	psyche.form = 50;
 }
 
 Player& Player::operator =(const Player &other)
@@ -187,4 +190,20 @@ double Player::Get_Overall() const
 double Player::Get_Value() const
 {
 	return _value;
+}
+
+void Player::Psyche::Update_Morale(bool result) //1 - good result, morale up. 0 - bad result, morale down.
+{
+	if (result == true)
+	{
+		morale += 10;
+		if (morale > 100)
+			morale = 100; //In case we went above 100, we're setting the maximum.
+	}
+	else
+	{
+		morale -= 10;
+		if (morale < 0)
+			morale = 0;
+	}
 }

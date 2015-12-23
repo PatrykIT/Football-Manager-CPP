@@ -23,6 +23,7 @@ private:
 	Club *clubs[number_of_clubs_in_ligue];
 
 	void Play_Match(Club **club_1, Club **club_2);
+	int Calculate_Match_Winning_Odds(Club **club_1, Club **club_2); //0 - should be draw. 1: club_1 should win. 2: club_2 should win.
     void Schedule_Rounds();
     void Give_Walkover(int i);
 

@@ -411,6 +411,8 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 {
 	printf("\nNow playing: [%d] vs [%d]\n", (*club_1)->Get_ID(), (*club_2)->Get_ID() );
 
+//-------------------------------------- Check if match can be played --------------------------------------------------
+
 	if ( Assert_Table_Full() != 1)
 	{
 		printf ("Cannot play match. League is not full yet.\n");
@@ -428,48 +430,53 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		return;
 	}
 
-	if((*club_1)->Get_Tactic_Rating() > (*club_2)->Get_Tactic_Rating() + 1)
+//----------------------------------------------------------------------------------------------------------------------
+
+	const int better_club = Calculate_Match_Winning_Odds(club_1, club_2);
+
+	if (better_club == 1)
 	{
 		cout << (*club_1)->club_name << " " << (*club_1)->city_name << " won!" << endl;
-		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
 
 		(*club_1)->points += 3;
-
-
-		++(*club_1)->matches_played;
-		++(*club_2)->matches_played;
-
 		++(*club_1)->matches_won;
 		++(*club_2)->matches_lost;
 
+		for(int i = 0; i < (*club_1)->number_of_players; ++i)
+			(*club_1)->players[i]->psyche.Update_Morale(1); //Players get better morale because of a win.
+
+		for(int i = 0; i < (*club_2)->number_of_players; ++i)
+			(*club_2)->players[i]->psyche.Update_Morale(0); //And goes the other way ;)
 	}
 
-	else if((*club_2)->Get_Tactic_Rating() > (*club_1)->Get_Tactic_Rating() + 1)
+	else if (better_club == 2)
 	{
 		cout << (*club_2)->club_name << " " << (*club_2)->city_name << " won!" << endl;
-		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
 
 		(*club_2)->points += 3;
-
-		++(*club_1)->matches_played;
-		++(*club_2)->matches_played;
-
 		++(*club_2)->matches_won;
 		++(*club_1)->matches_lost;
+
+		for(int i = 0; i < (*club_2)->number_of_players; ++i)
+			(*club_2)->players[i]->psyche.Update_Morale(1);
+
+		for(int i = 0; i < (*club_1)->number_of_players; ++i)
+			(*club_1)->players[i]->psyche.Update_Morale(0);
 	}
 	else
 	{
 		printf("There was a draw!\n");
-		cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
+
 		(*club_1)->points += 1;
 		(*club_2)->points += 1;
-
-		++(*club_1)->matches_played;
-		++(*club_2)->matches_played;
 
 		++(*club_1)->matches_drawn;
 		++(*club_2)->matches_drawn;
 	}
+
+	++(*club_1)->matches_played;
+	++(*club_2)->matches_played;
+
 
 
 	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2);
@@ -483,3 +490,49 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	round[current_round].match[match_index]->match_played = 1;
 }
 
+int Table::Calculate_Match_Winning_Odds(Club **club_1, Club **club_2) //This function will be optimalized in the coming days. (23.12.2015)
+{
+	cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
+
+	int sum_of_morale_club1 = 0, sum_of_morale_club2 = 0;
+	int club1_chances = 0, club2_chances = 0;
+
+	for(int i = 0; i < (*club_1)->number_of_players; ++i) //Bad thing. If one club has more players, it will have big advantage. Change loop to loops seperate for defs, mids, attackers.
+		sum_of_morale_club1 += (*club_1)->players[i]->psyche.morale;
+
+	for(int i = 0; i < (*club_2)->number_of_players; ++i)
+		sum_of_morale_club2 += (*club_2)->players[i]->psyche.morale;
+
+	if (sum_of_morale_club1 > sum_of_morale_club2 )
+	{
+		club1_chances = sum_of_morale_club1 - sum_of_morale_club2;
+	}
+	else if (sum_of_morale_club2 > sum_of_morale_club1)
+	{
+		club2_chances = sum_of_morale_club2 - sum_of_morale_club1;
+	}
+
+	if((*club_1)->Get_Tactic_Rating() > (*club_2)->Get_Tactic_Rating() + 1) // +1 so it has a margin for a draw - if clubs are too close in rating, it should be a draw.
+	{
+		club1_chances = club1_chances + ((*club_1)->Get_Tactic_Rating() - (*club_2)->Get_Tactic_Rating());
+	}
+	else if ((*club_2)->Get_Tactic_Rating() > (*club_1)->Get_Tactic_Rating() + 1)
+	{
+		club2_chances = club2_chances + ((*club_2)->Get_Tactic_Rating() - (*club_1)->Get_Tactic_Rating());
+	}
+
+	//cout << "Club_1 chances: " << club1_chances << " || Club_2: " << club2_chances << endl;
+
+
+	int better_chance; //0 - even chances. 1: club_1 better chances. 2: club_2 better chances
+
+	if (club1_chances > club2_chances + 1)
+		better_chance = 1;
+	else if (club2_chances > club1_chances + 1)
+		better_chance = 2;
+	else
+		better_chance = 0;
+
+	return better_chance;
+
+}

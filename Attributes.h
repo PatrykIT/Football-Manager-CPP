@@ -2,8 +2,10 @@
 #define ATTRIBUTES_H_
 #include <iostream>
 #include <vector>
-class Player;
 
+/* NOTE: This file should be named "Players.h" */
+
+class Player;
 extern std::vector<Player*> free_players;
 
 static std::string names[] = { "Cristiano", "Adu", "Patrick", "Sergio", "Raphael", "Karim", "Gareth", "Luis", "Andres", "Willian", "Oscar" };
@@ -41,9 +43,15 @@ private:
 			int aggression, concetration, pressure_handling, work_rate, leadership, flair, game_reading;
 			double overall;
 		} mental_attributes;
-	};
+	} attributes;
 
-	Attributes attributes;
+	struct Psyche
+	{
+		int morale; //Updated after playing match. In future: injures will also affect.
+		int form;
+
+		void Update_Morale(bool);
+	};
 
 	int _age;
 	int _position; //1 - Defender. 2 - Midfilder. 3 - Attacker
@@ -56,6 +64,7 @@ public:
 
 	std::string name, surname;
 
+	Psyche psyche;
 
 	void Print_Attributes() const;
 	void Print_Value() const;

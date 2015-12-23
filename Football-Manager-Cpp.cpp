@@ -139,7 +139,6 @@ void Start()
 /*
  * Dokończyć  Schedule_Rounds().
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
- * Add date traversal after playing round. Finish Travel_Calendar()
  * Transform to smart pointers.
  * Set_Tactics - change to QuickSort
  */
@@ -149,7 +148,6 @@ int main()
 	srand(time(NULL));
 	calendar->Print_Date();
 	Start();
-	calendar->Print_Date();
 
 
 	for(unsigned j = 0; j < free_players.size(); ++j)
