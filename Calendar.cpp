@@ -6,12 +6,13 @@ Calendar* Calendar::calendar = NULL;
 
 void Calendar::Set_Hour() //Used by History class to save messagess - it update's the time, without updating the date, because date is constantly modified by Travel_Calendar().
 {
-	//To do: Add checking weather updating the time would reset it - for example if old time is 23:00, and current time is 01:00, then we need to increment a day also.
-
 	time_t raw_time;
 	time(&raw_time); //returns the time since the Epoch (00:00:00 UTC, January 1, 1970), measured in seconds.
 
 	struct tm *my_date = localtime(&raw_time); //struct tm - this is a structure used to hold the time and date.
+
+	if (my_date->tm_hour < hour) //For example if we had 23:00 in-game. 2 hours later user decided to use this function, it means it's 01:00. That's why we need to increment days.
+		Travel_Calendar(1);
 
 	hour = my_date->tm_hour;
 	minute = my_date->tm_min;

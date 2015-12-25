@@ -432,7 +432,7 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-	const int better_club = Calculate_Match_Winning_Odds(club_1, club_2);
+	const int better_club = Calculate_Match_Winning_Odds(**club_1, **club_2);
 
 	if (better_club == 1)
 	{
@@ -490,35 +490,53 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	round[current_round].match[match_index]->match_played = 1;
 }
 
-int Table::Calculate_Match_Winning_Odds(Club **club_1, Club **club_2) //This function will be optimalized in the coming days. (23.12.2015)
+int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) //This function will be optimalized in the coming days. (23.12.2015)
 {
-	cout << "Ratings of clubs: " << (*club_1)->Get_Tactic_Rating() << " || " << (*club_2)->Get_Tactic_Rating() << endl;
+	cout << "Ratings of clubs: " << club_1.Get_Tactic_Rating() << " || " << club_2.Get_Tactic_Rating() << endl;
 
 	int sum_of_morale_club1 = 0, sum_of_morale_club2 = 0;
 	int club1_chances = 0, club2_chances = 0;
 
-	for(int i = 0; i < (*club_1)->number_of_players; ++i) //Bad thing. If one club has more players, it will have big advantage. Change loop to loops seperate for defs, mids, attackers.
-		sum_of_morale_club1 += (*club_1)->players[i]->psyche.morale;
+//-------------------------------------------------------------------Counting morale of both teams-------------------------------------------
 
-	for(int i = 0; i < (*club_2)->number_of_players; ++i)
-		sum_of_morale_club2 += (*club_2)->players[i]->psyche.morale;
+	int i;
+	for(i = 0; i < club_1.number_of_defenders_in_first_squad; ++i)
+		sum_of_morale_club1 += club_1.defenders_in_first_squad[i]->psyche.morale;
+
+	for(i = 0; i < club_1.number_of_midfilders_in_first_squad; ++i)
+		sum_of_morale_club1 += club_1.midfilders_in_first_squad[i]->psyche.morale;
+
+	for(i = 0; i < club_1.number_of_attackers_in_first_squad; ++i)
+		sum_of_morale_club1 += club_1.attackers_in_first_squad[i]->psyche.morale;
+
+
+	for(i = 0; i < club_2.number_of_defenders_in_first_squad; ++i)
+		sum_of_morale_club2 += club_2.defenders_in_first_squad[i]->psyche.morale;
+
+	for(i = 0; i < club_2.number_of_midfilders_in_first_squad; ++i)
+		sum_of_morale_club2 += club_2.midfilders_in_first_squad[i]->psyche.morale;
+
+	for(i = 0; i < club_2.number_of_attackers_in_first_squad; ++i)
+		sum_of_morale_club2 += club_2.attackers_in_first_squad[i]->psyche.morale;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	if (sum_of_morale_club1 > sum_of_morale_club2 )
 	{
-		club1_chances = sum_of_morale_club1 - sum_of_morale_club2;
+		club1_chances = (sum_of_morale_club1 - sum_of_morale_club2) / 5; //  Divide by 5 because morale have lesser influence than rating of a squad.
 	}
 	else if (sum_of_morale_club2 > sum_of_morale_club1)
 	{
-		club2_chances = sum_of_morale_club2 - sum_of_morale_club1;
+		club2_chances = (sum_of_morale_club2 - sum_of_morale_club1) / 5;
 	}
 
-	if((*club_1)->Get_Tactic_Rating() > (*club_2)->Get_Tactic_Rating() + 1) // +1 so it has a margin for a draw - if clubs are too close in rating, it should be a draw.
+	if(club_1.Get_Tactic_Rating() > club_2.Get_Tactic_Rating() + 1) // +1 so it has a margin for a draw - if clubs are too close in rating, it should be a draw.
 	{
-		club1_chances = club1_chances + ((*club_1)->Get_Tactic_Rating() - (*club_2)->Get_Tactic_Rating());
+		club1_chances += ((club_1.Get_Tactic_Rating() - club_2.Get_Tactic_Rating()) * 2) ;
 	}
-	else if ((*club_2)->Get_Tactic_Rating() > (*club_1)->Get_Tactic_Rating() + 1)
+	else if (club_2.Get_Tactic_Rating() > club_1.Get_Tactic_Rating() + 1)
 	{
-		club2_chances = club2_chances + ((*club_2)->Get_Tactic_Rating() - (*club_1)->Get_Tactic_Rating());
+		club2_chances += (club_2.Get_Tactic_Rating() - club_1.Get_Tactic_Rating());
 	}
 
 	//cout << "Club_1 chances: " << club1_chances << " || Club_2: " << club2_chances << endl;
@@ -534,5 +552,4 @@ int Table::Calculate_Match_Winning_Odds(Club **club_1, Club **club_2) //This fun
 		better_chance = 0;
 
 	return better_chance;
-
 }
