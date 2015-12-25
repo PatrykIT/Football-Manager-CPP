@@ -2,9 +2,6 @@
 
 extern Calendar *calendar;
 
-#include <iostream>
-#include <string>
-
 void History::Save_History(Club &club)
 {
 	calendar->Set_Hour();

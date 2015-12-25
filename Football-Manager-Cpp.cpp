@@ -142,6 +142,8 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Transform to smart pointers.
  * Set_Tactics - change to QuickSort
+ * Change Stadium container to vector - when stadion name is used, delete it from available names.
+ * Implement setting ticket prices and fans attending.
  */
 
 int main()

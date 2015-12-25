@@ -4,8 +4,6 @@
 #include "Calendar.h"
 #include "Clubs.h"
 
-#include <iostream>
-
 class Club;
 
 class History
@@ -13,7 +11,6 @@ class History
 public:
 	std::string message; //Description of an event, example: "Player moved club from %s to %s".
 	void Save_History(Club &club);
-
 };
 
 

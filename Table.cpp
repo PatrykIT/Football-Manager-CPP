@@ -34,7 +34,6 @@ void Table::Add_Club_to_Table(Club **club)
 		return;
 	}
 
-
 	clubs[number_of_clubs] = *club;
 
     ++number_of_clubs;
@@ -439,10 +438,10 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		++(*club_1)->matches_won;
 		++(*club_2)->matches_lost;
 
-		for(int i = 0; i < (*club_1)->number_of_players; ++i)
+		for(unsigned int i = 0; i < (*club_1)->players.size(); ++i)
 			(*club_1)->players[i]->psyche.Update_Morale(1); //Players get better morale because of a win.
 
-		for(int i = 0; i < (*club_2)->number_of_players; ++i)
+		for(unsigned int i = 0; i < (*club_2)->players.size(); ++i)
 			(*club_2)->players[i]->psyche.Update_Morale(0); //And goes the other way ;)
 	}
 
@@ -454,10 +453,10 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		++(*club_2)->matches_won;
 		++(*club_1)->matches_lost;
 
-		for(int i = 0; i < (*club_2)->number_of_players; ++i)
+		for(unsigned int i = 0; i < (*club_2)->players.size(); ++i)
 			(*club_2)->players[i]->psyche.Update_Morale(1);
 
-		for(int i = 0; i < (*club_1)->number_of_players; ++i)
+		for(unsigned int i = 0; i < (*club_1)->players.size(); ++i)
 			(*club_1)->players[i]->psyche.Update_Morale(0);
 	}
 	else
@@ -496,7 +495,7 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const //This
 
 //-------------------------------------------------------------------Counting morale of both teams-------------------------------------------
 
-	int i;
+	unsigned int i;
 	for(i = 0; i < club_1.number_of_defenders_in_first_squad; ++i)
 		sum_of_morale_club1 += club_1.defenders_in_first_squad[i]->psyche.morale;
 

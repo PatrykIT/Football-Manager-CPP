@@ -3,6 +3,7 @@
 
 #include "Attributes.h"
 #include "History.h"
+#include "Stadium.h"
 
 class History;
 static std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico"};
@@ -12,6 +13,9 @@ static std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", 
 class Club
 {
 private:
+	Club(const Club& other);
+	Club& operator=(const Club& other);
+
 	friend class Table;
 	friend class History;
 
@@ -22,21 +26,26 @@ private:
 	float _budget;
 
 	int points;
-	int goals_scored, goals_conceded;
-	int matches_played;
-	int matches_won, matches_lost, matches_drawn;
+	unsigned int goals_scored, goals_conceded;
+	unsigned int matches_played;
+	unsigned int matches_won, matches_lost, matches_drawn;
 
-	int number_of_players; //max - 23. It's a guard to avoid overflowing struct Player players[23].
-	int number_of_attackers_in_first_squad;
-	int number_of_midfilders_in_first_squad;
-	int number_of_defenders_in_first_squad;
+	unsigned int number_of_attackers_in_first_squad;
+	unsigned int number_of_midfilders_in_first_squad;
+	unsigned int number_of_defenders_in_first_squad;
 
-	Player *players[23]; //23 players CHANGE TO VECTOR
+	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are layed out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
 	Player *attackers_in_first_squad[3];
 	Player *midfilders_in_first_squad[5];
 	Player *defenders_in_first_squad[5];
+
+	History *_history;
+	int _history_messages_counter;
+	int	number_of_stories;
+
+	Stadium stadium;
 
 	void Set_Tactic_Rating(double sum);
 	void Allow_Playing();
@@ -48,14 +57,6 @@ private:
 	int Get_ID() const;
 	int Buy_Player();
 	int Sell_Player();
-
-	History *_history;
-
-	int _history_messages_counter;
-	int	number_of_stories;
-
-	Club(const Club& other);
-	Club& operator=(const Club& other);
 
 public:
 	Club();
@@ -70,11 +71,11 @@ public:
 	void Print_Whole_Squad() const;
 	void List_Players() const;
 	void Print_Positions_Number() const;
+	void Set_Ticket_Prices();
 
 	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter() const;
 	int Set_Tactics();
-	int Get_Number_of_Players() const;
 
 	double Get_Tactic_Rating() const;
 };

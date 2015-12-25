@@ -8,7 +8,10 @@
 class Table
 {
 private:
-	struct Pair_Clubs //pairing for scheduling matches.
+    Table(const Table& other);
+    Table& operator=(const Table& other);
+
+    struct Pair_Clubs //pairing for scheduling matches.
 	{
 		int match_played; //0 - match not played yet. 1 - match played.
 		Club *clubs_paired[2];
@@ -32,9 +35,6 @@ private:
     int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
     int Check_which_Club_Needs_to_Buy(int i) const; //Checks which club lacks players.
     int Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const; //0 - should be draw. 1: club_1 should win. 2: club_2 should win.
-
-    Table(const Table& other);
-    Table& operator=(const Table& other);
 
 public:
     Table();

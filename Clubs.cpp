@@ -9,9 +9,8 @@ using namespace std;
 int Club::_instance_number = 0;
 
 Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))]), city_name(cities[rand() % (sizeof(cities) / sizeof(cities[0]))])
-
 {
-	number_of_players = 0;
+	players.reserve(23);
 
 	tactic[0] = -1; //Say that this position is not yet filled with players.
 	tactic[1] = -1;
@@ -35,11 +34,12 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_history_messages_counter = 0;
 
 	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
+	cout << "Stadium: " << stadium.stadium_name << endl;
 }
 
 Club::~Club()
 {
-	for(int i = 0; i < number_of_players; ++i)
+	for(unsigned int i = 0; i < players.size(); ++i)
 	{
 		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
 		players[i] = NULL;
@@ -115,9 +115,9 @@ double Club::Get_Tactic_Rating() const
 
 int Club::Add_Player_to_Club(Player &player)
 {
-	if( number_of_players < 23 )
+	if( players.size() < 23 )
 	{
-		players[number_of_players] = &player;
+		players.push_back(&player);
 	}
 	else
 	{
@@ -132,7 +132,6 @@ int Club::Add_Player_to_Club(Player &player)
 	_history[_history_messages_counter].message = tmp;
 	_history->Save_History(*this);
 
-	++number_of_players;
 	return 0;
 }
 
@@ -142,8 +141,7 @@ int Club::Add_Player_to_Club(Player &player)
 void Club::List_Players() const
 {
 	printf("\n---Listing players---\n\n");
-	int i;
-	for ( i = 0 ; i < number_of_players; ++i)
+	for (unsigned i = 0 ; i < players.size(); ++i)
 	{
 		printf("%s %s\nOverall: %.2f%\n", players[i]->name, players[i]->surname, players[i]->Get_Overall());
 		switch (players[i]->Get_Position())
@@ -170,20 +168,20 @@ void Club::List_Players() const
 
 int Club::Set_Tactics()
 {
-	if(number_of_players < 11)
+	if(players.size() < 11)
 	{
 		printf("Not enough players to set tactic!\n");
 		return -1;
 	}
 
 //------------------------------------------------------------------------ORDERING PLAYERS FROM BEST TO WORSE-------------------------------------------------------------------------
-	int i;
+	unsigned int i;
 	int swapped;
 	do
 	{
 		swapped = 0;
 
-		for(i = 0; i < number_of_players - 1; ++i)
+		for(i = 0; i < players.size() - 1; ++i)
 		{
 			if( players[i]->Get_Overall() < players[i+1]->Get_Overall())
 			{
@@ -194,7 +192,10 @@ int Club::Set_Tactics()
 			else
 				++swapped;
 		}
-	} while(swapped != number_of_players - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
+	} while(swapped != players.size() - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
+
+	//for(int x = 0; x < players.size(); ++x)
+		//cout << players.at(x)->surname << ": " << players.at(x)->Get_Overall() << endl; cout <<endl <<endl<<endl;
 
 //------------------------------------------------------------------------------END OF ORDERING-------------------------------------------------------------------------
 
@@ -246,7 +247,7 @@ int Club::Set_Tactics()
 			}
 
 		++i;
-	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != number_of_players));
+	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != players.size()));
 
 	if( (current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_defenders) || (current_attackers +
 			current_midfilders + current_defenders != 10 ))
@@ -267,11 +268,11 @@ int Club::Set_Tactics()
 
 	double sum = 0;
 
-	for(i = 0; i < current_defenders; ++i)
+	for(int i = 0; i < current_defenders; ++i)
 		sum = sum + defenders_in_first_squad[i]->Get_Overall();
-	for(i = 0; i < current_midfilders; ++i)
+	for(int i = 0; i < current_midfilders; ++i)
 		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
-	for(i = 0; i <current_attackers; ++i)
+	for(int i = 0; i <current_attackers; ++i)
 		sum = sum + (*attackers_in_first_squad[i]).Get_Overall();
 
 	Set_Tactic_Rating(sum);
@@ -286,8 +287,8 @@ void Club::Print_Formation() const
 {
 	printf("\n---Current formation---\n");
 	cout << club_name << " " << city_name << "plays: ";
-	int i = 0;
-	for(; i < 3; ++i)
+
+	for(int i = 0; i < 3; ++i)
 		printf("%d ", tactic[i]);
 	printf("\n");
 }
@@ -295,7 +296,7 @@ void Club::Print_Formation() const
 void Club::Print_First_Squad() const
 {
 	printf("\n---First Squad [%d]---\n", _ID);
-	int i;
+	unsigned int i;
 	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
 		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->Get_Overall() << " (DEF)" << endl;
@@ -318,7 +319,7 @@ void Club::Print_First_Squad() const
 void Club::Print_Whole_Squad() const
 {
 	printf("\n---Whole Squad [%d]---\n", _ID);
-	for(int i = 0; i < number_of_players; ++i)
+	for(unsigned int i = 0; i < players.size(); ++i)
 	{
 		cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " | Position: " << players[i]->Get_Position()
 				<< " | Value: " << players[i]->Get_Value() << "$" << endl;
@@ -328,7 +329,7 @@ void Club::Print_Whole_Squad() const
 
 int Club::Buy_Player()
 {
-	if (number_of_players >= 23)
+	if (players.size() >= 23)
 	{
 		cout << "Squad is full. Cannot add another player." << endl;
 		return -1;
@@ -363,7 +364,7 @@ int Club::Buy_Player()
 				{
 					if (_budget < free_players[i]->Get_Value())
 					{
-						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\n Y or N:\t", _budget);
+						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\nY or N:\t", _budget);
 
 						char sell;
 						cin >> sell;
@@ -426,9 +427,9 @@ int Club::Buy_Player()
 
 int Club::Sell_Player()
 {
-	if (number_of_players < 12)
+	if (players.size() < 12)
 	{
-		cout << "Only " << number_of_players << " in squad. Cannot sell." << endl;
+		cout << "Only " << players.size() << " in squad. Cannot sell." << endl;
 		return -1;
 	}
 
@@ -444,7 +445,7 @@ int Club::Sell_Player()
 			cout << endl << "Which player would you like to sell?\nNr:\t ";
 			cin >> player_to_sell;
 		}
-		while (player_to_sell < 0 || player_to_sell > number_of_players - 1);
+		while (player_to_sell < 0 || player_to_sell > players.size() - 1);
 
 		cout << "You chose: " << players[player_to_sell]->name << " " << players[player_to_sell]->surname << endl << "Are you sure you want this player sold? Y or N" << endl;
 		cin >> confirm;
@@ -461,10 +462,8 @@ int Club::Sell_Player()
 	_history[_history_messages_counter].message = tmp;
 	_history->Save_History(*this);
 
-
-	players[player_to_sell] = players[number_of_players - 1]; //Copy the last player in place of a sold player.
-	players[number_of_players - 1] = NULL; //NULL out the clone of copied player.
-	--number_of_players;
+	swap(players[player_to_sell], players[players.size() -1]); //Copy the last player in place of a sold player.
+	players.pop_back(); //Delete sold player from vector.
 
 	cout << "Player sold." << endl;
 
@@ -481,8 +480,7 @@ void Club::Print_Positions_Number() const
 			"Defenders: " << number_of_defenders_in_first_squad << endl;
 }
 
-int Club::Get_Number_of_Players() const
+void Club::Set_Ticket_Prices()
 {
-	return number_of_players;
-}
 
+}
