@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
-
 #include <iostream>
 #include <string>
 #include <random>
@@ -41,7 +34,7 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_history = new History[number_of_stories];
 	_history_messages_counter = 0;
 
-	_allowed_to_play = 0; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
+	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
 }
 
 Club::~Club()
@@ -85,7 +78,7 @@ void Club::Set_Tactic_Rating(double sum)
 
 void Club::Allow_Playing()
 {
-	_allowed_to_play = 1;
+	_allowed_to_play = true;
 }
 
 void Club::Print_Tactic_Rating() const
@@ -368,7 +361,7 @@ int Club::Buy_Player()
 
 				if (buy == 'Y' || buy == 'y')
 				{
-					if (_budget < free_players[i]->Get_Value()) //Second time, there is no need to use 'at()', because if we came to second, means it is valid index. :)
+					if (_budget < free_players[i]->Get_Value())
 					{
 						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\n Y or N:\t", _budget);
 
@@ -376,7 +369,7 @@ int Club::Buy_Player()
 						cin >> sell;
 						if (sell == 'y' || sell == 'Y')
 						{
-							int ret = Sell_Player();
+							const int ret = Sell_Player();
 
 							if (ret == 0 && _budget >= free_players[i]->Get_Value())
 								{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)_
@@ -387,17 +380,14 @@ int Club::Buy_Player()
 							continue;
 					}
 
-					int ret = Add_Player_to_Club( *free_players[i] );
+					const int ret = Add_Player_to_Club( *free_players[i] );
 
 					if(ret == 0)
 					{
 						bought = true;
 						cout << "Player bought." << endl;
 
-						cout << "Budget before: " << _budget << endl;
 						_budget = _budget - free_players[i]->Get_Value();
-						cout << "Budget after: " << _budget << endl;
-
 						free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
 					}
 					else
@@ -424,7 +414,7 @@ int Club::Buy_Player()
 
 			break; //Exit infinite loop
 		}
-		else //Searched all players, didn't buy anyone.
+		else
 		{
 			cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
 			return -1;
@@ -472,17 +462,11 @@ int Club::Sell_Player()
 	_history->Save_History(*this);
 
 
-
-	for(int i = player_to_sell; i < number_of_players - 1; ++i) //reshuffle players by one element to the left
-	{
-		players[i] = players[i + 1];
-	}
-	players[number_of_players - 1] = NULL; //Because at the end of copying, we have two same elements.
-
-
+	players[player_to_sell] = players[number_of_players - 1]; //Copy the last player in place of a sold player.
+	players[number_of_players - 1] = NULL; //NULL out the clone of copied player.
+	--number_of_players;
 
 	cout << "Player sold." << endl;
-	--number_of_players;
 
 	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
 		Set_Tactics();

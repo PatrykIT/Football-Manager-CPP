@@ -112,6 +112,7 @@ void Start()
 	Add_Club_to_Table(&club_6, &table);
 	Add_Club_to_Table(&club_7, &table);
 	Add_Club_to_Table(&club_8, &table);*/
+
 	club->Set_Tactics();
 	club_2->Set_Tactics();
 	club_3->Set_Tactics();
@@ -164,7 +165,7 @@ int main()
 /*
  * Make : history of players (dates of playing in which clubs, goals scored, assists, development, fee received).
  * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendance etc.
- * Count attendency based on the reputation of guest team (maybe by position in table?)
+ * Count attendance based on the reputation of guest team (maybe by position in table?)
  *
  * Make it on-line - Two persons (client - server) can play in the same league.
  * Add save - load function.

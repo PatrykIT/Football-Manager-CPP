@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <iostream>
 using namespace std;
 
@@ -490,7 +487,7 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	round[current_round].match[match_index]->match_played = 1;
 }
 
-int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) //This function will be optimalized in the coming days. (23.12.2015)
+int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const //This function will be optimalized in the coming days. (23.12.2015)
 {
 	cout << "Ratings of clubs: " << club_1.Get_Tactic_Rating() << " || " << club_2.Get_Tactic_Rating() << endl;
 

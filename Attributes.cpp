@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stddef.h>
-#include <stdint.h>
-
-
 #include "Attributes.h"
 
 std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
