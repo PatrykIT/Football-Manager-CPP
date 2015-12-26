@@ -300,6 +300,10 @@ void Table::Give_Walkover(int i)
 		round[current_round].match[i]->clubs_paired[0]->matches_lost++;
 		round[current_round].match[i]->clubs_paired[0]->goals_conceded += 3;
 
+		int money = round[current_round].match[i]->clubs_paired[0]->_budget / 2; //For every walkover, team has to give away half of a budget.
+		round[current_round].match[i]->clubs_paired[0]->_budget -= money;
+
+		round[current_round].match[i]->clubs_paired[1]->_budget += money;
 	}
 	else //If away team cannot play.
 	{
@@ -313,6 +317,12 @@ void Table::Give_Walkover(int i)
 
 		round[current_round].match[i]->clubs_paired[1]->matches_lost++;
 		round[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
+
+		int money = round[current_round].match[i]->clubs_paired[1]->_budget / 2;
+		round[current_round].match[i]->clubs_paired[1]->_budget -= money;
+
+		round[current_round].match[i]->clubs_paired[0]->_budget += money;
+
 	}
 	++round[current_round].match[i]->clubs_paired[0]->matches_played;
 	++round[current_round].match[i]->clubs_paired[1]->matches_played;
@@ -406,6 +416,7 @@ void Table::Play_Round()
 		}
 	}
 
+	Print_Table();
 	++current_round;
 	Calendar::get()->Travel_Calendar(7);
 }
@@ -413,10 +424,9 @@ void Table::Play_Round()
 
 void Table::Play_Match(Club &club_1, Club &club_2)
 {
-	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID() );
-
+	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID());
+	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
 //-------------------------------------- Check if match can be played --------------------------------------------------
-
 	if ( Assert_Table_Full() != 1)
 	{
 		printf ("Cannot play match. League is not full yet.\n");
@@ -446,11 +456,11 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		++club_1.matches_won;
 		++club_2.matches_lost;
 
-		for(unsigned int i = 0; i < club_1.players.size(); ++i)
-			club_1.players[i]->psyche.Update_Morale(1); //Players get better morale because of a win.
+		club_1.Update_Players_Morale(1);
+		club_2.Update_Players_Morale(0);
 
-		for(unsigned int i = 0; i < club_2.players.size(); ++i)
-			club_2.players[i]->psyche.Update_Morale(0); //And goes the other way ;)
+		club_1.Improve_Skills(true);
+		club_2.Improve_Skills(false);
 	}
 
 	else if (better_club == 2)
@@ -461,15 +471,16 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		++club_2.matches_won;
 		++club_1.matches_lost;
 
-		for(unsigned int i = 0; i < club_2.players.size(); ++i)
-			club_2.players[i]->psyche.Update_Morale(1);
+		club_1.Update_Players_Morale(0);
+		club_2.Update_Players_Morale(1);
 
-		for(unsigned int i = 0; i < club_1.players.size(); ++i)
-			club_1.players[i]->psyche.Update_Morale(0);
+		club_1.Improve_Skills(false);
+		club_2.Improve_Skills(true);
+
 	}
 	else
 	{
-		printf("There was a draw!\n");
+		cout << "There was a draw!" << endl;
 
 		club_1.points += 1;
 		club_2.points += 1;
@@ -487,13 +498,15 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	club_1.Set_Ticket_Prices();
 	club_2.Set_Ticket_Prices();
 
+
+
 	club_1._budget += club_1._ticket_prices * club_1._attendance;
 
 	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2);
 
 	if(match_index == -1)
 	{
-		printf("Couldn't find an index of a match.\n");
+		cout << "Couldn't find an index of a match." << endl;
 		return;
 	}
 
@@ -511,23 +524,23 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 
 	unsigned int i;
 	for(i = 0; i < club_1.number_of_defenders_in_first_squad; ++i)
-		sum_of_morale_club1 += club_1.defenders_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club1 += club_1.defenders_in_first_squad[i]->Get_Morale();
 
 	for(i = 0; i < club_1.number_of_midfilders_in_first_squad; ++i)
-		sum_of_morale_club1 += club_1.midfilders_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club1 += club_1.midfilders_in_first_squad[i]->Get_Morale();
 
 	for(i = 0; i < club_1.number_of_attackers_in_first_squad; ++i)
-		sum_of_morale_club1 += club_1.attackers_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club1 += club_1.attackers_in_first_squad[i]->Get_Morale();
 
 
 	for(i = 0; i < club_2.number_of_defenders_in_first_squad; ++i)
-		sum_of_morale_club2 += club_2.defenders_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club2 += club_2.defenders_in_first_squad[i]->Get_Morale();
 
 	for(i = 0; i < club_2.number_of_midfilders_in_first_squad; ++i)
-		sum_of_morale_club2 += club_2.midfilders_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club2 += club_2.midfilders_in_first_squad[i]->Get_Morale();
 
 	for(i = 0; i < club_2.number_of_attackers_in_first_squad; ++i)
-		sum_of_morale_club2 += club_2.attackers_in_first_squad[i]->psyche.morale;
+		sum_of_morale_club2 += club_2.attackers_in_first_squad[i]->Get_Morale();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

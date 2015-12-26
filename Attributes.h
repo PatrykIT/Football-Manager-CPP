@@ -4,7 +4,7 @@
 #include <vector>
 
 /* NOTE: This file should be named "Players.h" */
-
+class Club;
 class Player;
 extern std::vector<Player*> free_players;
 
@@ -14,6 +14,7 @@ static std::string surnames[] = { "Ronaldo", "Costacurta", "Cyrklaff", "Ramos", 
 class Player
 {
 private:
+	friend class Club; //for improving players after game, and updating their morales.
 	void _Set_Attributes();
 	void _Set_Position();
 	void _Set_Value();
@@ -50,8 +51,7 @@ private:
 		int morale; //Updated after playing match. In future: injures will also affect.
 		int form;
 
-		void Update_Morale(bool);
-	};
+	} psyche;
 
 	int _age;
 	int _position; //1 - Defender. 2 - Midfilder. 3 - Attacker
@@ -64,13 +64,12 @@ public:
 
 	std::string name, surname;
 
-	Psyche psyche;
-
 	void Print_Attributes() const;
 	void Print_Value() const;
 
 	int Get_Age() const;
 	int Get_Position() const;
+	int Get_Morale() const;
 
 	double Get_Overall() const;
 	double Get_Value() const;

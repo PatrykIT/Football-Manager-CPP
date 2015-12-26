@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <algorithm>
 
 #include "Clubs.h"
 
@@ -32,8 +33,8 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_history = new History[number_of_stories];
 	_history_messages_counter = 0;
 
-	_attendance = 0;
-	_ticket_prices = 0;
+	_attendance = stadium._capacity;
+	_ticket_prices = 10;
 
 	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
 }
@@ -72,8 +73,17 @@ void Club::Resize_History()
 
 }
 
-void Club::Set_Tactic_Rating(double sum)
+void Club::Set_Tactic_Rating()
 {
+	double sum = 0;
+
+	for(int i = 0; i < number_of_defenders_in_first_squad; ++i)
+		sum = sum + defenders_in_first_squad[i]->Get_Overall();
+	for(int i = 0; i < number_of_midfilders_in_first_squad; ++i)
+		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
+	for(int i = 0; i < number_of_attackers_in_first_squad; ++i)
+		sum = sum + attackers_in_first_squad[i]->Get_Overall();
+
 	_tactic_rating = sum / 10; // 10 - number of outfield players.
 }
 
@@ -165,7 +175,7 @@ void Club::List_Players() const
 }
 
 
-
+bool Compare_Overall (Player* a, Player* b) { return a->Get_Overall() > b->Get_Overall(); }
 
 int Club::Set_Tactics()
 {
@@ -175,38 +185,14 @@ int Club::Set_Tactics()
 		return -1;
 	}
 
-//------------------------------------------------------------------------ORDERING PLAYERS FROM BEST TO WORSE-------------------------------------------------------------------------
-	unsigned int i;
-	int swapped;
-	do
-	{
-		swapped = 0;
-
-		for(i = 0; i < players.size() - 1; ++i)
-		{
-			if( players[i]->Get_Overall() < players[i+1]->Get_Overall())
-			{
-				struct Player *tmp = players[i];
-				players[i] = players[i+1];
-				players[i+1] = tmp;
-			}
-			else
-				++swapped;
-		}
-	} while(swapped != players.size() - 1); //because swap operation takes one cycle less than number of players. //If there was no swap all the way, means everything is ordered.
-
-	//for(int x = 0; x < players.size(); ++x)
-		//cout << players.at(x)->surname << ": " << players.at(x)->Get_Overall() << endl; cout <<endl <<endl<<endl;
-
-//------------------------------------------------------------------------------END OF ORDERING-------------------------------------------------------------------------
-
+	sort(players.begin(), players.end(), Compare_Overall); //Ordering players from best to worse.
 
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 	number_of_attackers_in_first_squad = 0, number_of_midfilders_in_first_squad = 0, number_of_defenders_in_first_squad = 0;
 	int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
 	int current_attackers = 0, current_midfilders = 0, current_defenders = 0;
 	int attacker_index = 0, midfilder_index = 0, defender_index = 0;
-	i = 0;
+	unsigned int i = 0;
 
 	//NOTE: Maybe current_attackers, current mid, current def are unnecessary.
 
@@ -266,17 +252,7 @@ int Club::Set_Tactics()
 	tactic[1] = current_midfilders;
 	tactic[2] = current_attackers;
 
-
-	double sum = 0;
-
-	for(int i = 0; i < current_defenders; ++i)
-		sum = sum + defenders_in_first_squad[i]->Get_Overall();
-	for(int i = 0; i < current_midfilders; ++i)
-		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
-	for(int i = 0; i <current_attackers; ++i)
-		sum = sum + (*attackers_in_first_squad[i]).Get_Overall();
-
-	Set_Tactic_Rating(sum);
+	Set_Tactic_Rating();
 
 	Allow_Playing(); //Coming to this line, it means that we successfully created formation, and added players.
 
@@ -491,9 +467,91 @@ void Club::Set_Ticket_Prices()
 
 void Club::Set_Attendancy()
 {
-	//In future: implement better algorithm affecting attendancy.
+	//In future: implement better algorithm affecting attendance.
 	if(matches_won > matches_lost)
 		_attendance = stadium._capacity;
 	else
 		_attendance = stadium._capacity / 2;
 }
+
+void Club::Improve_Skills(bool won)
+{
+	unsigned int i;
+	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
+	{
+		++defenders_in_first_squad[i]->attributes.defending_attributes.interceptions;
+		++defenders_in_first_squad[i]->attributes.defending_attributes.marking;
+		++defenders_in_first_squad[i]->attributes.defending_attributes.slide_tackle;
+		++defenders_in_first_squad[i]->attributes.defending_attributes.stand_tackle;
+	}
+
+	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
+	{
+		++midfilders_in_first_squad[i]->attributes.mental_attributes.pressure_handling;
+		if (won) //extra improving for winners.
+		{
+			++midfilders_in_first_squad[i]->attributes.mental_attributes.leadership;
+			++midfilders_in_first_squad[i]->attributes.mental_attributes.flair;
+			++midfilders_in_first_squad[i]->attributes.mental_attributes.concetration;
+			++midfilders_in_first_squad[i]->attributes.mental_attributes.game_reading;
+			++midfilders_in_first_squad[i]->attributes.mental_attributes.work_rate;
+		}
+	}
+
+	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
+	{
+		++attackers_in_first_squad[i]->attributes.attacking_attributes.ball_control;
+		++attackers_in_first_squad[i]->attributes.attacking_attributes.first_touch;
+		++attackers_in_first_squad[i]->attributes.attacking_attributes.passing;
+		++attackers_in_first_squad[i]->attributes.attacking_attributes.weak_foot;
+		if (won)
+		{
+			++attackers_in_first_squad[i]->attributes.attacking_attributes.dribbling;
+			++attackers_in_first_squad[i]->attributes.attacking_attributes.finishing;
+			++attackers_in_first_squad[i]->attributes.attacking_attributes.shooting;
+		}
+	}
+
+	Set_Tactic_Rating();
+}
+
+void Club::Update_Players_Morale(bool result)
+{
+	unsigned int i;
+	if (result == true)
+	{
+		for(i = 0; i < players.size(); ++i)
+		{
+			players[i]->psyche.morale += 10;
+
+		if (players[i]->psyche.morale > 100 )
+			players[i]->psyche.morale = 100; //In case we went above 100, we're setting the maximum.
+		}
+	}
+	else
+	{
+		for(i = 0; i < players.size(); ++i)
+		{
+			players[i]->psyche.morale -= 10;
+
+		if (players[i]->psyche.morale < 0 )
+			players[i]->psyche.morale = 0;
+		}
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

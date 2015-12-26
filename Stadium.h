@@ -1,9 +1,11 @@
 #ifndef STADIUM_H_
 #define STADIUM_H_
 
+#include <vector>
 #include <string>
 class Club;
-static std::string stadium_names[] = {"Camp Nou", "Santiago Bernabeu", "Stamford Bridge", "Anfield Park", "Etihad Stadium", "San Siro", "Goodison Park", "Old Trafford"};
+
+static std::vector<std::string> stadium_names = {"Camp Nou", "Santiago Bernabeu", "Stamford Bridge", "Anfield Park", "Etihad Stadium", "San Siro", "Goodison Park", "Old Trafford"};
 
 class Stadium
 {

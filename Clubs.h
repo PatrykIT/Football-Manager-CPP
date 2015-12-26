@@ -30,6 +30,10 @@ private:
 	unsigned int matches_played;
 	unsigned int matches_won, matches_lost, matches_drawn;
 
+	Player *attackers_in_first_squad[3];
+	Player *midfilders_in_first_squad[5];
+	Player *defenders_in_first_squad[5];
+
 	unsigned int number_of_attackers_in_first_squad;
 	unsigned int number_of_midfilders_in_first_squad;
 	unsigned int number_of_defenders_in_first_squad;
@@ -37,9 +41,6 @@ private:
 	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are layed out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
-	Player *attackers_in_first_squad[3];
-	Player *midfilders_in_first_squad[5];
-	Player *defenders_in_first_squad[5];
 
 	History *_history;
 	int _history_messages_counter;
@@ -49,12 +50,15 @@ private:
 	unsigned int _attendance;
 	unsigned int _ticket_prices;
 
-	void Set_Tactic_Rating(double sum);
+	void Set_Tactic_Rating();
 	void Allow_Playing();
 	void Resize_History();
 	void Increment_History_Messages_Counter();
-
+	void Set_Ticket_Prices();
+	void Set_Attendancy();
 	char Check_if_Allowed_to_Play() const;
+	void Improve_Skills(bool won);
+	void Update_Players_Morale(bool result);
 
 	int Get_ID() const;
 	int Buy_Player();
@@ -73,8 +77,6 @@ public:
 	void Print_Whole_Squad() const;
 	void List_Players() const;
 	void Print_Positions_Number() const;
-	void Set_Ticket_Prices();
-	void Set_Attendancy();
 
 	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter() const;

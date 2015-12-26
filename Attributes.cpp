@@ -185,18 +185,7 @@ double Player::Get_Value() const
 	return _value;
 }
 
-void Player::Psyche::Update_Morale(bool result) //1 - good result, morale up. 0 - bad result, morale down.
+int Player::Get_Morale() const
 {
-	if (result == true)
-	{
-		morale += 10;
-		if (morale > 100)
-			morale = 100; //In case we went above 100, we're setting the maximum.
-	}
-	else
-	{
-		morale -= 10;
-		if (morale < 0)
-			morale = 0;
-	}
+	return psyche.morale;
 }

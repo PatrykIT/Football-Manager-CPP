@@ -127,8 +127,6 @@ void Start()
 
 	table->Play_Round();
 
-	table->Print_Table();
-
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
 
@@ -140,9 +138,6 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Transform to smart pointers.
  * Set_Tactics - change to QuickSort
- * Change Stadium container to vector - when stadion name is used, delete it from available names.
- * Implement setting ticket prices and fans attending.
- * Implement function to pass for std::sort, and use it in Set_Tactis()
  * Try to change colours in console.
  */
 
@@ -166,9 +161,6 @@ int main()
 
 /*
  * Make : history of players (dates of playing in which clubs, goals scored, assists, development, fee received).
- * Add stadium, so games at home could be easier for the home team. Add ticket prices, average attendance etc.
- * Count attendance based on the reputation of guest team (maybe by position in table?)
- *
  * Make it on-line - Two persons (client - server) can play in the same league.
  * Add save - load function.
  * Create morale of players, and dialogues of them with You. Every dialogue affects morale, which affects performance.
