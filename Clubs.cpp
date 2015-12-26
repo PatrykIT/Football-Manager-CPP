@@ -190,67 +190,56 @@ int Club::Set_Tactics()
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 	number_of_attackers_in_first_squad = 0, number_of_midfilders_in_first_squad = 0, number_of_defenders_in_first_squad = 0;
 	int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
-	int current_attackers = 0, current_midfilders = 0, current_defenders = 0;
-	int attacker_index = 0, midfilder_index = 0, defender_index = 0;
 	unsigned int i = 0;
-
-	//NOTE: Maybe current_attackers, current mid, current def are unnecessary.
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 	{
-		if(players[i]->Get_Position() == 1 && (current_defenders < max_defenders ))
-			if(  (current_defenders + 1 == max_defenders) && (current_midfilders == max_midfilders || current_attackers == max_attackers) )
+		if(players[i]->Get_Position() == 1 && (number_of_defenders_in_first_squad < max_defenders ))
+			if((number_of_defenders_in_first_squad + 1 == max_defenders) && (number_of_midfilders_in_first_squad == max_midfilders || number_of_attackers_in_first_squad == max_attackers))
 			{} //can not have two max of positions, because the third one would not get a place.
 		else
 		{
-			defenders_in_first_squad[defender_index] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
-			++current_defenders;
-			++defender_index;
+			defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
 			++number_of_defenders_in_first_squad;
 		}
 
 
-		if(players[i]->Get_Position() == 2 && current_midfilders < max_midfilders)
-			if(  (current_midfilders + 1 == max_midfilders)  && (current_attackers == max_attackers  ||  current_defenders == max_defenders) )
+		if(players[i]->Get_Position() == 2 && number_of_midfilders_in_first_squad < max_midfilders)
+			if((number_of_midfilders_in_first_squad + 1 == max_midfilders)  && (number_of_attackers_in_first_squad == max_attackers  ||  number_of_defenders_in_first_squad == max_defenders))
 				{}
 		else
 		{
-			midfilders_in_first_squad[midfilder_index] = players[i];
-			++current_midfilders;
-			++midfilder_index;
+			midfilders_in_first_squad[number_of_midfilders_in_first_squad] = players[i];
 			++number_of_midfilders_in_first_squad;
 		}
 
 
-		if(players[i]->Get_Position() == 3 && current_attackers < max_attackers)
-			if(  (current_attackers + 1 == max_attackers) && (current_midfilders == max_midfilders || current_defenders == max_defenders) )
+		if(players[i]->Get_Position() == 3 && number_of_attackers_in_first_squad < max_attackers)
+			if((number_of_attackers_in_first_squad + 1 == max_attackers) && (number_of_midfilders_in_first_squad == max_midfilders || number_of_defenders_in_first_squad == max_defenders))
 				{}
 			else
 			{
-				attackers_in_first_squad[attacker_index] = players[i];
-				++current_attackers;
-				++attacker_index;
+				attackers_in_first_squad[number_of_attackers_in_first_squad] = players[i];
 				++number_of_attackers_in_first_squad;
 			}
 
 		++i;
-	} while  ( (current_attackers + current_midfilders + current_defenders < 10) && (i != players.size()));
+	} while  ((number_of_attackers_in_first_squad + number_of_midfilders_in_first_squad + number_of_defenders_in_first_squad < 10) && (i != players.size()));
 
-	if( (current_attackers < min_attackers || current_midfilders < min_midfilders || current_defenders < min_defenders) || (current_attackers +
-			current_midfilders + current_defenders != 10 ))
+	if( (number_of_attackers_in_first_squad < min_attackers || number_of_midfilders_in_first_squad < min_midfilders || number_of_defenders_in_first_squad < min_defenders) || (number_of_attackers_in_first_squad +
+			number_of_midfilders_in_first_squad + number_of_defenders_in_first_squad != 10 ))
 	{
 		printf("\nCouldn't set proper tactics! Not enough players for a position. [%d]\n", _ID);
-		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", current_attackers, current_midfilders, current_defenders);
+		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", number_of_attackers_in_first_squad, number_of_midfilders_in_first_squad, number_of_defenders_in_first_squad);
 		return -1;
 	}
-
 
 //---------------------------------------------------------------------END OF SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 
 
-	tactic[0] = current_defenders; //every value in index means number of players in this position.
-	tactic[1] = current_midfilders;
-	tactic[2] = current_attackers;
+	tactic[0] = number_of_defenders_in_first_squad; //every value in index means number of players in this position.
+	tactic[1] = number_of_midfilders_in_first_squad;
+	tactic[2] = number_of_attackers_in_first_squad;
 
 	Set_Tactic_Rating();
 
