@@ -156,14 +156,14 @@ void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be sche
 }
 
 
-int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2) const //Returns index of paired clubs.
+int Table::Find_Index_of_Pair_In_Kolejka(Club &club_1, Club &club_2) const //Returns index of paired clubs.
 {
 	int i;
 	int number_of_matches_in_round = (number_of_clubs_in_ligue / 2);
 
 	for(i = 0; i < number_of_matches_in_round; ++i)
 	{
-		if( (round[current_round].match[i]->clubs_paired[0])->Get_ID() == (*club_1)->Get_ID() && (round[current_round].match[i]->clubs_paired[1])->Get_ID() == (*club_2)->Get_ID())
+		if( (round[current_round].match[i]->clubs_paired[0])->Get_ID() == club_1.Get_ID() && (round[current_round].match[i]->clubs_paired[1])->Get_ID() == club_2.Get_ID())
 			return i;
 	}
 
@@ -364,7 +364,7 @@ void Table::Play_Round()
 	int i;
 	for(i = 0; i < number_of_clubs_in_ligue / 2; ++i)
 	{
-		Play_Match(round[current_round].match[i]->clubs_paired + 0, round[current_round].match[i]->clubs_paired + 1);
+		Play_Match(*round[current_round].match[i]->clubs_paired[0], *round[current_round].match[i]->clubs_paired[1]);
 	}
 
 	int index_of_match_not_played = -1;
@@ -381,8 +381,8 @@ void Table::Play_Round()
 		{
 			do
 			{
-				if ( Check_which_Club_Needs_to_Buy(index_of_match_not_played) == 1) //succesfull buying of a player
-					Play_Match( &(round[current_round].match[index_of_match_not_played]->clubs_paired[0]), &(round[current_round].match[index_of_match_not_played]->clubs_paired[1]) );
+				if ( Check_which_Club_Needs_to_Buy(index_of_match_not_played) == 1) //successfully bought a player
+					Play_Match( *round[current_round].match[index_of_match_not_played]->clubs_paired[0], *round[current_round].match[index_of_match_not_played]->clubs_paired[1] );
 				else
 					Give_Walkover(index_of_match_not_played);
 
@@ -411,9 +411,9 @@ void Table::Play_Round()
 }
 
 
-void Table::Play_Match(Club **club_1, Club **club_2)
+void Table::Play_Match(Club &club_1, Club &club_2)
 {
-	printf("\nNow playing: [%d] vs [%d]\n", (*club_1)->Get_ID(), (*club_2)->Get_ID() );
+	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID() );
 
 //-------------------------------------- Check if match can be played --------------------------------------------------
 
@@ -423,12 +423,12 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 		return;
 	}
 
-	if ((*club_1)->Check_if_Allowed_to_Play() == 0 && (*club_2)->Check_if_Allowed_to_Play()== 0)
+	if (club_1.Check_if_Allowed_to_Play() == 0 && club_2.Check_if_Allowed_to_Play()== 0)
 	{
 		printf ("Clubs are not allowed to play.\n");
 		return;
 	}
-	else if ((*club_1)->Check_if_Allowed_to_Play() == 0 || (*club_2)->Check_if_Allowed_to_Play() == 0)
+	else if (club_1.Check_if_Allowed_to_Play() == 0 || club_2.Check_if_Allowed_to_Play() == 0)
 	{
 		printf ("One club is not allowed to play.\n");
 		return;
@@ -436,57 +436,58 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-	const int better_club = Calculate_Match_Winning_Odds(**club_1, **club_2);
+	const int better_club = Calculate_Match_Winning_Odds(club_1, club_2);
 
 	if (better_club == 1)
 	{
-		cout << (*club_1)->club_name << " " << (*club_1)->city_name << " won!" << endl;
+		cout << club_1.club_name << " " << club_1.city_name << " won!" << endl;
 
-		(*club_1)->points += 3;
-		++(*club_1)->matches_won;
-		++(*club_2)->matches_lost;
+		club_1.points += 3;
+		++club_1.matches_won;
+		++club_2.matches_lost;
 
-		for(unsigned int i = 0; i < (*club_1)->players.size(); ++i)
-			(*club_1)->players[i]->psyche.Update_Morale(1); //Players get better morale because of a win.
+		for(unsigned int i = 0; i < club_1.players.size(); ++i)
+			club_1.players[i]->psyche.Update_Morale(1); //Players get better morale because of a win.
 
-		for(unsigned int i = 0; i < (*club_2)->players.size(); ++i)
-			(*club_2)->players[i]->psyche.Update_Morale(0); //And goes the other way ;)
+		for(unsigned int i = 0; i < club_2.players.size(); ++i)
+			club_2.players[i]->psyche.Update_Morale(0); //And goes the other way ;)
 	}
 
 	else if (better_club == 2)
 	{
-		cout << (*club_2)->club_name << " " << (*club_2)->city_name << " won!" << endl;
+		cout << club_2.club_name << " " << club_2.city_name << " won!" << endl;
 
-		(*club_2)->points += 3;
-		++(*club_2)->matches_won;
-		++(*club_1)->matches_lost;
+		club_2.points += 3;
+		++club_2.matches_won;
+		++club_1.matches_lost;
 
-		for(unsigned int i = 0; i < (*club_2)->players.size(); ++i)
-			(*club_2)->players[i]->psyche.Update_Morale(1);
+		for(unsigned int i = 0; i < club_2.players.size(); ++i)
+			club_2.players[i]->psyche.Update_Morale(1);
 
-		for(unsigned int i = 0; i < (*club_1)->players.size(); ++i)
-			(*club_1)->players[i]->psyche.Update_Morale(0);
+		for(unsigned int i = 0; i < club_1.players.size(); ++i)
+			club_1.players[i]->psyche.Update_Morale(0);
 	}
 	else
 	{
 		printf("There was a draw!\n");
 
-		(*club_1)->points += 1;
-		(*club_2)->points += 1;
+		club_1.points += 1;
+		club_2.points += 1;
 
-		++(*club_1)->matches_drawn;
-		++(*club_2)->matches_drawn;
+		++club_1.matches_drawn;
+		++club_2.matches_drawn;
 	}
 
-	++(*club_1)->matches_played;
-	++(*club_2)->matches_played;
+	++club_1.matches_played;
+	++club_2.matches_played;
 
-	(*club_1)->Set_Attendancy();
-	(*club_1)->Set_Ticket_Prices();
-	(*club_2)->Set_Attendancy();
-	(*club_2)->Set_Ticket_Prices();
+	club_1.Set_Attendancy();
+	club_2.Set_Attendancy();
 
-	(*club_1)->_budget += (*club_1)->_ticket_prices * (*club_1)->_attendance;
+	club_1.Set_Ticket_Prices();
+	club_2.Set_Ticket_Prices();
+
+	club_1._budget += club_1._ticket_prices * club_1._attendance;
 
 	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2);
 
