@@ -11,8 +11,7 @@ private:
 	friend class Club;
 
 	const unsigned int _capacity = 10000 + rand() % 50000; //values from 10.000 to 60.000;
-	unsigned int _attendance;
-	unsigned int _ticket_prices;
+
 public:
 	const std::string stadium_name;
 	Stadium();

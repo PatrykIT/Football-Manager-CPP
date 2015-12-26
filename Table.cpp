@@ -74,6 +74,7 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 	int x = 1; 				//second ID. Always starts with ID one bigger than first ID.
 	int c = 0; 				//pair_counter
 	int last_value_of_x;
+	int home_match = 0;
 
 	int total_cycles_counter;
 
@@ -83,17 +84,23 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 
 		while(x != number_of_clubs)
 		{
-			//pair_of_clubs[c].clubs_paired[0] = clubs + a;
-			//pair_of_clubs[c].clubs_paired[1] = clubs + x;
 
-			pair_of_clubs[c].clubs_paired[0] = clubs[a];
-			pair_of_clubs[c].clubs_paired[1] = clubs[x];
+			if (home_match % 2 ==0)
+			{
+				pair_of_clubs[c].clubs_paired[0] = clubs[a];
+				pair_of_clubs[c].clubs_paired[1] = clubs[x];
+			}
+			else
+			{
+				pair_of_clubs[c].clubs_paired[0] = clubs[x]; //Interchange clubs by the place, so every club hosts games at home, and away.
+				pair_of_clubs[c].clubs_paired[1] = clubs[a];
+			}
 
-			//printf("Scheduling: [%d] vs [%d] Pair: %d\n", (*pair_of_clubs[c].clubs_paired[0])->Get_ID(), (*pair_of_clubs[c].clubs_paired[1])->Get_ID(), c);
 			printf("Scheduling: [%d] vs [%d] Pair: %d\n", (pair_of_clubs[c].clubs_paired[0])->Get_ID(), (pair_of_clubs[c].clubs_paired[1])->Get_ID(), c);
 
 			++x;
 			++c;
+			++home_match;
 		}
 
 		++a;
@@ -131,7 +138,7 @@ void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be sche
 
 			++i;
 
-			round[current_round].match[i] = (pair_of_clubs + end);
+			round[current_round].match[i] = pair_of_clubs + end;
 			round[current_round].match[i]->match_played = 0;
 
 			if( end - start == 1 ) //If we reached the middle.
@@ -144,20 +151,19 @@ void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be sche
 
 		}
 	}
+
+	Print_Rounds();
 }
 
 
-int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2) const
+int Table::Find_Index_of_Pair_In_Kolejka(struct Club **club_1, struct Club **club_2) const //Returns index of paired clubs.
 {
-	//Returns index of paired clubs.
-
 	int i;
 	int number_of_matches_in_round = (number_of_clubs_in_ligue / 2);
 
 	for(i = 0; i < number_of_matches_in_round; ++i)
 	{
 		if( (round[current_round].match[i]->clubs_paired[0])->Get_ID() == (*club_1)->Get_ID() && (round[current_round].match[i]->clubs_paired[1])->Get_ID() == (*club_2)->Get_ID())
-
 			return i;
 	}
 
@@ -264,11 +270,11 @@ void Table::Print_Rounds() const
 	}
 }
 
-void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
+void Table::Give_Walkover(int i)
 {
 	printf("\n");
 
-	if (  round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && round[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0 )
+	if (round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && round[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0)
 	{
 		printf("Both clubs should give walkover, as they both cannot play.\nFor keeping it simple, walkover goes for the first team.\n");
 
@@ -281,7 +287,7 @@ void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
 		round[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
 
 	}
-	else if(  round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 ) //If home club cannot play.
+	else if(round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0) //If home club cannot play.
 	{
 		printf("Home Club [%d] is giving a walkover to [%d].\n", round[current_round].match[i]->clubs_paired[0]->Get_ID(),
 				round[current_round].match[i]->clubs_paired[1]->Get_ID());
@@ -308,6 +314,8 @@ void Table::Give_Walkover(int i) //zrobić printa by clubs_paierd.
 		round[current_round].match[i]->clubs_paired[1]->matches_lost++;
 		round[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
 	}
+	++round[current_round].match[i]->clubs_paired[0]->matches_played;
+	++round[current_round].match[i]->clubs_paired[1]->matches_played;
 
 	round[current_round].match[i]->match_played = 1;
 }
@@ -473,7 +481,12 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	++(*club_1)->matches_played;
 	++(*club_2)->matches_played;
 
+	(*club_1)->Set_Attendancy();
+	(*club_1)->Set_Ticket_Prices();
+	(*club_2)->Set_Attendancy();
+	(*club_2)->Set_Ticket_Prices();
 
+	(*club_1)->_budget += (*club_1)->_ticket_prices * (*club_1)->_attendance;
 
 	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2);
 
@@ -486,12 +499,12 @@ void Table::Play_Match(Club **club_1, Club **club_2)
 	round[current_round].match[match_index]->match_played = 1;
 }
 
-int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const //This function will be optimalized in the coming days. (23.12.2015)
+int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 {
 	cout << "Ratings of clubs: " << club_1.Get_Tactic_Rating() << " || " << club_2.Get_Tactic_Rating() << endl;
 
 	int sum_of_morale_club1 = 0, sum_of_morale_club2 = 0;
-	int club1_chances = 0, club2_chances = 0;
+	int club1_chances = 5, club2_chances = 0; //club_1 has advantage from the start, because it plays at home.
 
 //-------------------------------------------------------------------Counting morale of both teams-------------------------------------------
 

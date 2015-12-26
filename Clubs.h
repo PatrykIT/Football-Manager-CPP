@@ -46,6 +46,8 @@ private:
 	int	number_of_stories;
 
 	Stadium stadium;
+	unsigned int _attendance;
+	unsigned int _ticket_prices;
 
 	void Set_Tactic_Rating(double sum);
 	void Allow_Playing();
@@ -72,6 +74,7 @@ public:
 	void List_Players() const;
 	void Print_Positions_Number() const;
 	void Set_Ticket_Prices();
+	void Set_Attendancy();
 
 	int Add_Player_to_Club(Player &player);
 	int Get_Message_Counter() const;

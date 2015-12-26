@@ -15,14 +15,13 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	tactic[0] = -1; //Say that this position is not yet filled with players.
 	tactic[1] = -1;
 	tactic[2] = -1;
+	_tactic_rating = 0;
 
 	number_of_attackers_in_first_squad = 0;
 	number_of_midfilders_in_first_squad = 0;
 	number_of_defenders_in_first_squad = 0;
 
 	_budget = 10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000))); //values 1000.0000 - 99999.999 $
-
-	_tactic_rating = 0;
 
 	points = 0;
 	goals_scored = 0, goals_conceded = 0;
@@ -33,8 +32,10 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_history = new History[number_of_stories];
 	_history_messages_counter = 0;
 
+	_attendance = 0;
+	_ticket_prices = 0;
+
 	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
-	cout << "Stadium: " << stadium.stadium_name << endl;
 }
 
 Club::~Club()
@@ -462,7 +463,7 @@ int Club::Sell_Player()
 	_history[_history_messages_counter].message = tmp;
 	_history->Save_History(*this);
 
-	swap(players[player_to_sell], players[players.size() -1]); //Copy the last player in place of a sold player.
+	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.
 
 	cout << "Player sold." << endl;
@@ -482,5 +483,17 @@ void Club::Print_Positions_Number() const
 
 void Club::Set_Ticket_Prices()
 {
+	if(matches_won > matches_lost)
+		_ticket_prices = (matches_won - matches_lost) * 10; //for ex. 3 more wins, than set price at 30$.
+	else
+		_ticket_prices = 9;
+}
 
+void Club::Set_Attendancy()
+{
+	//In future: implement better algorithm affecting attendancy.
+	if(matches_won > matches_lost)
+		_attendance = stadium._capacity;
+	else
+		_attendance = stadium._capacity / 2;
 }

@@ -125,8 +125,6 @@ void Start()
 
 	table->Schedule_Season();
 
-	table->Print_Rounds();
-
 	table->Play_Round();
 
 	table->Print_Table();
@@ -144,6 +142,8 @@ void Start()
  * Set_Tactics - change to QuickSort
  * Change Stadium container to vector - when stadion name is used, delete it from available names.
  * Implement setting ticket prices and fans attending.
+ * Implement function to pass for std::sort, and use it in Set_Tactis()
+ * Try to change colours in console.
  */
 
 int main()
