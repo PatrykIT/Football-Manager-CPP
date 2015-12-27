@@ -15,21 +15,24 @@ Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
 
 Player& Player::operator =(const Player &other)
 {
+	attributes = other.attributes;
+	psyche = other.psyche;
 	_age = other._age;
 	_position = other._position;
 	name = other.name;
 	surname = other.surname;
-	attributes = other.attributes;
 	_overall = other._overall;
 	_value = other._value;
 
 	return *this;
 }
 
+Player::Player(const Player &other) : attributes(other.attributes), psyche(other.psyche), _age(other._age), _position(other._position), _overall(other._overall),
+		_value(other._value), name(other.name), surname(other.surname) {}
 
 void Player::_Set_Attributes()
 {
-	void *pointer_to_struct;
+	void *pointer_to_struct; //It is a shortcut by which I avoid writing each attribute separately. It is not portable, and dangerous.
 
 	//------------------------------------------ATTACKING----------------------------------------------------
 
@@ -101,9 +104,7 @@ void Player::_Set_Attributes()
 	}
 
 	attributes.mental_attributes.overall = (double) sum_of_attributes / number_of_attributes;
-
-
-
+	//----------------------------------------------------------------------------------------------------
 
 	_overall = (double) (attributes.attacking_attributes.overall + attributes.defending_attributes.overall + attributes.psyhical_attributes.overall +
 			attributes.mental_attributes.overall ) / 4;
@@ -152,7 +153,6 @@ void Player::Print_Attributes() const
 		break;
 	}
 	printf("\n");
-
 }
 
 void Player::_Set_Value()

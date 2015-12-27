@@ -61,6 +61,7 @@ private:
 public:
 	Player();
 	Player& operator =(const Player &other);
+	Player(const Player &other);
 
 	std::string name, surname;
 
