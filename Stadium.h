@@ -10,14 +10,12 @@ static std::vector<std::string> stadium_names = {"Camp Nou", "Santiago Bernabeu"
 class Stadium
 {
 private:
-	friend class Club;
-
 	const unsigned int _capacity = 10000 + rand() % 50000; //values from 10.000 to 60.000;
 
 public:
 	const std::string stadium_name;
+	unsigned int Get_Capacity();
 	Stadium();
-
 };
 
 
