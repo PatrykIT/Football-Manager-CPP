@@ -4,11 +4,12 @@
 class Calendar
 {
 private:
+	friend class History; //For access to time. We could make public getters, but I don't think it's bad design to friend history with time :)
+
 	Calendar();
 	Calendar(const Calendar &other);
 	Calendar& operator=(const Calendar& other);
 
-	friend class History;
 	static Calendar *calendar;
 
 	int hour, minute, seconde, day_of_a_week, day_of_a_month, month, year;

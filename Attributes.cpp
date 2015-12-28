@@ -112,7 +112,7 @@ void Player::_Set_Attributes()
 
 void Player::_Set_Position()
 {
-	if( attributes.attacking_attributes.overall - 10 > attributes.defending_attributes.overall ) //Has big advantage of a attacking skills.
+	if( attributes.attacking_attributes.overall - 10 > attributes.defending_attributes.overall ) //Has big advantage of attacking skills.
 		_position = 3;
 	else if (attributes.attacking_attributes.overall > attributes.defending_attributes.overall) //Similar skills.
 		_position = 2;

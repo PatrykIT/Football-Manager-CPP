@@ -1,8 +1,4 @@
-#include <iostream>
-#include <string>
-#include <random>
 #include <algorithm>
-
 #include "Clubs.h"
 
 using namespace std;
@@ -74,12 +70,12 @@ void Club::Resize_History()
 void Club::Set_Tactic_Rating()
 {
 	double sum = 0;
-
-	for(int i = 0; i < number_of_defenders_in_first_squad; ++i)
+	unsigned int i;
+	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 		sum = sum + defenders_in_first_squad[i]->Get_Overall();
-	for(int i = 0; i < number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
 		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
-	for(int i = 0; i < number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
 		sum = sum + attackers_in_first_squad[i]->Get_Overall();
 
 	_tactic_rating = sum / 10; // 10 - number of outfield players.
@@ -187,7 +183,7 @@ int Club::Set_Tactics()
 
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 	number_of_attackers_in_first_squad = 0, number_of_midfilders_in_first_squad = 0, number_of_defenders_in_first_squad = 0;
-	int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
+	unsigned int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
 	unsigned int i = 0;
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1

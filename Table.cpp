@@ -1,7 +1,6 @@
-#include <iostream>
+#include "Table.h"
 using namespace std;
 
-#include "Table.h"
 
 
 Table::Table()
@@ -54,7 +53,7 @@ Table::~Table()
 void Table::Print_Table() const
 {
     printf("\n\t---Table---\n");
-    for(int i = 0; i < number_of_clubs; ++i)
+    for(int i = 0; i < clubs.size(); ++i)
     {
         cout << clubs[i]->club_name << " " << clubs[i]->city_name << " [" << clubs[i]->Get_ID() << "] " << "has " <<  clubs[i]->points << " points." << endl;
 
@@ -156,7 +155,7 @@ void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be sche
 }
 
 
-int Table::Find_Index_of_Pair_In_Kolejka(Club &club_1, Club &club_2) const //Returns index of paired clubs.
+int Table::Find_Index_of_Pair_In_Round(Club &club_1, Club &club_2) const //Returns index of of a match in current round.
 {
 	int i;
 	int number_of_matches_in_round = (number_of_clubs_in_ligue / 2);
@@ -502,7 +501,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	club_1._budget += club_1._ticket_prices * club_1._attendance;
 
-	int match_index = Find_Index_of_Pair_In_Kolejka(club_1, club_2);
+	int match_index = Find_Index_of_Pair_In_Round(club_1, club_2);
 
 	if(match_index == -1)
 	{

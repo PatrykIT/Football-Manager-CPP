@@ -1,32 +1,22 @@
-
-#include <iostream>
-#include <vector>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stddef.h>
-#include <stdint.h>
-using namespace std;
-
 #include "Clubs.h"
 #include "Table.h"
 #include "Calendar.h"
 
+using namespace std;
+
 Calendar *calendar = Calendar::get();
 
-int number_of_players = 15;
 
 void Start()
 {
-	//printf("\nHello! You've been given %d players, and assigned a club.\n", number_of_players);
-
+	int number_of_players = 15;
 	int i;
 
 	for(unsigned j = 0; j < free_players.size(); ++j)
 		free_players[j] = new Player;
 
 	Club *club = new Club;
-	Player *players_1[number_of_players]; //redundant pointer?
+	Player *players_1[number_of_players];
 
 	for (i = 0; i < number_of_players; ++i)
 	{
@@ -139,6 +129,7 @@ void Start()
  * Transform to smart pointers.
  * Set_Tactics - change to QuickSort
  * Try to change colours in console.
+ * Add age as a factor to improving skills. Add declining of older players with time passing.
  */
 
 int main()
