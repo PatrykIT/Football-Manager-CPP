@@ -53,7 +53,7 @@ Table::~Table()
 void Table::Print_Table() const
 {
     printf("\n\t---Table---\n");
-    for(int i = 0; i < clubs.size(); ++i)
+    for(int i = 0; i < number_of_clubs_in_ligue; ++i)
     {
         cout << clubs[i]->club_name << " " << clubs[i]->city_name << " [" << clubs[i]->Get_ID() << "] " << "has " <<  clubs[i]->points << " points." << endl;
 
@@ -63,7 +63,7 @@ void Table::Print_Table() const
 void Table::Schedule_Season() //Pairs every club ID with every club ID.
 {
 	cout << endl << "Scheduling season: " << endl;
-	if(Assert_Table_Full() != 1)
+	if(Assert_Table_Full() != 0)
 	{
 		printf("Cannot schedule season. Table not full.\n");
 		return;
@@ -222,7 +222,7 @@ int Table::Count_Combinations(int n, int k) const
 int Table::Assert_Table_Full() const
 {
 	if( number_of_clubs == number_of_clubs_in_ligue )
-		return 1;
+		return 0;
 	else
 		return -1;
 }
@@ -249,7 +249,7 @@ int Table::Check_if_Round_Played(int *index_of_match_not_played) const
 	}
 
 	printf("\n\tRound played fully.\n");
-	return 1; //Coming here, means all matches were played in the round.
+	return 0; //Coming here, means all matches were played in the round.
 }
 
 
@@ -390,13 +390,13 @@ void Table::Play_Round()
 		{
 			do
 			{
-				if ( Check_which_Club_Needs_to_Buy(index_of_match_not_played) == 1) //successfully bought a player
+				if ( Check_which_Club_Needs_to_Buy(index_of_match_not_played) == 0) //successfully bought a player
 					Play_Match( *round[current_round].match[index_of_match_not_played]->clubs_paired[0], *round[current_round].match[index_of_match_not_played]->clubs_paired[1] );
 				else
 					Give_Walkover(index_of_match_not_played);
 
 			}
-			while( (Check_if_Round_Played(&index_of_match_not_played) != 1) );
+			while( (Check_if_Round_Played(&index_of_match_not_played) != 0) );
 
 		}
 		else if (choice == 2)
@@ -410,7 +410,7 @@ void Table::Play_Round()
 			{
 				Give_Walkover(index_of_match_not_played);
 			}
-			while( (Check_if_Round_Played(&index_of_match_not_played) != 1) );
+			while( (Check_if_Round_Played(&index_of_match_not_played) != 0) );
 
 		}
 	}
@@ -426,13 +426,13 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID());
 	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
 //-------------------------------------- Check if match can be played --------------------------------------------------
-	if ( Assert_Table_Full() != 1)
+	if ( Assert_Table_Full() != 0)
 	{
 		printf ("Cannot play match. League is not full yet.\n");
 		return;
 	}
 
-	if (club_1.Check_if_Allowed_to_Play() == 0 && club_2.Check_if_Allowed_to_Play()== 0)
+	if (club_1.Check_if_Allowed_to_Play() == 0 && club_2.Check_if_Allowed_to_Play() == 0)
 	{
 		printf ("Clubs are not allowed to play.\n");
 		return;

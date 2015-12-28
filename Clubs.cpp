@@ -382,7 +382,7 @@ int Club::Buy_Player()
 		}
 	}
 
-	return 1; //successfully bought a player.
+	return 0; //successfully bought a player.
 }
 
 int Club::Sell_Player()
