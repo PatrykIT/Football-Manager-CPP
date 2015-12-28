@@ -16,8 +16,8 @@ private:
 	Club(const Club& other);
 	Club& operator=(const Club& other);
 
-	friend class Table;
-	friend class History;
+	friend class Table; //So we can change points, match played etc.
+	friend class History; //So we can save history about things that happened in club throughout the game.
 
 	static int _instance_number;
 	const int _ID;

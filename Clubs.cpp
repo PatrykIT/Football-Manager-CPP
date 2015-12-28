@@ -33,7 +33,7 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	_history = new History[number_of_stories];
 	_history_messages_counter = 0;
 
-	_attendance = stadium._capacity;
+	_attendance = stadium.Get_Capacity();
 	_ticket_prices = 10;
 
 	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
@@ -42,11 +42,9 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 Club::~Club()
 {
 	for(unsigned int i = 0; i < players.size(); ++i)
-	{
 		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
-		players[i] = NULL;
-	}
 
+	players.clear();
 	delete []_history;
 }
 
@@ -181,7 +179,7 @@ int Club::Set_Tactics()
 {
 	if(players.size() < 11)
 	{
-		printf("Not enough players to set tactic!\n");
+		cout << "Not enough players to set tactic!" << endl;
 		return -1;
 	}
 
@@ -458,9 +456,9 @@ void Club::Set_Attendancy()
 {
 	//In future: implement better algorithm affecting attendance.
 	if(matches_won > matches_lost)
-		_attendance = stadium._capacity;
+		_attendance = stadium.Get_Capacity();
 	else
-		_attendance = stadium._capacity / 2;
+		_attendance = stadium.Get_Capacity() / 2;
 }
 
 void Club::Improve_Skills(bool won)
