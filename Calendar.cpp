@@ -1,10 +1,11 @@
 #include <iostream>
 #include "Calendar.h"
 
+#include "Table.h"
 Calendar* Calendar::calendar = NULL;
 
 
-void Calendar::Set_Hour() //Used by History class to save messagess - it update's the time, without updating the date, because date is constantly modified by Travel_Calendar().
+void Calendar::Set_Hour() //Used by History class to save messages - it update's the time, without updating the date, because date is constantly modified by Travel_Calendar().
 {
 	time_t raw_time;
 	time(&raw_time); //returns the time since the Epoch (00:00:00 UTC, January 1, 1970), measured in seconds.
@@ -34,6 +35,10 @@ void Calendar::Travel_Calendar(int days)
 		{
 			++year;
 			month = 1;
+
+			for(unsigned int i = 0; i < tables.size(); ++i) //for every table (league)
+				for(int a = 0; a < tables[i]->number_of_clubs; ++a) //for every club in a table
+					tables[i]->clubs[a]->Year_Passed(); //Making clubs aware that it is a New Year.
 		}
 		else
 			++month;
@@ -75,4 +80,9 @@ Calendar* Calendar::get()
 Calendar::~Calendar()
 {
 
+}
+
+void Calendar::Add_Table(Table &table)
+{
+	tables.push_back(&table);
 }
