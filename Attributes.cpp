@@ -51,7 +51,7 @@ void Player::_Set_Attributes()
 		pointer_to_struct += sizeof(int);
 	}
 
-	attributes.attacking_attributes.overall = (double) sum_of_attributes / number_of_attributes;
+	attributes.attacking_attributes.Set_Overall();
 
 	//------------------------------------------DEFENDING----------------------------------------------------
 
@@ -69,7 +69,7 @@ void Player::_Set_Attributes()
 		pointer_to_struct += sizeof(int);
 	}
 
-	attributes.defending_attributes.overall = (double) sum_of_attributes / number_of_attributes;
+	attributes.defending_attributes.Set_Overall();
 
 	//------------------------------------------PHYSICAL----------------------------------------------------
 
@@ -86,7 +86,7 @@ void Player::_Set_Attributes()
 		pointer_to_struct += sizeof(int);
 	}
 
-	attributes.psyhical_attributes.overall = (double) sum_of_attributes / number_of_attributes;
+	attributes.psyhical_attributes.Set_Overall();
 
 	//------------------------------------------MENTAL----------------------------------------------------
 
@@ -103,18 +103,17 @@ void Player::_Set_Attributes()
 		pointer_to_struct += sizeof(int);
 	}
 
-	attributes.mental_attributes.overall = (double) sum_of_attributes / number_of_attributes;
+	attributes.mental_attributes.Set_Overall();
 	//----------------------------------------------------------------------------------------------------
 
-	_overall = (double) (attributes.attacking_attributes.overall + attributes.defending_attributes.overall + attributes.psyhical_attributes.overall +
-			attributes.mental_attributes.overall ) / 4;
+	Set_Overall();
 }
 
 void Player::_Set_Position()
 {
-	if( attributes.attacking_attributes.overall - 10 > attributes.defending_attributes.overall ) //Has big advantage of attacking skills.
+	if( attributes.attacking_attributes.Get_Overall() - 10 > attributes.defending_attributes.Get_Overall() ) //Has big advantage of attacking skills.
 		_position = 3;
-	else if (attributes.attacking_attributes.overall > attributes.defending_attributes.overall) //Similar skills.
+	else if (attributes.attacking_attributes.Get_Overall() > attributes.defending_attributes.Get_Overall()) //Similar skills.
 		_position = 2;
 	else 																						//Better as a defender.
 		_position = 1;
@@ -189,3 +188,85 @@ int Player::Get_Morale() const
 {
 	return psyche.morale;
 }
+
+void Player::Set_Overall()
+{
+	_overall = (attributes.attacking_attributes.Get_Overall() + attributes.defending_attributes.Get_Overall() + attributes.mental_attributes.Get_Overall() +
+			attributes.psyhical_attributes.Get_Overall()) / 4.0;
+}
+
+
+
+void Player::Attributes::Defending_Attributes::Set_Overall()
+{
+	double sum = interceptions + marking + slide_tackle + stand_tackle;
+	overall = sum / 4;
+}
+
+
+void Player::Attributes::Attacking_Attributes::Set_Overall()
+{
+	double sum = 0;
+
+	sum += ball_control;
+	sum += crossing;
+	sum += dribbling;
+	sum += finishing;
+	sum += first_touch;
+	sum += passing;
+	sum += shooting;
+	sum += weak_foot;
+
+	overall = sum / 8;
+}
+
+void Player::Attributes::Mental_Attributes::Set_Overall()
+{
+	double sum = 0;
+
+	sum += aggression;
+	sum += concetration;
+	sum += flair;
+	sum += game_reading;
+	sum += leadership;
+	sum += pressure_handling;
+	sum += work_rate;
+
+	overall = sum / 7;
+}
+
+
+
+void Player::Attributes::Psyhical_Attributes::Set_Overall()
+{
+	double sum = accelaration + agility + stamina + strength;
+	overall = sum / 4;
+}
+
+
+double Player::Attributes::Attacking_Attributes::Get_Overall() const
+{
+	return overall;
+}
+
+double Player::Attributes::Defending_Attributes::Get_Overall() const
+{
+	return overall;
+}
+
+double Player::Attributes::Mental_Attributes::Get_Overall() const
+{
+	return overall;
+}
+
+double Player::Attributes::Psyhical_Attributes::Get_Overall() const
+{
+	return overall;
+}
+
+
+
+
+
+
+

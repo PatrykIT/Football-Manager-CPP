@@ -15,33 +15,47 @@ class Player
 {
 private:
 	friend class Club; //for improving players after game, and updating their morales.
+
 	void _Set_Attributes();
 	void _Set_Position();
 	void _Set_Value();
+	void Set_Overall();
 
 	struct Attributes
 	{
 		struct Attacking_Attributes
 		{
 			int ball_control, dribbling, crossing, passing, first_touch, shooting, finishing, weak_foot;
+			void Set_Overall();
+			double Get_Overall() const;
+		private:
 			double overall;
 		} attacking_attributes;
 
 		struct Defending_Attributes
 		{
 			int stand_tackle, slide_tackle, marking, interceptions;
+			void Set_Overall();
+			double Get_Overall() const;
+		private:
 			double overall;
 		} defending_attributes;
 
 		struct Psyhical_Attributes
 		{
 			int accelaration, agility, strength, stamina;
+			void Set_Overall();
+			double Get_Overall() const;
+		private:
 			double overall;
 		} psyhical_attributes;
 
 		struct Mental_Attributes
 		{
 			int aggression, concetration, pressure_handling, work_rate, leadership, flair, game_reading;
+			void Set_Overall();
+			double Get_Overall() const;
+		private:
 			double overall;
 		} mental_attributes;
 	} attributes;
@@ -54,9 +68,10 @@ private:
 	} psyche;
 
 	int _age;
-	int _position; //1 - Defender. 2 - Midfilder. 3 - Attacker
+	int _position; //1 - Defender. 2 - Midfielder. 3 - Attacker
 	double _overall; //counted on all overalls.
 	double _value;
+
 
 public:
 	Player();
