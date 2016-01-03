@@ -371,8 +371,6 @@ int Club::Buy_Player()
 		if (bought == true)
 		{
 			Set_Tactics();
-			Print_First_Squad();
-
 			break; //Exit infinite loop
 		}
 		else
@@ -457,15 +455,19 @@ void Club::Set_Attendancy()
 		_attendance = stadium.Get_Capacity() / 2;
 }
 
-void Club::Improve_Skills(bool won)
+void Club::Improve_Skills_After_Match(bool won)
 {
+
 	unsigned int i;
 	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
 	{
 		++defenders_in_first_squad[i]->attributes.defending_attributes.interceptions;
 		++defenders_in_first_squad[i]->attributes.defending_attributes.marking;
-		++defenders_in_first_squad[i]->attributes.defending_attributes.slide_tackle;
-		++defenders_in_first_squad[i]->attributes.defending_attributes.stand_tackle;
+		if (won)
+		{
+			++defenders_in_first_squad[i]->attributes.defending_attributes.slide_tackle;
+			++defenders_in_first_squad[i]->attributes.defending_attributes.stand_tackle;
+		}
 	}
 
 	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
@@ -523,6 +525,112 @@ void Club::Update_Players_Morale(bool result)
 	}
 
 }
+
+void Club::Year_Passed()
+{
+	for(unsigned int i = 0; i < players.size(); ++i)
+	{
+		if(players[i]->_age < 24)
+			Improve_Skills_New_Year(players[i], players[i]->_position);
+		else if(players[i]->_age > 29)
+			Decline_Skills_New_Year(players[i], players[i]->_position);
+	}
+
+	Set_Tactic_Rating();
+}
+
+void Club::Improve_Skills_New_Year(Player *&player, int position)
+{
+	if (position == 3)
+	{
+		player->attributes.attacking_attributes.ball_control += 2;
+		player->attributes.attacking_attributes.crossing += 2;
+		player->attributes.attacking_attributes.dribbling += 2;
+		player->attributes.attacking_attributes.finishing += 2;
+		player->attributes.attacking_attributes.first_touch += 2;
+		player->attributes.attacking_attributes.passing += 2;
+		player->attributes.attacking_attributes.passing += 2;
+		player->attributes.attacking_attributes.shooting += 2;
+		player->attributes.attacking_attributes.weak_foot += 2;
+	}
+	if (position == 2)
+	{
+		player->attributes.mental_attributes.aggression += 2;
+		player->attributes.mental_attributes.concetration += 2;
+		player->attributes.mental_attributes.flair += 2;
+		player->attributes.mental_attributes.game_reading += 2;
+		player->attributes.mental_attributes.leadership += 2;
+		player->attributes.mental_attributes.pressure_handling += 2;
+		player->attributes.mental_attributes.work_rate += 2;
+	}
+	if (position == 1)
+	{
+		player->attributes.defending_attributes.interceptions += 2;
+		player->attributes.defending_attributes.marking += 2;
+		player->attributes.defending_attributes.slide_tackle += 2;
+		player->attributes.defending_attributes.stand_tackle += 2;
+	}
+
+	player->attributes.psyhical_attributes.accelaration += 2; //Physical attributes get better no matter the position.
+	player->attributes.psyhical_attributes.agility += 2;
+	player->attributes.psyhical_attributes.stamina += 2;
+	player->attributes.psyhical_attributes.strength += 2;
+
+	player->attributes.attacking_attributes.Set_Overall();
+	player->attributes.defending_attributes.Set_Overall();
+	player->attributes.mental_attributes.Set_Overall();
+	player->attributes.psyhical_attributes.Set_Overall();
+
+	player->Set_Overall();
+}
+
+
+
+void Club::Decline_Skills_New_Year(Player *&player, int position)
+{
+	if (position == 3)
+	{
+		player->attributes.attacking_attributes.ball_control -= 2;
+		player->attributes.attacking_attributes.crossing -= 2;
+		player->attributes.attacking_attributes.dribbling -= 2;
+		player->attributes.attacking_attributes.finishing -= 2;
+		player->attributes.attacking_attributes.first_touch -= 2;
+		player->attributes.attacking_attributes.passing -= 2;
+		player->attributes.attacking_attributes.passing -= 2;
+		player->attributes.attacking_attributes.shooting -= 2;
+		player->attributes.attacking_attributes.weak_foot -= 2;
+	}
+	if (position == 2)
+	{
+		player->attributes.mental_attributes.concetration += 3; //With age, some skills get even better.
+		player->attributes.mental_attributes.game_reading += 3;
+		player->attributes.mental_attributes.leadership += 4;
+		player->attributes.mental_attributes.pressure_handling += 4;
+		player->attributes.mental_attributes.aggression -= 2;
+		player->attributes.mental_attributes.flair -= 2;
+		player->attributes.mental_attributes.work_rate -= 2;
+	}
+	if (position == 1)
+	{
+		player->attributes.defending_attributes.interceptions -= 2;
+		player->attributes.defending_attributes.marking -= 2;
+		player->attributes.defending_attributes.slide_tackle -= 2;
+		player->attributes.defending_attributes.stand_tackle -= 2;
+	}
+
+	player->attributes.psyhical_attributes.accelaration -= 2;
+	player->attributes.psyhical_attributes.agility -= 2;
+	player->attributes.psyhical_attributes.stamina -= 2;
+	player->attributes.psyhical_attributes.strength -= 2;
+
+	player->attributes.attacking_attributes.Set_Overall();
+	player->attributes.defending_attributes.Set_Overall();
+	player->attributes.mental_attributes.Set_Overall();
+	player->attributes.psyhical_attributes.Set_Overall();
+
+	player->Set_Overall();
+}
+
 
 
 

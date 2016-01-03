@@ -13,6 +13,8 @@ static std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", 
 class Club
 {
 private:
+	friend class Calendar; //for Year_Passed()
+
 	Club(const Club& other);
 	Club& operator=(const Club& other);
 
@@ -22,7 +24,7 @@ private:
 	static int _instance_number;
 	const int _ID;
 	bool _allowed_to_play;
-	double _tactic_rating; //Tacting rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
+	double _tactic_rating; //Tactic rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
 	float _budget;
 
 	int points;
@@ -39,7 +41,7 @@ private:
 	unsigned int number_of_defenders_in_first_squad;
 
 	std::vector<Player*> players;
-	int tactic[3]; //Indicates how players are layed out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
+	int tactic[3]; //Indicates how players are laid out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
 
 	History *_history;
@@ -50,15 +52,18 @@ private:
 	unsigned int _attendance;
 	unsigned int _ticket_prices;
 
+	char Check_if_Allowed_to_Play() const;
 	void Set_Tactic_Rating();
 	void Allow_Playing();
 	void Resize_History();
 	void Increment_History_Messages_Counter();
 	void Set_Ticket_Prices();
 	void Set_Attendancy();
-	char Check_if_Allowed_to_Play() const;
-	void Improve_Skills(bool won);
+	void Improve_Skills_After_Match(bool won);
 	void Update_Players_Morale(bool result);
+	void Year_Passed(); //When New Year comes, class Calendar should make club's aware with calling this function.
+	void Improve_Skills_New_Year(Player *&player, int position);
+	void Decline_Skills_New_Year(Player *&player, int position);
 
 	int Get_ID() const;
 	int Buy_Player();
