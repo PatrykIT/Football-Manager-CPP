@@ -10,13 +10,15 @@
 class Table
 {
 private:
-    Table(const Table& other);
+	friend class Calendar; //for giving access to clubs
+
+	Table(const Table& other);
     Table& operator=(const Table& other);
 
     struct Pair_Clubs //pairing for scheduling matches.
 	{
 		int match_played; //0 - match not played yet. 1 - match played.
-		Club *clubs_paired[2];
+		Club *clubs_paired[2]; //this is two clubs that play a match.
 	} *pair_of_clubs;
 
 	struct Round
@@ -30,6 +32,8 @@ private:
 	void Play_Match(Club &club_1, Club &club_2);
     void Schedule_Rounds();
     void Give_Walkover(int i);
+    void Season_Finished();
+    void Sort_Table();
 
     int Assert_Table_Full() const;
     int Check_if_Round_Played(int *index_of_match_not_played) const;

@@ -22,6 +22,8 @@ Table::Table()
 	for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
 		round[i].match = new Pair_Clubs*[sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)];
 
+	Calendar::get()->Add_Table(*this);
+
 	current_round = 0;
 }
 
@@ -53,11 +55,13 @@ Table::~Table()
 void Table::Print_Table() const
 {
     printf("\n\t---Table---\n");
+    printf("\t\t\t|PTS|W|L|D|GS|GA|\n");
     for(int i = 0; i < number_of_clubs_in_ligue; ++i)
     {
-        cout << clubs[i]->club_name << " " << clubs[i]->city_name << " [" << clubs[i]->Get_ID() << "] " << "has " <<  clubs[i]->points << " points." << endl;
+    	printf("%s %s [%d]\t|%d  |%d|%d|%d|%d |%d |\n", clubs[i]->club_name.c_str(), clubs[i]->city_name.c_str(), clubs[i]->_ID, clubs[i]->points,
+    			clubs[i]->matches_won, clubs[i]->matches_lost, clubs[i]->matches_drawn, clubs[i]->goals_scored, clubs[i]->goals_conceded);
 
-    }
+    } cout << endl << endl << endl;
 }
 
 void Table::Schedule_Season() //Pairs every club ID with every club ID.
@@ -232,14 +236,13 @@ int Table::Assert_Table_Full() const
 
 int Table::Check_if_Round_Played(int *index_of_match_not_played) const
 {
-	printf("\n\tChecking if round was played fully:\n");
 	int i;
 
 	for(i = 0; i < number_of_clubs_in_ligue / 2 ; ++i)
 	{
 		if(round[current_round].match[i]->match_played == 0)
 		{
-			printf("Match not played! [%d] vs [%d]\nNot checking any further.\n", (round[current_round].match[i]->clubs_paired[0])->Get_ID(),
+			printf("\nMatch not played! [%d] vs [%d]\nNot checking any further.\n", (round[current_round].match[i]->clubs_paired[0])->Get_ID(),
 					(round[current_round].match[i]->clubs_paired[1])->Get_ID());
 
 			*index_of_match_not_played = i; //For Play_Round(), if we are giving walkover. We need to indicate, which match needs to have a walkover.
@@ -247,8 +250,6 @@ int Table::Check_if_Round_Played(int *index_of_match_not_played) const
 			return -1;
 		}
 	}
-
-	printf("\n\tRound played fully.\n");
 	return 0; //Coming here, means all matches were played in the round.
 }
 
@@ -266,7 +267,7 @@ void Table::Print_Rounds() const
 			printf("Round nr: %d: [%d] vs [%d]\n", current_round, (round[current_round].match[i]->clubs_paired[0])->Get_ID(),
 					(round[current_round].match[i]->clubs_paired[1])->Get_ID());
 		}
-	}
+	} cout << endl << endl;
 }
 
 void Table::Give_Walkover(int i)
@@ -370,6 +371,9 @@ void Table::Play_Round()
 		return;
 	}
 
+	Calendar::get()->Print_Date();
+	cout << "Round: " << current_round + 1 << endl;
+
 	int i;
 	for(i = 0; i < number_of_clubs_in_ligue / 2; ++i)
 	{
@@ -378,9 +382,9 @@ void Table::Play_Round()
 
 	int index_of_match_not_played = -1;
 
-	if( Check_if_Round_Played(&index_of_match_not_played) == -1)
+	if(Check_if_Round_Played(&index_of_match_not_played) == -1)
 	{
-		printf("\nRound not played fully!\n");
+		printf("\n\tRound not played fully!\n");
 		printf("Enter choice:\n1) Buy player to set tactic or something like that:D\n2) Play rest of the matches in future.\n3) Give walkover.\nYour choice: \t");
 
 		int choice;
@@ -418,6 +422,9 @@ void Table::Play_Round()
 	Print_Table();
 	++current_round;
 	Calendar::get()->Travel_Calendar(7);
+
+	if(current_round == number_of_clubs - 1)
+		Season_Finished();
 }
 
 
@@ -426,7 +433,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID());
 	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
 //-------------------------------------- Check if match can be played --------------------------------------------------
-	if ( Assert_Table_Full() != 0)
+	if (Assert_Table_Full() != 0)
 	{
 		printf ("Cannot play match. League is not full yet.\n");
 		return;
@@ -449,7 +456,8 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	if (better_club == 1)
 	{
-		cout << club_1.club_name << " " << club_1.city_name << " won!" << endl;
+		//cout << "\t" << club_1.club_name << " " << club_1.city_name << " won!" << endl;
+		printf("\t%s %s won![%d]\n", club_1.club_name.c_str(), club_1.city_name.c_str(), club_1._ID);
 
 		club_1.points += 3;
 		++club_1.matches_won;
@@ -458,13 +466,14 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_1.Update_Players_Morale(1);
 		club_2.Update_Players_Morale(0);
 
-		club_1.Improve_Skills(true);
-		club_2.Improve_Skills(false);
+		club_1.Improve_Skills_After_Match(true);
+		club_2.Improve_Skills_After_Match(false);
 	}
 
 	else if (better_club == 2)
 	{
-		cout << club_2.club_name << " " << club_2.city_name << " won!" << endl;
+		//cout << "\t" << club_2.club_name << " " << club_2.city_name << " won!" << endl;
+		printf("\t%s %s won![%d]\n", club_2.club_name.c_str(), club_2.city_name.c_str(), club_2._ID);
 
 		club_2.points += 3;
 		++club_2.matches_won;
@@ -473,13 +482,13 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_1.Update_Players_Morale(0);
 		club_2.Update_Players_Morale(1);
 
-		club_1.Improve_Skills(false);
-		club_2.Improve_Skills(true);
+		club_1.Improve_Skills_After_Match(false);
+		club_2.Improve_Skills_After_Match(true);
 
 	}
 	else
 	{
-		cout << "There was a draw!" << endl;
+		cout << "\t" << "There was a draw!" << endl;
 
 		club_1.points += 1;
 		club_2.points += 1;
@@ -561,9 +570,6 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 		club2_chances += (club_2.Get_Tactic_Rating() - club_1.Get_Tactic_Rating());
 	}
 
-	//cout << "Club_1 chances: " << club1_chances << " || Club_2: " << club2_chances << endl;
-
-
 	int better_chance; //0 - even chances. 1: club_1 better chances. 2: club_2 better chances
 
 	if (club1_chances > club2_chances + 1)
@@ -574,4 +580,35 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 		better_chance = 0;
 
 	return better_chance;
+}
+
+
+void Table::Season_Finished()
+{
+	cout << "Season is finished!" << endl;
+	Sort_Table();
+	Print_Table();
+
+
+}
+
+
+void Table::Sort_Table()
+{
+	for(int x = 0; x < number_of_clubs; ++x)
+	{
+		int index_of_max = x;
+
+		for(int y = x; y < number_of_clubs; ++y)
+		{
+			if(clubs[index_of_max]->points < clubs[y]->points)
+			{
+				index_of_max = y;
+			}
+		}
+
+		Club *temp = clubs[x];
+		clubs[x] = clubs[index_of_max];
+		clubs[index_of_max] = temp;
+	}
 }
