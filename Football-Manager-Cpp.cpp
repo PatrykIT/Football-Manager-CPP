@@ -64,7 +64,7 @@ void Start()
 	club_3->Set_Tactics();
 	club_4->Set_Tactics();
 
-
+	club->Print_History();
 	table->Schedule_Season();
 
 	table->Play_Round();
@@ -84,7 +84,7 @@ void Start()
  * Try to change colours in console.
  * Make it user-friendly.
  * Finish Season_Finished() - create top goalscorers etc.
- * Reformat Save_History() - it should return a string.
+ * Create move constructor for History class, so vector could construct it in place in Save_History()
  */
 
 int main()
@@ -105,9 +105,7 @@ int main()
 
 
 /*
- * Make : history of players (dates of playing in which clubs, goals scored, assists, development, fee received).
  * Make it on-line - Two persons (client - server) can play in the same league.
  * Add save - load function.
- * Create morale of players, and dialogues of them with You. Every dialogue affects morale, which affects performance.
- * Players should improve / decline with time.
+ * Create dialogues of players with You. Every dialogue affects morale, which affects performance.
  */

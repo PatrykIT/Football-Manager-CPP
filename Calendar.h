@@ -8,7 +8,7 @@ class Calendar
 {
 private:
 	friend class History; //For access to time. We could make public getters, but I don't think it's bad design to friend history with time :)
-	friend class Table; //For traveling time.
+	friend class Table; //For traveling time - making clubs in league aware of it's passing.
 
 	std::vector<Table*> tables;
 	Calendar();
