@@ -2,8 +2,25 @@
 
 extern Calendar *calendar;
 
-void History::Save_History(Club &club)
+void History::Save_History(Club &club) const
 {
+	/**
+	 * Appends whole string (description of what happened + date) to a history object in club.
+	 */
+
+	std::string date = Append_Date();
+	club.history[club.history.size() -1].message.append(date);
+
+	club.history.emplace_back(History{" "}); //Make place for the next message.
+	//club.history.emplace_back(" ");
+}
+
+std::string History::Append_Date() const
+{
+	/**
+	 * This function adds a date in string format looking like: " on a day 07.12.2015 22:30:15 ".
+	 */
+
 	calendar->Set_Hour();
 
 	std::string date = "";
@@ -36,12 +53,5 @@ void History::Save_History(Club &club)
 	date.append(calendar_string);
 	calendar_string.clear();
 
-	club._history[club.Get_Message_Counter()].message.append(date);
-
-	club.Increment_History_Messages_Counter();
-
-	if (club.Get_Message_Counter() == club.number_of_stories) //if we reached max of allocated histories.
-	{
-		club.Resize_History();
-	}
+	return date;
 }
