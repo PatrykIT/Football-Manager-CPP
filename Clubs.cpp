@@ -25,9 +25,9 @@ Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (siz
 	matches_played = 0;
 	matches_won = 0, matches_lost = 0, matches_drawn = 0;
 
-	number_of_stories = 50;
-	_history = new History[number_of_stories];
-	_history_messages_counter = 0;
+	history.reserve(50);
+	History tmp;
+	history.push_back(tmp);
 
 	_attendance = stadium.Get_Capacity();
 	_ticket_prices = 10;
@@ -41,31 +41,8 @@ Club::~Club()
 		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
 
 	players.clear();
-	delete []_history;
 }
 
-void Club::Increment_History_Messages_Counter()
-{
-	++_history_messages_counter;
-}
-
-int Club::Get_Message_Counter() const
-{
-	return _history_messages_counter;
-}
-
-void Club::Resize_History()
-{
-	number_of_stories = number_of_stories * 2;
-
-	History *tmp = new History[number_of_stories];
-	copy(_history, _history + _history_messages_counter, tmp);
-
-	delete []_history;
-
-	_history = tmp;
-
-}
 
 void Club::Set_Tactic_Rating()
 {
@@ -93,11 +70,11 @@ void Club::Print_Tactic_Rating() const
 
 void Club::Print_History() const
 {
-	cout << endl << "\t --- Club History ---" << endl;
-	for(int i = 0; i < Get_Message_Counter(); ++i)
-	{
-		cout << _history[i].message << endl;
-	}
+	cout << "\n\t --- Club History ---" << endl;
+
+	for(unsigned int i = 0; i < history.size(); ++i)
+		cout << history[i].message << endl;
+
 	cout << endl << endl;
 }
 
@@ -130,12 +107,11 @@ int Club::Add_Player_to_Club(Player &player)
 		return -1;
 	}
 
+	string information = "Bought ";
+	information.append((player).name).append(" ").append((player).surname);
 
-	string tmp = "Bought ";
-	tmp.append((player).name).append(" ").append((player).surname);
-
-	_history[_history_messages_counter].message = tmp;
-	_history->Save_History(*this);
+	history.back().message = information;
+	history.back().Save_History(*this);
 
 	return 0;
 }
@@ -308,79 +284,66 @@ int Club::Buy_Player()
 
 	printf("\t--- Current budget: %f$ ---\n", _budget);
 
-	while(1) //Infinite loop, in case a player never decides - he will have to. :)
+
+	for(unsigned int i = 0; i < free_players.size(); ++i)
 	{
-		bool bought = false;
-
-		for(unsigned int i = 0; i < free_players.size(); ++i)
+		if (free_players.at(i)->Get_Position() == position_to_buy)
 		{
-			if (free_players.at(i)->Get_Position() == position_to_buy)
+			cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl; free_players[i]->Print_Value();
+			cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
+			char buy; cin >> buy;
+
+			if (buy == 'Y' || buy == 'y')
 			{
-				cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl; free_players[i]->Print_Value();
-				cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
-				char buy; cin >> buy;
-
-				if (buy == 'Y' || buy == 'y')
+				if (_budget < free_players[i]->Get_Value())
 				{
-					if (_budget < free_players[i]->Get_Value())
+					printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\nY or N:\t", _budget);
+
+					char sell;
+					cin >> sell;
+					if (sell == 'y' || sell == 'Y')
 					{
-						printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\nY or N:\t", _budget);
+						const int ret = Sell_Player();
 
-						char sell;
-						cin >> sell;
-						if (sell == 'y' || sell == 'Y')
-						{
-							const int ret = Sell_Player();
-
-							if (ret == 0 && _budget >= free_players[i]->Get_Value())
-								{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)_
-							else
-								continue;
-						}
-						else //means keep looking
+						if (ret == 0 && _budget >= free_players[i]->Get_Value())
+							{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)
+						else
 							continue;
 					}
+					else //means keep looking
+						continue;
+				}
 
-					const int ret = Add_Player_to_Club( *free_players[i] );
+				const int ret = Add_Player_to_Club( *free_players[i] );
 
-					if(ret == 0)
-					{
-						bought = true;
-						cout << "Player bought." << endl;
+				if(ret == 0)
+				{
+					cout << "Player bought." << endl;
 
-						_budget = _budget - free_players[i]->Get_Value();
-						free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
-					}
-					else
-					{
-						cout << "Cannot add new player." << endl;
-						return -1;
-					}
+					_budget = _budget - free_players[i]->Get_Value();
+					free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
 
-					break;
+					Set_Tactics();
+					return 0; //Exit infinite loop
+				}
+				else
+				{
+					cout << "Cannot add new player." << endl;
+					return -1;
 				}
 			}
-			else
-			{
-				cout << "Searching.." << endl;
-				cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->Get_Position()
-						<< " | Value: " <<  free_players[i]->Get_Value() << "$" << endl;
-			}
-		}
-
-		if (bought == true)
-		{
-			Set_Tactics();
-			break; //Exit infinite loop
 		}
 		else
 		{
-			cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
-			return -1;
+			cout << "Searching.." << endl;
+			cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->Get_Position()
+					<< " | Value: " <<  free_players[i]->Get_Value() << "$" << endl;
 		}
 	}
 
-	return 0; //successfully bought a player.
+	cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
+	return -1;
+
 }
 
 int Club::Sell_Player()
@@ -414,11 +377,11 @@ int Club::Sell_Player()
 	free_players.push_back(players[player_to_sell]);
 	_budget += players[player_to_sell]->Get_Value();
 
-	string tmp = "Sold ";
-	tmp.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
+	string information = "Sold ";
+	information.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
 
-	_history[_history_messages_counter].message = tmp;
-	_history->Save_History(*this);
+	history.back().message = information;
+	history.back().Save_History(*this);
 
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.

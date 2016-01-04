@@ -43,10 +43,7 @@ private:
 	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are laid out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
-
-	History *_history;
-	int _history_messages_counter;
-	int	number_of_stories;
+	std::vector<History> history;
 
 	Stadium stadium;
 	unsigned int _attendance;
@@ -55,8 +52,6 @@ private:
 	char Check_if_Allowed_to_Play() const;
 	void Set_Tactic_Rating();
 	void Allow_Playing();
-	void Resize_History();
-	void Increment_History_Messages_Counter();
 	void Set_Ticket_Prices();
 	void Set_Attendancy();
 	void Improve_Skills_After_Match(bool won);
@@ -84,7 +79,6 @@ public:
 	void Print_Positions_Number() const;
 
 	int Add_Player_to_Club(Player &player);
-	int Get_Message_Counter() const;
 	int Set_Tactics();
 
 	double Get_Tactic_Rating() const;
