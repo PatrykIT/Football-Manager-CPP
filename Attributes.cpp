@@ -2,9 +2,10 @@
 
 std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
 
-Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]), surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
+Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
+		surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ]),
+		_age (rand() % (26) + 16) //(max_number + 1 - minimum_number)) + minimum_number
 {
-	_age = rand() % (26) + 16; //(max_number + 1 - minimum_number)) + minimum_number
 	_Set_Attributes();
 	_Set_Position();
 	_Set_Value();
@@ -89,7 +90,7 @@ void Player::_Set_Attributes()
 	attributes.mental_attributes.Set_Overall();
 	//----------------------------------------------------------------------------------------------------
 
-	Set_Overall();
+	_Set_Overall();
 }
 
 void Player::_Set_Position()
@@ -172,7 +173,7 @@ int Player::Get_Morale() const
 	return psyche.morale;
 }
 
-void Player::Set_Overall()
+void Player::_Set_Overall()
 {
 	_overall = (attributes.attacking_attributes.Get_Overall() + attributes.defending_attributes.Get_Overall() + attributes.mental_attributes.Get_Overall() +
 			attributes.psyhical_attributes.Get_Overall()) / 4.0;

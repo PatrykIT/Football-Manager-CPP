@@ -19,7 +19,7 @@ private:
 	void _Set_Attributes();
 	void _Set_Position();
 	void _Set_Value();
-	void Set_Overall();
+	void _Set_Overall();
 
 	struct Attributes
 	{
