@@ -58,7 +58,6 @@ void Start()
 	table->Add_Club_to_Table(&club_3);
 	table->Add_Club_to_Table(&club_4);
 
-
 	club->Set_Tactics();
 	club_2->Set_Tactics();
 	club_3->Set_Tactics();
@@ -73,7 +72,6 @@ void Start()
 
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
-
 }
 
 
@@ -96,7 +94,6 @@ int main()
 	for(unsigned j = 0; j < free_players.size(); ++j)
 			delete free_players[j];
 	delete calendar;
-
 
 	cout << "Bye bye." << endl;
 	return 0;
