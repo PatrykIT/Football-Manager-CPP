@@ -1,35 +1,44 @@
 #include "Table.h"
 using namespace std;
 
-
-
 Table::Table()
 {
-	pair_of_clubs = new Pair_Clubs[Count_Combinations(number_of_clubs_in_ligue, 2)];
+	pair_of_clubs = NULL;
+	round = NULL; //NULL'ing out because of a catch block - if allocation of pair_of_clubs fails, we cannot delete round (as it was unallocated yet). Deleting NULL has no effect.
+	int i = -1; //in case round[i].match won't be allocated - then in a catch block we prevent it from being deallocated in loop.
 
-	number_of_clubs = 0;
+	try //Instead of try - catch, we could make temporary unique_ptr's, that would automatically deallocate memory in case of failure.
+	{
+		pair_of_clubs = new Pair_Clubs[Count_Combinations(number_of_clubs_in_ligue, 2)];
+		round = new Round[number_of_clubs_in_ligue - 1];
+		for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
+		{
+			round[i].match = new Pair_Clubs*[sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)];
+		}
+	}
 
-	int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
-	int i;
+	catch (...)
+	{
+		delete []pair_of_clubs;
+		delete []round;
+		for(int x = i; x >= 0; --x)
+			delete round[x].match;
+	}
 
+	const int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
 	for(i = 0; i < all_unique_combinations_of_matches; ++i)
 	{
 		pair_of_clubs[i] = (struct Pair_Clubs) {0}; // Match not played.  //C99. style! :)
 	}
 
-	round = new Round[number_of_clubs_in_ligue - 1];
-
-	for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
-		round[i].match = new Pair_Clubs*[sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)];
-
 	Calendar::get()->Add_Table(*this);
-
+	number_of_clubs = 0;
 	current_round = 0;
 }
 
 void Table::Add_Club_to_Table(Club **club)
 {
-	if( number_of_clubs == number_of_clubs_in_ligue )
+	if(Assert_Table_Full() == 0)
 	{
 		printf("Table full. Cannot add another club.\n");
 		return;
@@ -45,10 +54,7 @@ Table::~Table()
 	delete []pair_of_clubs;
 
 	for(int i = 0; i < number_of_clubs_in_ligue - 1; ++i)
-	{
 		delete []round[i].match;
-	}
-
 	delete []round;
 }
 
@@ -176,18 +182,14 @@ int Table::Find_Index_of_Pair_In_Round(Club &club_1, Club &club_2) const //Retur
 
 int Table::Count_Combinations(int n, int k) const
 {
-
-	/*
+	/**
 	 * Kombinację bez powtórzeń wykorzystujemy wtedy, gdy chcemy wiedzieć ile możemy stworzyć różnych układów k-elementowych, mając do dyspozycji n-elementów,
 	 * przy czym kolejność elementów w układzie jest nieistotna, a elementy nie mogą się powtarzać.
 	 *
 	 *  Wzór na kombinację bez powtórzeń: n! / k! * (n-k)!
-	 *
-	 *  Silnia dla np. 4! : 4! =  1 * 2 * 3 * 4
-	 *
 	 */
 
-	//---------------- We are counting silnias (factorials) and putting them to formula. -------------------------
+	//---------------- We are counting factorial's and putting them to formula. -------------------------
 
 	int n_minus_k = n - k;
 	int i;
@@ -195,7 +197,7 @@ int Table::Count_Combinations(int n, int k) const
 	int sum = 1;
 	int current_silnia = n;
 
-	for( i = 1; i < current_silnia + 1; ++i)
+	for(i = 1; i < current_silnia + 1; ++i)
 		sum = sum * i;
 
 	n = sum;
@@ -216,7 +218,7 @@ int Table::Count_Combinations(int n, int k) const
 
 	n_minus_k = sum;
 
-	//-------------------Kombinacja bez powtórzeń. ---------------------------
+	//------------------- Combinations without repetitions. ---------------------------
 
 	int result_permutation = n / (k * n_minus_k);
 	return result_permutation;
@@ -236,9 +238,7 @@ int Table::Assert_Table_Full() const
 
 int Table::Check_if_Round_Played(int *index_of_match_not_played) const
 {
-	int i;
-
-	for(i = 0; i < number_of_clubs_in_ligue / 2 ; ++i)
+	for(int i = 0; i < number_of_clubs_in_ligue / 2 ; ++i)
 	{
 		if(round[current_round].match[i]->match_played == 0)
 		{
@@ -258,11 +258,11 @@ void Table::Print_Rounds() const
 {
 	printf("\n");
 	int matches_in_round = number_of_clubs_in_ligue / 2;
-	int current_round, i;
+	int current_round;
 
 	for(current_round = 0; current_round < number_of_clubs_in_ligue - 1; ++current_round)
 	{
-		for(i = 0; i < matches_in_round; ++i)
+		for(int i = 0; i < matches_in_round; ++i)
 		{
 			printf("Round nr: %d: [%d] vs [%d]\n", current_round, (round[current_round].match[i]->clubs_paired[0])->Get_ID(),
 					(round[current_round].match[i]->clubs_paired[1])->Get_ID());
@@ -270,8 +270,12 @@ void Table::Print_Rounds() const
 	} cout << endl << endl;
 }
 
-void Table::Give_Walkover(int i)
+void Table::Give_Walkover(const int i)
 {
+	/**
+	 * One team gives 3 points to the opposite team.
+	 */
+
 	printf("\n");
 
 	if (round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0 && round[current_round].match[i]->clubs_paired[1]->Check_if_Allowed_to_Play() == 0)
@@ -330,7 +334,7 @@ void Table::Give_Walkover(int i)
 	round[current_round].match[i]->match_played = 1;
 }
 
-int Table::Check_which_Club_Needs_to_Buy(int i) const
+int Table::Check_which_Club_Needs_to_Buy(const int i) const
 {
 	printf("\n");
 	int bought;

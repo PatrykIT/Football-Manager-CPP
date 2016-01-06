@@ -31,7 +31,7 @@ private:
 
 	void Play_Match(Club &club_1, Club &club_2);
     void Schedule_Rounds();
-    void Give_Walkover(int i);
+    void Give_Walkover(const int i);
     void Season_Finished();
     void Sort_Table();
 
@@ -39,7 +39,7 @@ private:
     int Check_if_Round_Played(int *index_of_match_not_played) const;
     int Find_Index_of_Pair_In_Round(Club &club_1, Club &club_2) const; //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
     int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
-    int Check_which_Club_Needs_to_Buy(int i) const; //Checks which club lacks players.
+    int Check_which_Club_Needs_to_Buy(const int i) const; //Checks which club lacks players.
     int Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const; //0 - should be draw. 1: club_1 should win. 2: club_2 should win.
 
 public:
