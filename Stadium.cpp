@@ -9,7 +9,7 @@ Stadium::Stadium() : stadium_name (stadium_names[rand() % stadium_names.size()])
 		stadium_names.push_back("UNNAMED STADIUM"); //In case there is less names available than clubs, avoid crashing.
 }
 
-unsigned int Stadium::Get_Capacity()
+unsigned int Stadium::Get_Capacity() const
 {
 	return _capacity;
 }

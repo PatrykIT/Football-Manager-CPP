@@ -5,7 +5,8 @@
 #include <string>
 class Club;
 
-static std::vector<std::string> stadium_names = {"Camp Nou", "Santiago Bernabeu", "Stamford Bridge", "Anfield Park", "Etihad Stadium", "San Siro", "Goodison Park", "Old Trafford"};
+static std::vector<std::string> stadium_names = {"Camp Nou", "Santiago Bernabeu", "Stamford Bridge", "Anfield Park",
+		"Etihad Stadium", "San Siro", "Goodison Park", "Old Trafford"};
 
 class Stadium
 {
@@ -14,7 +15,7 @@ private:
 
 public:
 	const std::string stadium_name;
-	unsigned int Get_Capacity();
+	unsigned int Get_Capacity() const;
 	Stadium();
 };
 
