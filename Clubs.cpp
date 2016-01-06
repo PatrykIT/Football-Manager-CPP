@@ -5,42 +5,36 @@ using namespace std;
 
 int Club::_instance_number = 0;
 
-Club::Club() :_ID(Club::_instance_number++), club_name (club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))]), city_name(cities[rand() % (sizeof(cities) / sizeof(cities[0]))])
+Club::Club() :_ID(Club::_instance_number++),
+		_allowed_to_play (false), //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
+		_tactic_rating (0),
+		_budget (10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000)))), //values 1000.0000 - 99999.999 $
+		points (0),
+		goals_scored (0), goals_conceded (0),
+		matches_played (0),
+		matches_won (0), matches_lost (0), matches_drawn (0),
+		number_of_attackers_in_first_squad (0),
+		number_of_midfilders_in_first_squad (0),
+		number_of_defenders_in_first_squad (0),
+		_attendance (stadium.Get_Capacity()),
+		_ticket_prices (10),
+		club_name (club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))]),
+		city_name(cities[rand() % (sizeof(cities) / sizeof(cities[0]))])
 {
-	players.reserve(23);
-
 	tactic[0] = -1; //Say that this position is not yet filled with players.
 	tactic[1] = -1;
 	tactic[2] = -1;
-	_tactic_rating = 0;
 
-	number_of_attackers_in_first_squad = 0;
-	number_of_midfilders_in_first_squad = 0;
-	number_of_defenders_in_first_squad = 0;
-
-	_budget = 10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000))); //values 1000.0000 - 99999.999 $
-
-	points = 0;
-	goals_scored = 0, goals_conceded = 0;
-	matches_played = 0;
-	matches_won = 0, matches_lost = 0, matches_drawn = 0;
+	players.reserve(23);
 
 	history.reserve(50);
-	History tmp;
-	history.push_back(tmp);
-
-	_attendance = stadium.Get_Capacity();
-	_ticket_prices = 10;
-
-	_allowed_to_play = false; //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
+	history.emplace_back(History{""});
 }
 
 Club::~Club()
 {
 	for(unsigned int i = 0; i < players.size(); ++i)
 		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
-
-	players.clear();
 }
 
 
@@ -110,8 +104,7 @@ int Club::Add_Player_to_Club(Player &player)
 	string information = "Bought ";
 	information.append((player).name).append(" ").append((player).surname);
 
-	history.back().message = information;
-	history.back().Save_History(*this);
+	history.back().Save_History(*this, information);
 
 	return 0;
 }
@@ -145,7 +138,7 @@ void Club::List_Players() const
 }
 
 
-bool Compare_Overall (Player* a, Player* b) { return a->Get_Overall() > b->Get_Overall(); }
+bool Compare_Overall (const Player* a, const Player* b) { return a->Get_Overall() > b->Get_Overall(); }
 
 int Club::Set_Tactics()
 {
@@ -166,22 +159,22 @@ int Club::Set_Tactics()
 	{
 		if(players[i]->Get_Position() == 1 && (number_of_defenders_in_first_squad < max_defenders ))
 			if((number_of_defenders_in_first_squad + 1 == max_defenders) && (number_of_midfilders_in_first_squad == max_midfilders || number_of_attackers_in_first_squad == max_attackers))
-			{} //can not have two max of positions, because the third one would not get a place.
-		else
-		{
-			defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
-			++number_of_defenders_in_first_squad;
-		}
+				{} //can not have two max of positions, because the third one would not get a place.
+			else
+			{
+				defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
+				++number_of_defenders_in_first_squad;
+			}
 
 
 		if(players[i]->Get_Position() == 2 && number_of_midfilders_in_first_squad < max_midfilders)
 			if((number_of_midfilders_in_first_squad + 1 == max_midfilders)  && (number_of_attackers_in_first_squad == max_attackers  ||  number_of_defenders_in_first_squad == max_defenders))
 				{}
-		else
-		{
-			midfilders_in_first_squad[number_of_midfilders_in_first_squad] = players[i];
-			++number_of_midfilders_in_first_squad;
-		}
+			else
+			{
+				midfilders_in_first_squad[number_of_midfilders_in_first_squad] = players[i];
+				++number_of_midfilders_in_first_squad;
+			}
 
 
 		if(players[i]->Get_Position() == 3 && number_of_attackers_in_first_squad < max_attackers)
@@ -380,8 +373,7 @@ int Club::Sell_Player()
 	string information = "Sold ";
 	information.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
 
-	history.back().message = information;
-	history.back().Save_History(*this);
+	history.back().Save_History(*this, information);
 
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.
@@ -544,7 +536,7 @@ void Club::Improve_Skills_New_Year(Player *&player, int position)
 	player->attributes.mental_attributes.Set_Overall();
 	player->attributes.psyhical_attributes.Set_Overall();
 
-	player->Set_Overall();
+	player->_Set_Overall();
 }
 
 
@@ -591,7 +583,7 @@ void Club::Decline_Skills_New_Year(Player *&player, int position)
 	player->attributes.mental_attributes.Set_Overall();
 	player->attributes.psyhical_attributes.Set_Overall();
 
-	player->Set_Overall();
+	player->_Set_Overall();
 }
 
 

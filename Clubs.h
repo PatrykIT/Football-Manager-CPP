@@ -6,8 +6,8 @@
 #include "Stadium.h"
 
 class History;
-static std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico"};
-static std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", "Poznan",  "Warszawa", "Cordoba"};
+static const std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico"};
+static const std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", "Poznan",  "Warszawa", "Cordoba"};
 
 
 class Club
