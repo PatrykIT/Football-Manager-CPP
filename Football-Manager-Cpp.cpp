@@ -83,6 +83,7 @@ void Start()
  * Make it user-friendly.
  * Finish Season_Finished() - create top goalscorers etc.
  * Create move constructor for History class, so vector could construct it in place in Save_History()
+ * Make delegated constructor: club(int budget)
  */
 
 int main()
