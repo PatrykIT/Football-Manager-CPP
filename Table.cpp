@@ -17,7 +17,7 @@ Table::Table()
 		}
 	}
 
-	catch (...)
+	catch (const bad_alloc&)
 	{
 		delete []pair_of_clubs;
 		delete []round;
