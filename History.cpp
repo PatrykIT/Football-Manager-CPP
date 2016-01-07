@@ -11,9 +11,7 @@ void History::Save_History(Club &club, std::string message) const
 	std::string date = Append_Date();
 	club.history.back().message.append(message);
 	club.history.back().message.append(date);
-
-	club.history.emplace_back(History{""}); //Make place for the next message.
-	//club.history.emplace_back("");
+	club.history.emplace_back(History(""));	//Make place for the next message.
 }
 
 std::string History::Append_Date() const
@@ -62,4 +60,10 @@ History::History() : message ("")
 
 
 History::History(std::string message) : message(message)
+{}
+
+History::History(History&& other) : message (std::move(other.message))
+{}
+
+History::History(History &other) : message (other.message)
 {}
