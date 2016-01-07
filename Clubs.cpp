@@ -28,7 +28,7 @@ Club::Club() :_ID(Club::_instance_number++),
 	players.reserve(23);
 
 	history.reserve(50);
-	history.emplace_back(History{""});
+	history.emplace_back(History("")); //diff in History("") and History{""} ??
 }
 
 Club::~Club()
