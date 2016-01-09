@@ -18,15 +18,15 @@ void Player::_Set_Attributes()
 {
 	void *pointer_to_struct; /*It is a shortcut by which I initialize all struct members avoiding writing each attribute separately. It is not portable,
 								and will be rewritten in the final version.	*/
-
-	//------------------------------------------ATTACKING----------------------------------------------------
-
-	pointer_to_struct = static_cast<void*> (&(attributes.attacking_attributes));
 	int attribute_value;
 	int sum_of_attributes = 0; //our variable to count average rating from.
 	int counter;
 
+	//------------------------------------------ATTACKING----------------------------------------------------
+
+	pointer_to_struct = static_cast<void*> (&(attributes.attacking_attributes));
 	int number_of_attributes = 8; //number_of_atrributes doesn't involve 'overall' rating.
+
 	for(counter = 0; counter < number_of_attributes; ++counter)
 	{
 		attribute_value = rand() %60 + 40; //40 - 99 values.
@@ -40,11 +40,10 @@ void Player::_Set_Attributes()
 
 	//------------------------------------------DEFENDING----------------------------------------------------
 
-	pointer_to_struct = static_cast<void*> (&(attributes.attacking_attributes));
+	pointer_to_struct = static_cast<void*> (&(attributes.defending_attributes));
 	sum_of_attributes = 0;
-
-
 	number_of_attributes = 4;
+
 	for(counter = 0; counter < number_of_attributes; ++counter)
 	{
 		attribute_value = rand() %60 + 40;
@@ -58,10 +57,10 @@ void Player::_Set_Attributes()
 
 	//------------------------------------------PHYSICAL----------------------------------------------------
 
-	pointer_to_struct = static_cast<void*> (&(attributes.attacking_attributes));
+	pointer_to_struct = static_cast<void*> (&(attributes.psyhical_attributes));
 	sum_of_attributes = 0;
-
 	number_of_attributes = 4;
+
 	for(counter = 0; counter < number_of_attributes; ++counter)
 	{
 		attribute_value = rand() %60 + 40;
@@ -75,10 +74,10 @@ void Player::_Set_Attributes()
 
 	//------------------------------------------MENTAL----------------------------------------------------
 
-	pointer_to_struct = static_cast<void*> (&(attributes.attacking_attributes));
+	pointer_to_struct = static_cast<void*> (&(attributes.mental_attributes));
 	sum_of_attributes = 0;
-
 	number_of_attributes = 7;
+
 	for(counter = 0; counter < number_of_attributes; ++counter)
 	{
 		attribute_value = rand() %60 + 40;
