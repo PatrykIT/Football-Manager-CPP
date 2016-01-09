@@ -3,8 +3,8 @@ using namespace std;
 
 Table::Table()
 {
-	pair_of_clubs = NULL;
-	round = NULL; //NULL'ing out because of a catch block - if allocation of pair_of_clubs fails, we cannot delete round (as it was unallocated yet). Deleting NULL has no effect.
+	pair_of_clubs = nullptr;
+	round = nullptr; //NULL'ing out because of a catch block - if allocation of pair_of_clubs fails, we cannot delete round (as it was unallocated yet). Deleting NULL has no effect.
 	int i = -1; //in case round[i].match won't be allocated - then in a catch block we prevent it from being deallocated in loop.
 
 	try //Instead of try - catch, we could make temporary unique_ptr's, that would automatically deallocate memory in case of failure.
@@ -23,6 +23,8 @@ Table::Table()
 		delete []round;
 		for(int x = i; x >= 0; --x)
 			delete round[x].match;
+
+		throw;
 	}
 
 	const int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
