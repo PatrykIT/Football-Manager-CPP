@@ -3,23 +3,23 @@ using namespace std;
 
 Table::Table()
 {
-	pair_of_clubs = nullptr;
+	matches = nullptr;
 	round = nullptr; //NULL'ing out because of a catch block - if allocation of pair_of_clubs fails, we cannot delete round (as it was unallocated yet). Deleting NULL has no effect.
 	int i = -1; //in case round[i].match won't be allocated - then in a catch block we prevent it from being deallocated in loop.
 
 	try //Instead of try - catch, we could make temporary unique_ptr's, that would automatically deallocate memory in case of failure.
 	{
-		pair_of_clubs = new Pair_Clubs[Count_Combinations(number_of_clubs_in_ligue, 2)];
+		matches = new Pair_Clubs[Count_Combinations(number_of_clubs_in_ligue, 2)];
 		round = new Round[number_of_clubs_in_ligue - 1];
 		for(i = 0; i < number_of_clubs_in_ligue - 1; ++i)
 		{
-			round[i].match = new Pair_Clubs*[sizeof(pair_of_clubs) * (number_of_clubs_in_ligue / 2)];
+			round[i].match = new Pair_Clubs*[sizeof(matches) * (number_of_clubs_in_ligue / 2)];
 		}
 	}
 
 	catch (const bad_alloc&)
 	{
-		delete []pair_of_clubs;
+		delete []matches;
 		delete []round;
 		for(int x = i; x >= 0; --x)
 			delete round[x].match;
@@ -30,7 +30,7 @@ Table::Table()
 	const int all_unique_combinations_of_matches = Count_Combinations(number_of_clubs_in_ligue, 2);
 	for(i = 0; i < all_unique_combinations_of_matches; ++i)
 	{
-		pair_of_clubs[i] = (struct Pair_Clubs) {0}; // Match not played.  //C99. style! :)
+		matches[i] = (struct Pair_Clubs) {0}; // Match not played.  //C99. style! :)
 	}
 
 	Calendar::get()->Add_Table(*this);
@@ -53,7 +53,7 @@ void Table::Add_Club_to_Table(Club **club)
 
 Table::~Table()
 {
-	delete []pair_of_clubs;
+	delete []matches;
 
 	for(int i = 0; i < number_of_clubs_in_ligue - 1; ++i)
 		delete []round[i].match;
@@ -98,16 +98,16 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 
 			if (home_match % 2 ==0)
 			{
-				pair_of_clubs[c].clubs_paired[0] = clubs[a];
-				pair_of_clubs[c].clubs_paired[1] = clubs[x];
+				matches[c].clubs_paired[0] = clubs[a];
+				matches[c].clubs_paired[1] = clubs[x];
 			}
 			else
 			{
-				pair_of_clubs[c].clubs_paired[0] = clubs[x]; //Interchange clubs by the place, so every club hosts games at home, and away.
-				pair_of_clubs[c].clubs_paired[1] = clubs[a];
+				matches[c].clubs_paired[0] = clubs[x]; //Interchange clubs by the place, so every club hosts games at home, and away.
+				matches[c].clubs_paired[1] = clubs[a];
 			}
 
-			printf("Scheduling: [%d] vs [%d] Pair: %d\n", (pair_of_clubs[c].clubs_paired[0])->Get_ID(), (pair_of_clubs[c].clubs_paired[1])->Get_ID(), c);
+			printf("Scheduling: [%d] vs [%d] Pair: %d\n", (matches[c].clubs_paired[0])->Get_ID(), (matches[c].clubs_paired[1])->Get_ID(), c);
 
 			++x;
 			++c;
@@ -144,12 +144,12 @@ void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be sche
 
 		while (1)
 		{
-			round[current_round].match[i] = pair_of_clubs + start;
+			round[current_round].match[i] = matches + start;
 			round[current_round].match[i]->match_played = 0;
 
 			++i;
 
-			round[current_round].match[i] = pair_of_clubs + end;
+			round[current_round].match[i] = matches + end;
 			round[current_round].match[i]->match_played = 0;
 
 			if( end - start == 1 ) //If we reached the middle.
@@ -436,8 +436,10 @@ void Table::Play_Round()
 
 void Table::Play_Match(Club &club_1, Club &club_2)
 {
-	printf("\nNow playing: [%d] vs [%d]\n", club_1.Get_ID(), club_2.Get_ID());
+	printf("\nNow playing: %s %s [%d] vs %s %s [%d]\n", club_1.club_name.c_str(), club_1.city_name.c_str(), club_1.Get_ID(),
+			club_2.club_name.c_str(), club_2.city_name.c_str(), club_2.Get_ID());
 	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
+
 //-------------------------------------- Check if match can be played --------------------------------------------------
 	if (Assert_Table_Full() != 0)
 	{
@@ -460,44 +462,63 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	const int better_club = Calculate_Match_Winning_Odds(club_1, club_2);
 
+	int goals_scored_by_winner = 1 +(rand() % 5); // 1- 5
+	int goals_scored_by_loser = (rand() % 4); // 0  - 3
+	goals_scored_by_loser = (goals_scored_by_loser >= goals_scored_by_winner) ? goals_scored_by_winner - 1 : goals_scored_by_loser;
+	//If losing team get's better rand then winners, we have to change it so winning team scores one more goal than the losing team.
+
+
 	if (better_club == 1)
 	{
-		//cout << "\t" << club_1.club_name << " " << club_1.city_name << " won!" << endl;
-		printf("\t%s %s won![%d]\n", club_1.club_name.c_str(), club_1.city_name.c_str(), club_1._ID);
-
 		club_1.points += 3;
 		++club_1.matches_won;
 		++club_2.matches_lost;
+
+		club_1.goals_scored += goals_scored_by_winner;
+		club_1.goals_conceded += goals_scored_by_loser;
+		club_2.goals_scored += goals_scored_by_loser;
+		club_2.goals_conceded += goals_scored_by_winner;
 
 		club_1.Update_Players_Morale(1);
 		club_2.Update_Players_Morale(0);
 
 		club_1.Improve_Skills_After_Match(true);
 		club_2.Improve_Skills_After_Match(false);
+
+		printf("\t%s %s won %d:%d![%d]\n", club_1.club_name.c_str(), club_1.city_name.c_str(), goals_scored_by_winner, goals_scored_by_loser, club_1._ID);
 	}
 
 	else if (better_club == 2)
 	{
-		//cout << "\t" << club_2.club_name << " " << club_2.city_name << " won!" << endl;
-		printf("\t%s %s won![%d]\n", club_2.club_name.c_str(), club_2.city_name.c_str(), club_2._ID);
-
 		club_2.points += 3;
 		++club_2.matches_won;
 		++club_1.matches_lost;
 
-		club_1.Update_Players_Morale(0);
+		club_2.goals_scored += goals_scored_by_winner;
+		club_2.goals_conceded += goals_scored_by_loser;
+		club_1.goals_scored += goals_scored_by_loser;
+		club_1.goals_conceded += goals_scored_by_winner;
+
 		club_2.Update_Players_Morale(1);
+		club_1.Update_Players_Morale(0);
 
-		club_1.Improve_Skills_After_Match(false);
 		club_2.Improve_Skills_After_Match(true);
+		club_1.Improve_Skills_After_Match(false);
 
+		printf("\t%s %s won %d:%d![%d]\n", club_2.club_name.c_str(), club_2.city_name.c_str(), goals_scored_by_winner, goals_scored_by_loser, club_2._ID);
 	}
 	else
 	{
-		cout << "\t" << "There was a draw!" << endl;
+		printf("\tThere was a draw! %d:%d\n", goals_scored_by_winner, goals_scored_by_winner);
 
 		club_1.points += 1;
 		club_2.points += 1;
+
+
+		club_1.goals_scored += goals_scored_by_winner;
+		club_1.goals_conceded += goals_scored_by_winner;
+		club_2.goals_scored += goals_scored_by_winner;
+		club_2.goals_conceded += goals_scored_by_winner;
 
 		++club_1.matches_drawn;
 		++club_2.matches_drawn;
@@ -511,8 +532,6 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	club_1.Set_Ticket_Prices();
 	club_2.Set_Ticket_Prices();
-
-
 
 	club_1._budget += club_1._ticket_prices * club_1._attendance;
 

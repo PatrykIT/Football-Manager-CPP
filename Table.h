@@ -19,7 +19,7 @@ private:
 	{
 		int match_played; //0 - match not played yet. 1 - match played.
 		Club *clubs_paired[2]; //this is two clubs that play a match.
-	} *pair_of_clubs;
+	} *matches;
 
 	struct Round
 	{
