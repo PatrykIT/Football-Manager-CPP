@@ -40,7 +40,7 @@ Table::Table()
 
 void Table::Add_Club_to_Table(Club **club)
 {
-	if(Assert_Table_Full() == 0)
+	if(Table_Full())
 	{
 		printf("Table full. Cannot add another club.\n");
 		return;
@@ -75,7 +75,7 @@ void Table::Print_Table() const
 void Table::Schedule_Season() //Pairs every club ID with every club ID.
 {
 	cout << endl << "Scheduling season: " << endl;
-	if(Assert_Table_Full() != 0)
+	if(!Table_Full())
 	{
 		printf("Cannot schedule season. Table not full.\n");
 		return;
@@ -227,12 +227,9 @@ int Table::Count_Combinations(int n, int k) const
 }
 
 
-int Table::Assert_Table_Full() const
+bool Table::Table_Full() const
 {
-	if( number_of_clubs == number_of_clubs_in_ligue )
-		return 0;
-	else
-		return -1;
+	return (number_of_clubs == number_of_clubs_in_ligue);
 }
 
 
@@ -441,7 +438,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
 
 //-------------------------------------- Check if match can be played --------------------------------------------------
-	if (Assert_Table_Full() != 0)
+	if (!Table_Full())
 	{
 		printf ("Cannot play match. League is not full yet.\n");
 		return;
