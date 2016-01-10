@@ -1,11 +1,6 @@
-#include "Clubs.h"
 #include "Table.h"
-#include "Calendar.h"
 
 using namespace std;
-
-Calendar *calendar = Calendar::get();
-
 
 void Start()
 {
@@ -63,7 +58,6 @@ void Start()
 	club_3->Set_Tactics();
 	club_4->Set_Tactics();
 
-	club->Print_History();
 	table->Schedule_Season();
 
 	table->Play_Round();
@@ -80,10 +74,8 @@ void Start()
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Transform to smart pointers.
  * Try to change colours in console.
- * Make it user-friendly.
+ * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
- * Create move constructor for History class, so vector could construct it in place in Save_History()
- * Make delegated constructor: club(int budget)
  */
 
 int main()
@@ -94,7 +86,7 @@ int main()
 
 	for(unsigned j = 0; j < free_players.size(); ++j)
 			delete free_players[j];
-	delete calendar;
+	delete Calendar::get();
 
 	cout << "Bye bye." << endl;
 	return 0;
