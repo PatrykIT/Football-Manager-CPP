@@ -77,7 +77,7 @@ int Club::Get_ID() const
 	return _ID;
 }
 
-char Club::Check_if_Allowed_to_Play() const
+bool Club::Check_if_Allowed_to_Play() const
 {
 	return _allowed_to_play;
 }

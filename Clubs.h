@@ -49,7 +49,7 @@ private:
 	unsigned int _attendance;
 	unsigned int _ticket_prices;
 
-	char Check_if_Allowed_to_Play() const;
+	bool Check_if_Allowed_to_Play() const;
 	void Set_Tactic_Rating();
 	void Allow_Playing();
 	void Set_Ticket_Prices();
