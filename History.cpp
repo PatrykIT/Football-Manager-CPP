@@ -1,7 +1,5 @@
 #include "History.h"
 
-extern Calendar *calendar;
-
 void History::Save_History(Club &club, std::string message) const
 {
 	/**
@@ -19,36 +17,32 @@ std::string History::Append_Date() const
 	/**
 	 * This function adds a date in string format looking like: " on a day 07.12.2015 22:30:15 ".
 	 */
+	Calendar::get()->Set_Hour();
 
-	calendar->Set_Hour();
-
-	std::string date = "";
 	std::string calendar_string = "";
+	std::string date = " on a day: ";
 
-	date += " on a day: ";
-
-	calendar_string.append(std::to_string(calendar->day_of_a_month));
+	calendar_string.append(std::to_string(Calendar::get()->day_of_a_month));
 	date.append(calendar_string + ".");
 	calendar_string.clear();
 
-	calendar_string.append(std::to_string(calendar->month));
+	calendar_string.append(std::to_string(Calendar::get()->month));
 	date.append(calendar_string + ".");
 	calendar_string.clear();
 
-
-	calendar_string.append(std::to_string(calendar->year));
+	calendar_string.append(std::to_string(Calendar::get()->year));
 	date.append(calendar_string);
 	calendar_string.clear();
 
-	calendar_string.append(" ").append(std::to_string(calendar->hour));
+	calendar_string.append(" ").append(std::to_string(Calendar::get()->hour));
 	date.append(calendar_string + ":");
 	calendar_string.clear();
 
-	calendar_string.append(std::to_string(calendar->minute));
+	calendar_string.append(std::to_string(Calendar::get()->minute));
 	date.append(calendar_string + ":");
 	calendar_string.clear();
 
-	calendar_string.append(std::to_string(calendar->seconde));
+	calendar_string.append(std::to_string(Calendar::get()->seconde));
 	date.append(calendar_string);
 	calendar_string.clear();
 
