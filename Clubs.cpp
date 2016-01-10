@@ -5,10 +5,10 @@ using namespace std;
 
 int Club::_instance_number = 0;
 
-Club::Club() :_ID(Club::_instance_number++),
+Club::Club(int budget) :_ID(Club::_instance_number++),
 		_allowed_to_play (false), //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
 		_tactic_rating (0),
-		_budget (10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000)))), //values 1000.0000 - 99999.999 $
+		_budget (budget),
 		points (0),
 		goals_scored (0), goals_conceded (0),
 		matches_played (0),

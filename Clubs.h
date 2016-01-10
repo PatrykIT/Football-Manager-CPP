@@ -65,7 +65,7 @@ private:
 	int Sell_Player();
 
 public:
-	Club();
+	explicit Club(int budget = (10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000))))); //values 1000.0000 - 99999.999 $
 	~Club();
 	const std::string club_name;
 	const std::string city_name;
