@@ -35,7 +35,7 @@ private:
     void Season_Finished();
     void Sort_Table();
 
-    int Assert_Table_Full() const;
+    int Assert_Table_Full() const; //Change to bool, and change name.
     int Check_if_Round_Played(int *index_of_match_not_played) const;
     int Find_Index_of_Pair_In_Round(Club &club_1, Club &club_2) const; //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
     int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
