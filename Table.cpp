@@ -1,4 +1,6 @@
 #include "Table.h"
+#include <algorithm>
+#include <iterator>
 using namespace std;
 
 Table::Table()
@@ -38,7 +40,7 @@ Table::Table()
 	current_round = 0;
 }
 
-void Table::Add_Club_to_Table(Club **club)
+void Table::Add_Club_to_Table(Club *&club)
 {
 	if(Table_Full())
 	{
@@ -46,9 +48,13 @@ void Table::Add_Club_to_Table(Club **club)
 		return;
 	}
 
-	clubs[number_of_clubs] = *club;
-
+	clubs[number_of_clubs] = club;
     ++number_of_clubs;
+
+    for(unsigned int i = 0; i < club->players.size(); ++i)
+    {
+    	player_statistics.insert(make_pair(club->players.at(i), Player_Statistics {0,0}) );
+    }
 }
 
 Table::~Table()
@@ -464,7 +470,6 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	goals_scored_by_loser = (goals_scored_by_loser >= goals_scored_by_winner) ? goals_scored_by_winner - 1 : goals_scored_by_loser;
 	//If losing team get's better rand then winners, we have to change it so winning team scores one more goal than the losing team.
 
-
 	if (better_club == 1)
 	{
 		club_1.points += 3;
@@ -475,6 +480,30 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_1.goals_conceded += goals_scored_by_loser;
 		club_2.goals_scored += goals_scored_by_loser;
 		club_2.goals_conceded += goals_scored_by_winner;
+
+		for(int i = 0; i < goals_scored_by_winner; ++i) //For each goal scored, we rand a person scoring it.
+		{
+			int attackers_chance = rand() % 3, //Attackers have the greatest chance of scoring goals.
+				midfielders_chance = rand() % 2,
+				defenders_chance = rand() % 1;
+
+			if (attackers_chance > midfielders_chance && attackers_chance > defenders_chance)
+			{
+				int player_that_scored = rand() % club_1.attackers_in_first_squad.size(); //Out of attackers, we rand which one scored.
+				player_statistics.find(club_1.attackers_in_first_squad.at(player_that_scored))->second.goals_scored++;
+			}
+			else if(midfielders_chance > defenders_chance)
+			{
+				int player_that_scored = rand() % club_1.midfilders_in_first_squad.size();
+				player_statistics.find(club_1.midfilders_in_first_squad.at(player_that_scored))->second.goals_scored++;
+			}
+			else
+			{
+				int player_that_scored = rand() % club_1.defenders_in_first_squad.size();
+				player_statistics.find(club_1.defenders_in_first_squad.at(player_that_scored))->second.goals_scored++;
+			}
+		}
+		cin.get();
 
 		club_1.Update_Players_Morale(1);
 		club_2.Update_Players_Morale(0);
@@ -553,23 +582,23 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 //-------------------------------------------------------------------Counting morale of both teams-------------------------------------------
 
 	unsigned int i;
-	for(i = 0; i < club_1.number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < club_1.defenders_in_first_squad.size(); ++i)
 		sum_of_morale_club1 += club_1.defenders_in_first_squad[i]->Get_Morale();
 
-	for(i = 0; i < club_1.number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < club_1.midfilders_in_first_squad.size(); ++i)
 		sum_of_morale_club1 += club_1.midfilders_in_first_squad[i]->Get_Morale();
 
-	for(i = 0; i < club_1.number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < club_1.attackers_in_first_squad.size(); ++i)
 		sum_of_morale_club1 += club_1.attackers_in_first_squad[i]->Get_Morale();
 
 
-	for(i = 0; i < club_2.number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < club_2.defenders_in_first_squad.size(); ++i)
 		sum_of_morale_club2 += club_2.defenders_in_first_squad[i]->Get_Morale();
 
-	for(i = 0; i < club_2.number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < club_2.midfilders_in_first_squad.size(); ++i)
 		sum_of_morale_club2 += club_2.midfilders_in_first_squad[i]->Get_Morale();
 
-	for(i = 0; i < club_2.number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < club_2.attackers_in_first_squad.size(); ++i)
 		sum_of_morale_club2 += club_2.attackers_in_first_squad[i]->Get_Morale();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -633,4 +662,11 @@ void Table::Sort_Table()
 		clubs[x] = clubs[index_of_max];
 		clubs[index_of_max] = temp;
 	}
+}
+
+
+void Table::Print_Players_Statistics() const
+{
+	for(auto it  : player_statistics)
+		cout << it.first->name << " " << it.first->surname << " scored: " << it.second.goals_scored << endl;
 }
