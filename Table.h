@@ -3,6 +3,7 @@
 
 #include "Clubs.h"
 #include <array>
+#include <map>
 
 #define number_of_clubs_in_ligue 4
 
@@ -40,20 +41,28 @@ private:
     int Find_Index_of_Pair_In_Round(Club &club_1, Club &club_2) const; //For Play_Match(), so it could set 'match_played = 1' in struct Pair_Clubs.
     int Count_Combinations(int n, int k) const; //Counts combinations WITHOUT repetitions! So only unique combinations.
     int Check_which_Club_Needs_to_Buy(const int i) const; //Checks which club lacks players.
-    int Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const; //0 - should be draw. 1: club_1 should win. 2: club_2 should win.
+    int Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const; //0: should be draw. 1: club_1 should win. 2: club_2 should win.
+
+    int current_round;
+    int number_of_clubs;
+
+    struct Player_Statistics
+    {
+    	int goals_scored, assists;
+    };
+
+    std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
 
 public:
     Table();
     ~Table();
 
-    int current_round;
-    int number_of_clubs;
-
-    void Add_Club_to_Table(Club **club);
+    void Add_Club_to_Table(Club *&club);
     void Schedule_Season();
     void Print_Table() const;
     void Print_Rounds() const;
     void Play_Round();
+    void Print_Players_Statistics() const;
 
 };
 
