@@ -4,6 +4,7 @@
 #include "Attributes.h"
 #include "History.h"
 #include "Stadium.h"
+#include <vector>
 
 class History;
 static const std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico"};
@@ -32,13 +33,9 @@ private:
 	unsigned int matches_played;
 	unsigned int matches_won, matches_lost, matches_drawn;
 
-	Player *attackers_in_first_squad[3];
-	Player *midfilders_in_first_squad[5];
-	Player *defenders_in_first_squad[5];
-
-	unsigned int number_of_attackers_in_first_squad;
-	unsigned int number_of_midfilders_in_first_squad;
-	unsigned int number_of_defenders_in_first_squad;
+	std::vector<Player*> attackers_in_first_squad;
+	std::vector<Player*> midfilders_in_first_squad;
+	std::vector<Player*> defenders_in_first_squad;
 
 	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are laid out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1

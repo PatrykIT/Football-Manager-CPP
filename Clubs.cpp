@@ -13,9 +13,6 @@ Club::Club(int budget) :_ID(Club::_instance_number++),
 		goals_scored (0), goals_conceded (0),
 		matches_played (0),
 		matches_won (0), matches_lost (0), matches_drawn (0),
-		number_of_attackers_in_first_squad (0),
-		number_of_midfilders_in_first_squad (0),
-		number_of_defenders_in_first_squad (0),
 		_attendance (stadium.Get_Capacity()),
 		_ticket_prices (10),
 		club_name (club_names[rand() % (sizeof(club_names) / sizeof(club_names[0]))]),
@@ -42,11 +39,11 @@ void Club::Set_Tactic_Rating()
 {
 	double sum = 0;
 	unsigned int i;
-	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < defenders_in_first_squad.size(); ++i)
 		sum = sum + defenders_in_first_squad[i]->Get_Overall();
-	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
 		sum = sum + midfilders_in_first_squad[i]->Get_Overall();
-	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < attackers_in_first_squad.size(); ++i)
 		sum = sum + attackers_in_first_squad[i]->Get_Overall();
 
 	_tactic_rating = sum / 10; // 10 - number of outfield players.
@@ -151,58 +148,57 @@ int Club::Set_Tactics()
 	sort(players.begin(), players.end(), Compare_Overall); //Ordering players from best to worse.
 
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
-	number_of_attackers_in_first_squad = 0, number_of_midfilders_in_first_squad = 0, number_of_defenders_in_first_squad = 0;
+	attackers_in_first_squad.clear(); midfilders_in_first_squad.clear(); defenders_in_first_squad.clear();
+
 	unsigned int max_attackers = 3, min_attackers = 1, max_midfilders = 5, min_midfilders = 3, max_defenders = 5, min_defenders = 3;
 	unsigned int i = 0;
 
 	do //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 	{
-		if(players[i]->Get_Position() == 1 && (number_of_defenders_in_first_squad < max_defenders ))
-			if((number_of_defenders_in_first_squad + 1 == max_defenders) && (number_of_midfilders_in_first_squad == max_midfilders || number_of_attackers_in_first_squad == max_attackers))
+		if(players[i]->Get_Position() == 1 && (defenders_in_first_squad.size() < max_defenders ))
+			if((defenders_in_first_squad.size() + 1 == max_defenders) && (midfilders_in_first_squad.size() == max_midfilders || attackers_in_first_squad.size() == max_attackers))
 				{} //can not have two max of positions, because the third one would not get a place.
 			else
 			{
-				defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
-				++number_of_defenders_in_first_squad;
+				//defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
+				defenders_in_first_squad.push_back(players[i]);  //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
 			}
 
 
-		if(players[i]->Get_Position() == 2 && number_of_midfilders_in_first_squad < max_midfilders)
-			if((number_of_midfilders_in_first_squad + 1 == max_midfilders)  && (number_of_attackers_in_first_squad == max_attackers  ||  number_of_defenders_in_first_squad == max_defenders))
+		if(players[i]->Get_Position() == 2 && midfilders_in_first_squad.size() < max_midfilders)
+			if((midfilders_in_first_squad.size() + 1 == max_midfilders)  && (attackers_in_first_squad.size() == max_attackers  ||  defenders_in_first_squad.size() == max_defenders))
 				{}
 			else
 			{
-				midfilders_in_first_squad[number_of_midfilders_in_first_squad] = players[i];
-				++number_of_midfilders_in_first_squad;
+				midfilders_in_first_squad.push_back(players[i]);
 			}
 
 
-		if(players[i]->Get_Position() == 3 && number_of_attackers_in_first_squad < max_attackers)
-			if((number_of_attackers_in_first_squad + 1 == max_attackers) && (number_of_midfilders_in_first_squad == max_midfilders || number_of_defenders_in_first_squad == max_defenders))
+		if(players[i]->Get_Position() == 3 && attackers_in_first_squad.size() < max_attackers)
+			if((attackers_in_first_squad.size() + 1 == max_attackers) && (midfilders_in_first_squad.size() == max_midfilders || defenders_in_first_squad.size() == max_defenders))
 				{}
 			else
 			{
-				attackers_in_first_squad[number_of_attackers_in_first_squad] = players[i];
-				++number_of_attackers_in_first_squad;
+				attackers_in_first_squad.push_back(players[i]);
 			}
 
 		++i;
-	} while  ((number_of_attackers_in_first_squad + number_of_midfilders_in_first_squad + number_of_defenders_in_first_squad < 10) && (i != players.size()));
+	} while  ((attackers_in_first_squad.size() + midfilders_in_first_squad.size() + defenders_in_first_squad.size() < 10) && (i != players.size()));
 
-	if( (number_of_attackers_in_first_squad < min_attackers || number_of_midfilders_in_first_squad < min_midfilders || number_of_defenders_in_first_squad < min_defenders) || (number_of_attackers_in_first_squad +
-			number_of_midfilders_in_first_squad + number_of_defenders_in_first_squad != 10 ))
+	if( (attackers_in_first_squad.size() < min_attackers || midfilders_in_first_squad.size() < min_midfilders || defenders_in_first_squad.size() < min_defenders)
+			|| (attackers_in_first_squad.size() + midfilders_in_first_squad.size() + defenders_in_first_squad.size() != 10 ))
 	{
 		printf("\nCouldn't set proper tactics! Not enough players for a position. [%d]\n", _ID);
-		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", number_of_attackers_in_first_squad, number_of_midfilders_in_first_squad, number_of_defenders_in_first_squad);
+		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", attackers_in_first_squad.size(), midfilders_in_first_squad.size(), defenders_in_first_squad.size());
 		return -1;
 	}
 
 //---------------------------------------------------------------------END OF SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 
 
-	tactic[0] = number_of_defenders_in_first_squad; //every value in index means number of players in this position.
-	tactic[1] = number_of_midfilders_in_first_squad;
-	tactic[2] = number_of_attackers_in_first_squad;
+	tactic[0] = defenders_in_first_squad.size(); //every value in index means number of players in this position.
+	tactic[1] = midfilders_in_first_squad.size();
+	tactic[2] = attackers_in_first_squad.size();
 
 	Set_Tactic_Rating();
 
@@ -215,7 +211,7 @@ int Club::Set_Tactics()
 void Club::Print_Formation() const
 {
 	printf("\n---Current formation---\n");
-	cout << club_name << " " << city_name << "plays: ";
+	cout << club_name << " " << city_name << " plays: ";
 
 	for(int i = 0; i < 3; ++i)
 		printf("%d ", tactic[i]);
@@ -226,17 +222,17 @@ void Club::Print_First_Squad() const
 {
 	printf("\n---First Squad [%d]---\n", _ID);
 	unsigned int i;
-	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < defenders_in_first_squad.size(); ++i)
 	{
 		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->Get_Overall() << " (DEF)" << endl;
 	}
 
-	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
 	{
 		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->Get_Overall() << " (MID)" << endl;
 	}
 
-	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < attackers_in_first_squad.size(); ++i)
 	{
 		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->Get_Overall() << " (ATT)" << endl;
 	}
@@ -336,7 +332,6 @@ int Club::Buy_Player()
 
 	cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
 	return -1;
-
 }
 
 int Club::Sell_Player()
@@ -389,8 +384,8 @@ int Club::Sell_Player()
 void Club::Print_Positions_Number() const
 {
 	printf("Current positions in first squad [%d]:\n", _ID);
-	cout << "Attackers: " << number_of_attackers_in_first_squad << endl << "Midfielders: " << number_of_midfilders_in_first_squad << endl <<
-			"Defenders: " << number_of_defenders_in_first_squad << endl;
+	cout << "Attackers: " << attackers_in_first_squad.size() << endl << "Midfielders: " << midfilders_in_first_squad.size() << endl <<
+			"Defenders: " << defenders_in_first_squad.size() << endl;
 }
 
 void Club::Set_Ticket_Prices()
@@ -414,7 +409,7 @@ void Club::Improve_Skills_After_Match(bool won)
 {
 
 	unsigned int i;
-	for(i = 0; i < number_of_defenders_in_first_squad; ++i)
+	for(i = 0; i < defenders_in_first_squad.size(); ++i)
 	{
 		++defenders_in_first_squad[i]->attributes.defending_attributes.interceptions;
 		++defenders_in_first_squad[i]->attributes.defending_attributes.marking;
@@ -425,7 +420,7 @@ void Club::Improve_Skills_After_Match(bool won)
 		}
 	}
 
-	for(i = 0; i < number_of_midfilders_in_first_squad; ++i)
+	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
 	{
 		++midfilders_in_first_squad[i]->attributes.mental_attributes.pressure_handling;
 		if (won) //extra improving for winners.
@@ -438,7 +433,7 @@ void Club::Improve_Skills_After_Match(bool won)
 		}
 	}
 
-	for(i = 0; i < number_of_attackers_in_first_squad; ++i)
+	for(i = 0; i < attackers_in_first_squad.size(); ++i)
 	{
 		++attackers_in_first_squad[i]->attributes.attacking_attributes.ball_control;
 		++attackers_in_first_squad[i]->attributes.attacking_attributes.first_touch;
