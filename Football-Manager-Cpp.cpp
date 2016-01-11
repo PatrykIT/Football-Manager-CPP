@@ -48,10 +48,10 @@ void Start()
 
 
 	Table *table = new Table;
-	table->Add_Club_to_Table(&club);
-	table->Add_Club_to_Table(&club_2);
-	table->Add_Club_to_Table(&club_3);
-	table->Add_Club_to_Table(&club_4);
+	table->Add_Club_to_Table(club);
+	table->Add_Club_to_Table(club_2);
+	table->Add_Club_to_Table(club_3);
+	table->Add_Club_to_Table(club_4);
 
 	club->Set_Tactics();
 	club_2->Set_Tactics();
@@ -61,8 +61,9 @@ void Start()
 	table->Schedule_Season();
 
 	table->Play_Round();
-	table->Play_Round();
-	table->Play_Round();
+	table->Print_Players_Statistics();
+	//table->Play_Round();
+	//table->Play_Round();
 
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
@@ -76,6 +77,7 @@ void Start()
  * Try to change colours in console.
  * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
+ * Finish assigning goals scored and assists in match in Play_Match().
  */
 
 int main()
