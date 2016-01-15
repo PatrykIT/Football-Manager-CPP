@@ -436,6 +436,120 @@ void Table::Play_Round()
 		Season_Finished();
 }
 
+void Table::Print_Assister(Player *&player)
+{
+	printf(" (%s %s assisted)\n", player->name.c_str(), player->surname.c_str());
+}
+
+void Table::Pick_Assister(Player *&player, Club &club)
+{
+	/**
+	 * Randomizes which player from a team should make an assist.
+	 * Makes sure that the player that has scored in this action, can't have an assist.
+	 * Midfielders have the biggest chance.
+	 * *&player is the player that scored a goal, so he can not have an assist.
+	 */
+
+	//-----------Chance of assisting--------------------
+	int attackers_chance_assisting = rand() % 2,
+		midfielders_chance_assisting = rand() % 3,
+		defenders_chance_assisting = rand() % 1;
+
+	if(attackers_chance_assisting > midfielders_chance_assisting && attackers_chance_assisting > defenders_chance_assisting )
+	{
+		int player_that_assisted = rand() % club.attackers_in_first_squad.size(); //Out of attackers, we rand which one assisted.
+
+		if(club.attackers_in_first_squad[player_that_assisted] != player)
+		{
+			player_statistics.find(club.attackers_in_first_squad.at(player_that_assisted))->second.assists++;
+			Print_Assister(club.attackers_in_first_squad[player_that_assisted]);
+		}
+		else
+		{
+			player_statistics.find(club.midfilders_in_first_squad.at(0))->second.assists++; //In case we randed the same player that scored, we'll give a midfielder an assist.
+			Print_Assister(club.midfilders_in_first_squad[0]);
+		}
+	}
+
+	if(midfielders_chance_assisting > defenders_chance_assisting)
+	{
+		int player_that_assisted = rand() % club.midfilders_in_first_squad.size();
+
+		if(club.midfilders_in_first_squad[player_that_assisted] != player)
+		{
+			player_statistics.find(club.midfilders_in_first_squad.at(player_that_assisted))->second.assists++;
+			Print_Assister(club.midfilders_in_first_squad[player_that_assisted]);
+		}
+		else
+		{
+			player_statistics.find(club.attackers_in_first_squad.at(0))->second.assists++;
+			Print_Assister(club.attackers_in_first_squad[0]);
+		}
+	}
+	else
+	{
+		int player_that_assisted = rand() % club.defenders_in_first_squad.size();
+
+		if(club.defenders_in_first_squad[player_that_assisted] != player)
+		{
+			player_statistics.find(club.defenders_in_first_squad.at(player_that_assisted))->second.assists++;
+			Print_Assister(club.defenders_in_first_squad[player_that_assisted]);
+
+		}
+		else
+		{
+			player_statistics.find(club.midfilders_in_first_squad.at(0))->second.assists++;
+			Print_Assister(club.midfilders_in_first_squad[0]);
+		}
+	}
+}
+
+void Table::Pick_Scorer(int goals_scored, Club &club_1)
+{
+	/**
+	 * Randomizes which player from a team should score a goal.
+	 * Attackers have the biggest chance.
+	 * Also calls Pick_Assister() for each goal.
+	 */
+
+	for(int i = 0; i < goals_scored; ++i) //For each goal scored, we rand a person scoring it, and assisting.
+	{
+		//-----------Chance of scoring----------------------
+		int attackers_chance = rand() % 3, //Attackers have the greatest chance of scoring goals.
+			midfielders_chance = rand() % 2,
+			defenders_chance = rand() % 1;
+
+
+		if (attackers_chance > midfielders_chance && attackers_chance > defenders_chance)
+		{
+			int player_that_scored = rand() % club_1.attackers_in_first_squad.size(); //Out of attackers, we rand which one scored.
+			player_statistics.find(club_1.attackers_in_first_squad.at(player_that_scored))->second.goals_scored++;
+
+			printf("%s %s (%s %s) scores!", club_1.attackers_in_first_squad.at(player_that_scored)->name.c_str(),
+					club_1.attackers_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
+			Pick_Assister(club_1.attackers_in_first_squad[player_that_scored], club_1);
+
+		}
+		else if(midfielders_chance > defenders_chance)
+		{
+			int player_that_scored = rand() % club_1.midfilders_in_first_squad.size();
+			player_statistics.find(club_1.midfilders_in_first_squad.at(player_that_scored))->second.goals_scored++;
+
+			printf("%s %s (%s %s) scores!", club_1.midfilders_in_first_squad.at(player_that_scored)->name.c_str(),
+					club_1.midfilders_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
+			Pick_Assister(club_1.midfilders_in_first_squad[player_that_scored], club_1);
+		}
+		else
+		{
+			int player_that_scored = rand() % club_1.defenders_in_first_squad.size();
+			player_statistics.find(club_1.defenders_in_first_squad.at(player_that_scored))->second.goals_scored++;
+
+			printf("%s %s (%s %s) scores!", club_1.defenders_in_first_squad.at(player_that_scored)->name.c_str(),
+					club_1.defenders_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
+			Pick_Assister(club_1.defenders_in_first_squad[player_that_scored], club_1);
+		}
+	}
+}
 
 void Table::Play_Match(Club &club_1, Club &club_2)
 {
@@ -481,28 +595,8 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_2.goals_scored += goals_scored_by_loser;
 		club_2.goals_conceded += goals_scored_by_winner;
 
-		for(int i = 0; i < goals_scored_by_winner; ++i) //For each goal scored, we rand a person scoring it.
-		{
-			int attackers_chance = rand() % 3, //Attackers have the greatest chance of scoring goals.
-				midfielders_chance = rand() % 2,
-				defenders_chance = rand() % 1;
-
-			if (attackers_chance > midfielders_chance && attackers_chance > defenders_chance)
-			{
-				int player_that_scored = rand() % club_1.attackers_in_first_squad.size(); //Out of attackers, we rand which one scored.
-				player_statistics.find(club_1.attackers_in_first_squad.at(player_that_scored))->second.goals_scored++;
-			}
-			else if(midfielders_chance > defenders_chance)
-			{
-				int player_that_scored = rand() % club_1.midfilders_in_first_squad.size();
-				player_statistics.find(club_1.midfilders_in_first_squad.at(player_that_scored))->second.goals_scored++;
-			}
-			else
-			{
-				int player_that_scored = rand() % club_1.defenders_in_first_squad.size();
-				player_statistics.find(club_1.defenders_in_first_squad.at(player_that_scored))->second.goals_scored++;
-			}
-		}
+		Pick_Scorer(goals_scored_by_winner, club_1);
+		Pick_Scorer(goals_scored_by_loser, club_2);
 		cin.get();
 
 		club_1.Update_Players_Morale(1);
@@ -525,6 +619,10 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_1.goals_scored += goals_scored_by_loser;
 		club_1.goals_conceded += goals_scored_by_winner;
 
+		Pick_Scorer(goals_scored_by_winner, club_1);
+		Pick_Scorer(goals_scored_by_loser, club_2);
+		cin.get();
+
 		club_2.Update_Players_Morale(1);
 		club_1.Update_Players_Morale(0);
 
@@ -545,6 +643,9 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_1.goals_conceded += goals_scored_by_winner;
 		club_2.goals_scored += goals_scored_by_winner;
 		club_2.goals_conceded += goals_scored_by_winner;
+
+		Pick_Scorer(goals_scored_by_winner, club_1);
+		Pick_Scorer(goals_scored_by_winner, club_2);
 
 		++club_1.matches_drawn;
 		++club_2.matches_drawn;
@@ -571,6 +672,10 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	round[current_round].match[match_index]->match_played = 1;
 }
+
+
+
+
 
 int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 {
@@ -646,6 +751,9 @@ void Table::Season_Finished()
 
 void Table::Sort_Table()
 {
+	/**
+	 * Sorts clubs in table by their points.
+	 */
 	for(int x = 0; x < number_of_clubs; ++x)
 	{
 		int index_of_max = x;
@@ -668,5 +776,16 @@ void Table::Sort_Table()
 void Table::Print_Players_Statistics() const
 {
 	for(auto it  : player_statistics)
-		cout << it.first->name << " " << it.first->surname << " scored: " << it.second.goals_scored << endl;
+		printf("%s %s: %d goals and %d assists\n", it.first->name.c_str(), it.first->surname.c_str(), it.second.goals_scored, it.second.assists);
 }
+
+
+
+
+
+
+
+
+
+
+
