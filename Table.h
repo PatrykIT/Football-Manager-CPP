@@ -31,6 +31,9 @@ private:
 	std::array<Club*, number_of_clubs_in_ligue> clubs;
 
 	void Play_Match(Club &club_1, Club &club_2);
+	void Pick_Scorer(int goals_scored, Club &club_1);
+	void Pick_Assister(Player *&player, Club &club_1);
+	void Print_Assister(Player *&player);
     void Schedule_Rounds();
     void Give_Walkover(const int i);
     void Season_Finished();
