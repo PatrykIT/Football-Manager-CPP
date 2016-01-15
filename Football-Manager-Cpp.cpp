@@ -78,13 +78,15 @@ void Start()
  * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
  * Finish assigning goals scored and assists in match in Play_Match().
+ * Add threads.
+ * Check const auto & in Print_Player_Statistics
  */
+
 
 int main()
 {
 	srand(time(NULL));
 	Start();
-
 
 	for(unsigned j = 0; j < free_players.size(); ++j)
 			delete free_players[j];
