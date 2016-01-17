@@ -2,7 +2,7 @@
 #include "Calendar.h"
 
 #include "Table.h"
-Calendar* Calendar::calendar = NULL;
+Calendar* Calendar::calendar = nullptr;
 
 
 void Calendar::Set_Hour() //Used by History class to save messages - it update's the time, without updating the date, because date is constantly modified by Travel_Calendar().
