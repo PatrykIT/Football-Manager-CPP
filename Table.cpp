@@ -1,7 +1,9 @@
 #include "Table.h"
+#include "Attributes.h"
 #include <algorithm>
 #include <iterator>
 using namespace std;
+
 
 Table::Table()
 {
@@ -450,6 +452,7 @@ void Table::Pick_Assister(Player *&player, Club &club)
 	 * *&player is the player that scored a goal, so he can not have an assist.
 	 */
 
+	map<Player*, Player_Statistics>::iterator it;
 	//-----------Chance of assisting--------------------
 	int attackers_chance_assisting = rand() % 2,
 		midfielders_chance_assisting = rand() % 3,
@@ -461,28 +464,59 @@ void Table::Pick_Assister(Player *&player, Club &club)
 
 		if(club.attackers_in_first_squad[player_that_assisted] != player)
 		{
-			player_statistics.find(club.attackers_in_first_squad.at(player_that_assisted))->second.assists++;
+			it = player_statistics.find(club.attackers_in_first_squad.at(player_that_assisted));
+
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
 			Print_Assister(club.attackers_in_first_squad[player_that_assisted]);
 		}
 		else
 		{
-			player_statistics.find(club.midfilders_in_first_squad.at(0))->second.assists++; //In case we randed the same player that scored, we'll give a midfielder an assist.
+			it = player_statistics.find(club.midfilders_in_first_squad.at(0)); //In case we randed the same player that scored, we'll give a midfielder an assist.
+
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
 			Print_Assister(club.midfilders_in_first_squad[0]);
 		}
 	}
-
-	if(midfielders_chance_assisting > defenders_chance_assisting)
+	else if(midfielders_chance_assisting > defenders_chance_assisting)
 	{
 		int player_that_assisted = rand() % club.midfilders_in_first_squad.size();
 
 		if(club.midfilders_in_first_squad[player_that_assisted] != player)
 		{
-			player_statistics.find(club.midfilders_in_first_squad.at(player_that_assisted))->second.assists++;
+			it = player_statistics.find(club.midfilders_in_first_squad.at(player_that_assisted));
+
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
 			Print_Assister(club.midfilders_in_first_squad[player_that_assisted]);
 		}
 		else
 		{
-			player_statistics.find(club.attackers_in_first_squad.at(0))->second.assists++;
+			it = player_statistics.find(club.attackers_in_first_squad.at(0));
+
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
 			Print_Assister(club.attackers_in_first_squad[0]);
 		}
 	}
@@ -492,13 +526,28 @@ void Table::Pick_Assister(Player *&player, Club &club)
 
 		if(club.defenders_in_first_squad[player_that_assisted] != player)
 		{
-			player_statistics.find(club.defenders_in_first_squad.at(player_that_assisted))->second.assists++;
-			Print_Assister(club.defenders_in_first_squad[player_that_assisted]);
+			it = player_statistics.find(club.defenders_in_first_squad.at(player_that_assisted));
 
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
+			Print_Assister(club.defenders_in_first_squad[player_that_assisted]);
 		}
 		else
 		{
-			player_statistics.find(club.midfilders_in_first_squad.at(0))->second.assists++;
+			it = player_statistics.find(club.midfilders_in_first_squad.at(0));
+
+			if(it != player_statistics.end())
+				it->second.assists++;
+			else
+			{
+				cout << "Player that assisted is not currently being observed by league. Not saving an assist to statistics." << endl;
+				return;
+			}
 			Print_Assister(club.midfilders_in_first_squad[0]);
 		}
 	}
@@ -512,6 +561,8 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 	 * Also calls Pick_Assister() for each goal.
 	 */
 
+	map<Player*, Player_Statistics>::iterator it;
+
 	for(int i = 0; i < goals_scored; ++i) //For each goal scored, we rand a person scoring it, and assisting.
 	{
 		//-----------Chance of scoring----------------------
@@ -523,9 +574,16 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 		if (attackers_chance > midfielders_chance && attackers_chance > defenders_chance)
 		{
 			int player_that_scored = rand() % club_1.attackers_in_first_squad.size(); //Out of attackers, we rand which one scored.
-			player_statistics.find(club_1.attackers_in_first_squad.at(player_that_scored))->second.goals_scored++;
 
-			printf("%s %s (%s %s) scores!", club_1.attackers_in_first_squad.at(player_that_scored)->name.c_str(),
+			it = player_statistics.find(club_1.attackers_in_first_squad.at(player_that_scored));
+			if(it == player_statistics.end())
+			{
+				cout << "Player that scored is not currently being observed by league. Not saving a goal to statistics." << endl;
+				return;
+			}
+			it->second.goals_scored++;
+
+			printf("\t%s %s (%s %s) scores!", club_1.attackers_in_first_squad.at(player_that_scored)->name.c_str(),
 					club_1.attackers_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
 			Pick_Assister(club_1.attackers_in_first_squad[player_that_scored], club_1);
 
@@ -533,18 +591,32 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 		else if(midfielders_chance > defenders_chance)
 		{
 			int player_that_scored = rand() % club_1.midfilders_in_first_squad.size();
-			player_statistics.find(club_1.midfilders_in_first_squad.at(player_that_scored))->second.goals_scored++;
 
-			printf("%s %s (%s %s) scores!", club_1.midfilders_in_first_squad.at(player_that_scored)->name.c_str(),
+			it = player_statistics.find(club_1.midfilders_in_first_squad.at(player_that_scored));
+			if(it == player_statistics.end())
+			{
+				cout << "Player that scored is not currently being observed by league. Not saving a goal to statistics." << endl;
+				return;
+			}
+			it->second.goals_scored++;
+
+			printf("\t%s %s (%s %s) scores!", club_1.midfilders_in_first_squad.at(player_that_scored)->name.c_str(),
 					club_1.midfilders_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
 			Pick_Assister(club_1.midfilders_in_first_squad[player_that_scored], club_1);
 		}
 		else
 		{
 			int player_that_scored = rand() % club_1.defenders_in_first_squad.size();
-			player_statistics.find(club_1.defenders_in_first_squad.at(player_that_scored))->second.goals_scored++;
 
-			printf("%s %s (%s %s) scores!", club_1.defenders_in_first_squad.at(player_that_scored)->name.c_str(),
+			it = player_statistics.find(club_1.defenders_in_first_squad.at(player_that_scored));
+			if(it == player_statistics.end())
+			{
+				cout << "Player that scored is not currently being observed by league. Not saving a goal to statistics." << endl;
+				return;
+			}
+			it->second.goals_scored++;
+
+			printf("\t%s %s (%s %s) scores!", club_1.defenders_in_first_squad.at(player_that_scored)->name.c_str(),
 					club_1.defenders_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
 			Pick_Assister(club_1.defenders_in_first_squad[player_that_scored], club_1);
 		}
@@ -775,11 +847,15 @@ void Table::Sort_Table()
 
 void Table::Print_Players_Statistics() const
 {
-	for(auto it  : player_statistics)
+	for(const auto &it  : player_statistics)
 		printf("%s %s: %d goals and %d assists\n", it.first->name.c_str(), it.first->surname.c_str(), it.second.goals_scored, it.second.assists);
 }
 
-
+void Table::Add_Player_to_Observe(Player &player)
+{
+	//player_statistics.insert(make_pair(&player, Player_Statistics {0,0}) );
+	cout << "Can't work :(\n";
+}
 
 
 
