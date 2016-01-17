@@ -1,14 +1,13 @@
 #include "Table.h"
-
+#include "Transfers.hpp"
+#include <map>
 using namespace std;
+
 
 void Start()
 {
 	int number_of_players = 15;
 	int i;
-
-	for(unsigned j = 0; j < free_players.size(); ++j)
-		free_players[j] = new Player;
 
 	Club *club = new Club;
 	Player *players_1[number_of_players];
@@ -62,8 +61,9 @@ void Start()
 
 	table->Play_Round();
 	table->Print_Players_Statistics();
-	//table->Play_Round();
-	//table->Play_Round();
+	table->Play_Round();
+	table->Print_Players_Statistics();
+	table->Play_Round();
 
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
@@ -77,9 +77,9 @@ void Start()
  * Try to change colours in console.
  * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
- * Finish assigning goals scored and assists in match in Play_Match().
  * Add threads.
- * Check const auto & in Print_Player_Statistics
+ * Make class Transfer_Window. Only when it's open, we can buy players. After buying, we give signal to Table::player_statistics to observe new player.
+ * Above is almost done, but static map player_statistics cannot be empty defined. Fix this bug.
  */
 
 
@@ -88,9 +88,8 @@ int main()
 	srand(time(NULL));
 	Start();
 
-	for(unsigned j = 0; j < free_players.size(); ++j)
-			delete free_players[j];
 	delete Calendar::get();
+	delete Transfers::get();
 
 	cout << "Bye bye." << endl;
 	return 0;
