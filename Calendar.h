@@ -24,8 +24,8 @@ private:
 	void Add_Table(Table &table);
 
 public:
-	~Calendar();
 	static Calendar *get();
+	~Calendar();
 
 	void Print_Date() const;
 };
