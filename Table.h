@@ -12,6 +12,7 @@ class Table
 {
 private:
 	friend class Calendar; //for giving access to clubs
+	friend class Transfers; //for helper function
 
 	Table(const Table& other);
     Table& operator=(const Table& other);
@@ -55,6 +56,7 @@ private:
     };
 
     std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
+    static void Add_Player_to_Observe(Player &player); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
 
 public:
     Table();
