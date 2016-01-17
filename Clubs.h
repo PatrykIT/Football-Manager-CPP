@@ -1,12 +1,14 @@
 #ifndef CLUBS_H_
 #define CLUBS_H_
 
-#include "Attributes.h"
+//#include "Attributes.h"
 #include "History.h"
 #include "Stadium.h"
+//#include "Transfers.hpp"
 #include <vector>
 
 class History;
+class Player;
 static const std::string club_names[] = {"Real", "Manchester", "Arsenal", "Leeds", "Norwitch", "Lech", "Legia", "Atletico"};
 static const std::string cities[] = {"Madrid", "United", "London", "York", "Bristol", "Poznan",  "Warszawa", "Cordoba"};
 
@@ -15,12 +17,12 @@ class Club
 {
 private:
 	friend class Calendar; //for Year_Passed()
+	friend class Table; //So we can change points, match played etc.
+	friend class History; //So we can save history about things that happened in club throughout the game.
 
 	Club(const Club& other);
 	Club& operator=(const Club& other);
 
-	friend class Table; //So we can change points, match played etc.
-	friend class History; //So we can save history about things that happened in club throughout the game.
 
 	static int _instance_number;
 	const int _ID;
