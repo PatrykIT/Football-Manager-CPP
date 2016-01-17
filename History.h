@@ -1,8 +1,9 @@
 #ifndef HISTORY_H_
 #define HISTORY_H_
 
+#include <string>
 #include "Calendar.h"
-#include "Clubs.h"
+//#include "Clubs.h"
 
 class Club;
 

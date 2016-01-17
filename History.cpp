@@ -1,4 +1,5 @@
 #include "History.h"
+#include "Clubs.h"
 
 void History::Save_History(Club &club, std::string message) const
 {
