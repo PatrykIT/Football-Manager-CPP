@@ -1,12 +1,10 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 #include <iostream>
-#include <vector>
 
 /* NOTE: This file should be named "Players.h" */
 class Club;
 class Player;
-extern std::vector<Player*> free_players;
 
 static std::string names[] = { "Cristiano", "Adu", "Patrick", "Sergio", "Raphael", "Karim", "Gareth", "Luis", "Andres", "Willian", "Oscar" };
 static std::string surnames[] = { "Ronaldo", "Costacurta", "Cyrklaff", "Ramos", "Varane", "Benzema", "Bale", "Suarez", "Iniesta", "Romero", "Gaucho" };
