@@ -1,6 +1,6 @@
 #include "Attributes.h"
 
-std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
+//std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
 
 Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
 		surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ]),
