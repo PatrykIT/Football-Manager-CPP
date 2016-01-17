@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "Clubs.h"
-
+#include "Transfers.hpp"
 using namespace std;
 
 int Club::_instance_number = 0;
@@ -31,7 +31,8 @@ Club::Club(int budget) :_ID(Club::_instance_number++),
 Club::~Club()
 {
 	for(unsigned int i = 0; i < players.size(); ++i)
-		free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
+		Transfers::get()->free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
+		//free_players.push_back(players[i]);
 }
 
 
@@ -114,7 +115,7 @@ void Club::List_Players() const
 	printf("\n---Listing players---\n\n");
 	for (unsigned i = 0 ; i < players.size(); ++i)
 	{
-		printf("%s %s\nOverall: %.2f%\n", players[i]->name, players[i]->surname, players[i]->Get_Overall());
+		printf("%s %s\nOverall: %.2f%\n", players[i]->name.c_str(), players[i]->surname.c_str(), players[i]->Get_Overall());
 		switch (players[i]->Get_Position())
 			{
 			case 1:
@@ -189,7 +190,7 @@ int Club::Set_Tactics()
 			|| (attackers_in_first_squad.size() + midfilders_in_first_squad.size() + defenders_in_first_squad.size() != 10 ))
 	{
 		printf("\nCouldn't set proper tactics! Not enough players for a position. [%d]\n", _ID);
-		printf("Attackers: %d\nMidfilders: %d\nDefenders: %d\n\n", attackers_in_first_squad.size(), midfilders_in_first_squad.size(), defenders_in_first_squad.size());
+		printf("Attackers: %lu\nMidfilders: %lu\nDefenders: %lu\n\n", attackers_in_first_squad.size(), midfilders_in_first_squad.size(), defenders_in_first_squad.size());
 		return -1;
 	}
 
@@ -254,6 +255,8 @@ void Club::Print_Whole_Squad() const
 
 int Club::Buy_Player()
 {
+	Transfers *transfer =  Transfers::get();
+
 	if (players.size() >= 23)
 	{
 		cout << "Squad is full. Cannot add another player." << endl;
@@ -274,17 +277,18 @@ int Club::Buy_Player()
 	printf("\t--- Current budget: %f$ ---\n", _budget);
 
 
-	for(unsigned int i = 0; i < free_players.size(); ++i)
+	for(unsigned int i = 0; i < transfer->free_players.size(); ++i)
 	{
-		if (free_players.at(i)->Get_Position() == position_to_buy)
+		if (transfer->free_players.at(i)->Get_Position() == position_to_buy)
 		{
-			cout << endl << "Found: " << free_players[i]->name << " "<< free_players[i]->surname << ". His overall: " << free_players[i]->Get_Overall() <<"%" << endl; free_players[i]->Print_Value();
+			cout << endl << "Found: " << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname
+					<< ". His overall: " << transfer->free_players[i]->Get_Overall() <<"%" << endl; transfer->free_players[i]->Print_Value();
 			cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
 			char buy; cin >> buy;
 
 			if (buy == 'Y' || buy == 'y')
 			{
-				if (_budget < free_players[i]->Get_Value())
+				if (_budget < transfer->free_players[i]->Get_Value())
 				{
 					printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\nY or N:\t", _budget);
 
@@ -294,7 +298,7 @@ int Club::Buy_Player()
 					{
 						const int ret = Sell_Player();
 
-						if (ret == 0 && _budget >= free_players[i]->Get_Value())
+						if (ret == 0 && _budget >= transfer->free_players[i]->Get_Value())
 							{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)
 						else
 							continue;
@@ -303,14 +307,15 @@ int Club::Buy_Player()
 						continue;
 				}
 
-				const int ret = Add_Player_to_Club( *free_players[i] );
+				const int ret = Add_Player_to_Club(*transfer->free_players[i]);
 
 				if(ret == 0)
 				{
 					cout << "Player bought." << endl;
 
-					_budget = _budget - free_players[i]->Get_Value();
-					free_players.erase(free_players.begin() + i); //Remove player from free players (transfer list).
+					_budget = _budget - transfer->free_players[i]->Get_Value();
+					Transfers::get()->Player_Bought(*transfer->free_players[i]); //Inform transfer list that we're buying from it.
+					transfer->free_players.erase(transfer->free_players.begin() + i); //Remove player from transfer list.
 
 					Set_Tactics();
 					return 0; //Exit infinite loop
@@ -325,8 +330,8 @@ int Club::Buy_Player()
 		else
 		{
 			cout << "Searching.." << endl;
-			cout << free_players[i]->name << " "<< free_players[i]->surname << "  | Position: " << free_players[i]->Get_Position()
-					<< " | Value: " <<  free_players[i]->Get_Value() << "$" << endl;
+			cout << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname << "  | Position: "
+					<< transfer->free_players[i]->Get_Position() << " | Value: " <<  transfer->free_players[i]->Get_Value() << "$" << endl;
 		}
 	}
 
@@ -362,7 +367,7 @@ int Club::Sell_Player()
 	while (confirm != 'Y' && confirm != 'y');
 
 
-	free_players.push_back(players[player_to_sell]);
+	Transfers::get()->free_players.push_back(players[player_to_sell]);
 	_budget += players[player_to_sell]->Get_Value();
 
 	string information = "Sold ";
