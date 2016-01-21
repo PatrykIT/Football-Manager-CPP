@@ -203,7 +203,7 @@ int Table::Count_Combinations(int n, int k) const
 
 	//---------------- We are counting factorial's and putting them to formula. -------------------------
 
-	int n_minus_k = n - k; //n: 4 | k : 2 | result = 6 | n-k = 2
+	int n_minus_k = n - k;
 
 	int sum = 1;
 	for(int i = 1; i < n + 1; ++i) //factorial of n
