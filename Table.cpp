@@ -195,35 +195,30 @@ int Table::Count_Combinations(int n, int k) const
 	/**
 	 * Kombinację bez powtórzeń wykorzystujemy wtedy, gdy chcemy wiedzieć ile możemy stworzyć różnych układów k-elementowych, mając do dyspozycji n-elementów,
 	 * przy czym kolejność elementów w układzie jest nieistotna, a elementy nie mogą się powtarzać.
+	 * n - number of clubs in league.
+	 * k - How many times clubs can be linked to each other (usually is 2, because of home - away and revenges)
 	 *
 	 *  Wzór na kombinację bez powtórzeń: n! / k! * (n-k)!
 	 */
 
 	//---------------- We are counting factorial's and putting them to formula. -------------------------
 
-	int n_minus_k = n - k;
-	int i;
+	int n_minus_k = n - k; //n: 4 | k : 2 | result = 6 | n-k = 2
 
 	int sum = 1;
-	int current_silnia = n;
-
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(int i = 1; i < n + 1; ++i) //factorial of n
 		sum = sum * i;
 
 	n = sum;
 
 	sum = 1;
-	current_silnia = k;
-
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(int i = 1; i < k + 1; ++i) //factorial of k
 		sum = sum * i;
 
 	k = sum;
 
 	sum = 1;
-	current_silnia = n_minus_k;
-
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(int i = 1; i < n_minus_k + 1; ++i) //factorial of (n-k)
 		sum = sum * i;
 
 	n_minus_k = sum;
