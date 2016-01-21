@@ -1,10 +1,8 @@
 #ifndef CLUBS_H_
 #define CLUBS_H_
 
-//#include "Attributes.h"
 #include "History.h"
 #include "Stadium.h"
-//#include "Transfers.hpp"
 #include <vector>
 
 class History;
