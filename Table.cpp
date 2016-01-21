@@ -207,7 +207,7 @@ int Table::Count_Combinations(int n, int k) const
 	int sum = 1;
 	int current_silnia = n;
 
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(i = 1; i < current_silnia + 1; ++i) //Count factorial of n
 		sum = sum * i;
 
 	n = sum;
@@ -215,7 +215,7 @@ int Table::Count_Combinations(int n, int k) const
 	sum = 1;
 	current_silnia = k;
 
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(i = 1; i < current_silnia + 1; ++i) //Count factorial of k
 		sum = sum * i;
 
 	k = sum;
@@ -223,7 +223,7 @@ int Table::Count_Combinations(int n, int k) const
 	sum = 1;
 	current_silnia = n_minus_k;
 
-	for(i = 1; i < current_silnia + 1; ++i)
+	for(i = 1; i < current_silnia + 1; ++i) //Count factorial of n - k
 		sum = sum * i;
 
 	n_minus_k = sum;
