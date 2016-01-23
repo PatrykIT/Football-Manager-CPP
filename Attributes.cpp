@@ -1,10 +1,9 @@
 #include "Attributes.h"
 
-//std::vector<Player*> free_players(30); //free agents - players without clubs, ready to be bought.
+Player::Player() :_age (rand() % (26) + 16), //(max_number + 1 - minimum_number)) + minimum_number
+		name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
+		surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ])
 
-Player::Player() : name (names [ rand() % (sizeof(names) / sizeof(names[0])) ]),
-		surname (surnames [ rand() % (sizeof(surnames) / sizeof(surnames[0])) ]),
-		_age (rand() % (26) + 16) //(max_number + 1 - minimum_number)) + minimum_number
 {
 	_Set_Attributes();
 	_Set_Position();
@@ -175,8 +174,14 @@ int Player::Get_Morale() const
 
 void Player::_Set_Overall()
 {
+	attributes.attacking_attributes.Set_Overall();
+	attributes.defending_attributes.Set_Overall();
+	attributes.mental_attributes.Set_Overall();
+	attributes.psyhical_attributes.Set_Overall();
+
 	_overall = (attributes.attacking_attributes.Get_Overall() + attributes.defending_attributes.Get_Overall() + attributes.mental_attributes.Get_Overall() +
 			attributes.psyhical_attributes.Get_Overall()) / 4.0;
+	_Set_Value();
 }
 
 void Player::Attributes::Defending_Attributes::Set_Overall()
@@ -184,7 +189,6 @@ void Player::Attributes::Defending_Attributes::Set_Overall()
 	double sum = interceptions + marking + slide_tackle + stand_tackle;
 	overall = sum / 4;
 }
-
 
 void Player::Attributes::Attacking_Attributes::Set_Overall()
 {
@@ -217,14 +221,11 @@ void Player::Attributes::Mental_Attributes::Set_Overall()
 	overall = sum / 7;
 }
 
-
-
 void Player::Attributes::Psyhical_Attributes::Set_Overall()
 {
 	double sum = accelaration + agility + stamina + strength;
 	overall = sum / 4;
 }
-
 
 double Player::Attributes::Attacking_Attributes::Get_Overall() const
 {
