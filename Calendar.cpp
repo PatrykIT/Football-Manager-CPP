@@ -2,6 +2,8 @@
 #include "Calendar.h"
 
 #include "Table.h"
+#include "Attributes.h"
+#include "Clubs.h"
 Calendar* Calendar::calendar = nullptr;
 
 

@@ -1,6 +1,9 @@
-#include <algorithm>
 #include "Clubs.h"
 #include "Transfers.hpp"
+#include "History.h"
+#include "Attributes.h"
+
+#include <algorithm>
 using namespace std;
 
 int Club::_instance_number = 0;
@@ -25,7 +28,7 @@ Club::Club(int budget) :_ID(Club::_instance_number++),
 	players.reserve(23);
 
 	history.reserve(50);
-	history.emplace_back(History("")); //diff in History("") and History{""} ??
+	history.emplace_back("");
 }
 
 Club::~Club()
@@ -100,7 +103,7 @@ int Club::Add_Player_to_Club(Player &player)
 	}
 
 	string information = "Bought ";
-	information.append((player).name).append(" ").append((player).surname);
+	information.append(player.name).append(" ").append(player.surname);
 
 	history.back().Save_History(*this, information);
 
@@ -260,7 +263,14 @@ int Club::Buy_Player()
 	if (players.size() >= 23)
 	{
 		cout << "Squad is full. Cannot add another player." << endl;
-		return -1;
+
+		cout << "Would you like to sell? Y or N:\t";
+		char confirm;
+		cin >> confirm;
+		if (confirm == 'y' || confirm == 'Y')
+			Sell_Player();
+		else
+			return -1;
 	}
 
 	Print_Positions_Number();
@@ -311,12 +321,12 @@ int Club::Buy_Player()
 
 				if(ret == 0)
 				{
-					cout << "Player bought." << endl;
 
 					_budget = _budget - transfer->free_players[i]->Get_Value();
 					Transfers::get()->Player_Bought(*transfer->free_players[i]); //Inform transfer list that we're buying from it.
 					transfer->free_players.erase(transfer->free_players.begin() + i); //Remove player from transfer list.
 
+					cout << "Player bought. Current budget: " << _budget << "$" << endl;
 					Set_Tactics();
 					return 0; //Exit infinite loop
 				}
@@ -371,7 +381,9 @@ int Club::Sell_Player()
 	_budget += players[player_to_sell]->Get_Value();
 
 	string information = "Sold ";
-	information.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname);
+	information.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname).append(" for: ").
+			append(to_string(players[player_to_sell]->Get_Value())).append("$"); //ex: Sold Patrick Cyrklaff for: 7999$
+
 
 	history.back().Save_History(*this, information);
 
@@ -423,6 +435,7 @@ void Club::Improve_Skills_After_Match(bool won)
 			++defenders_in_first_squad[i]->attributes.defending_attributes.slide_tackle;
 			++defenders_in_first_squad[i]->attributes.defending_attributes.stand_tackle;
 		}
+		defenders_in_first_squad[i]->_Set_Overall();
 	}
 
 	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
@@ -436,6 +449,7 @@ void Club::Improve_Skills_After_Match(bool won)
 			++midfilders_in_first_squad[i]->attributes.mental_attributes.game_reading;
 			++midfilders_in_first_squad[i]->attributes.mental_attributes.work_rate;
 		}
+		midfilders_in_first_squad[i]->_Set_Overall();
 	}
 
 	for(i = 0; i < attackers_in_first_squad.size(); ++i)
@@ -450,6 +464,7 @@ void Club::Improve_Skills_After_Match(bool won)
 			++attackers_in_first_squad[i]->attributes.attacking_attributes.finishing;
 			++attackers_in_first_squad[i]->attributes.attacking_attributes.shooting;
 		}
+		attackers_in_first_squad[i]->_Set_Overall();
 	}
 
 	Set_Tactic_Rating();
@@ -531,11 +546,6 @@ void Club::Improve_Skills_New_Year(Player *&player, int position)
 	player->attributes.psyhical_attributes.stamina += 2;
 	player->attributes.psyhical_attributes.strength += 2;
 
-	player->attributes.attacking_attributes.Set_Overall();
-	player->attributes.defending_attributes.Set_Overall();
-	player->attributes.mental_attributes.Set_Overall();
-	player->attributes.psyhical_attributes.Set_Overall();
-
 	player->_Set_Overall();
 }
 
@@ -557,7 +567,7 @@ void Club::Decline_Skills_New_Year(Player *&player, int position)
 	}
 	if (position == 2)
 	{
-		player->attributes.mental_attributes.concetration += 3; //With age, some skills get even better.
+		player->attributes.mental_attributes.concetration += 3; //With age, mental skills get even better.
 		player->attributes.mental_attributes.game_reading += 3;
 		player->attributes.mental_attributes.leadership += 4;
 		player->attributes.mental_attributes.pressure_handling += 4;
@@ -577,11 +587,6 @@ void Club::Decline_Skills_New_Year(Player *&player, int position)
 	player->attributes.psyhical_attributes.agility -= 2;
 	player->attributes.psyhical_attributes.stamina -= 2;
 	player->attributes.psyhical_attributes.strength -= 2;
-
-	player->attributes.attacking_attributes.Set_Overall();
-	player->attributes.defending_attributes.Set_Overall();
-	player->attributes.mental_attributes.Set_Overall();
-	player->attributes.psyhical_attributes.Set_Overall();
 
 	player->_Set_Overall();
 }

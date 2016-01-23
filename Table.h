@@ -1,12 +1,13 @@
 #ifndef TABLE_H_
 #define TABLE_H_
 
-#include "Clubs.h"
 #include <array>
 #include <map>
 
 #define number_of_clubs_in_ligue 4
 
+class Club;
+class Player;
 
 class Table
 {

@@ -1,7 +1,6 @@
 #ifndef CLUBS_H_
 #define CLUBS_H_
 
-#include "History.h"
 #include "Stadium.h"
 #include <vector>
 

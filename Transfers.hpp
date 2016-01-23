@@ -2,8 +2,8 @@
 #define TRANSFERS_HPP_
 #include <vector>
 
-#include "Attributes.h"
 class Club;
+class Player;
 
 class Transfers
 {

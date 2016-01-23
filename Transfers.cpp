@@ -1,5 +1,6 @@
 #include "Transfers.hpp"
 #include "Table.h"
+#include "Attributes.h"
 
 Transfers* Transfers::transfers = nullptr;
 
@@ -21,7 +22,7 @@ Transfers::Transfers()
 	for(unsigned j = 0; j < free_players.capacity(); ++j)
 	{
 		//free_players[j] = new Player;
-		free_players.push_back(new Player);
+		free_players.emplace_back(new Player);
 	}
 }
 

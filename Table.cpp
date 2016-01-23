@@ -1,5 +1,7 @@
 #include "Table.h"
 #include "Attributes.h"
+#include "Clubs.h"
+#include "Calendar.h"
 #include <algorithm>
 #include <iterator>
 using namespace std;
@@ -196,7 +198,6 @@ int Table::Count_Combinations(int n, int k) const
 	 * Kombinację bez powtórzeń wykorzystujemy wtedy, gdy chcemy wiedzieć ile możemy stworzyć różnych układów k-elementowych, mając do dyspozycji n-elementów,
 	 * przy czym kolejność elementów w układzie jest nieistotna, a elementy nie mogą się powtarzać.
 	 * n - number of clubs in league.
-	 * k - How many times clubs can be linked to each other (usually is 2, because of home - away and revenges)
 	 *
 	 *  Wzór na kombinację bez powtórzeń: n! / k! * (n-k)!
 	 */
