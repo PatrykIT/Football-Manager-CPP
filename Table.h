@@ -56,7 +56,7 @@ private:
     	int goals_scored, assists;
     };
 
-    std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
+    static std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
     static void Add_Player_to_Observe(Player &player); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
 
 public:

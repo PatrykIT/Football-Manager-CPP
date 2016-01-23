@@ -4,8 +4,10 @@
 #include "Calendar.h"
 #include <algorithm>
 #include <iterator>
+
 using namespace std;
 
+map<Player*, Table::Player_Statistics >Table::player_statistics;
 
 Table::Table()
 {
@@ -849,8 +851,9 @@ void Table::Print_Players_Statistics() const
 
 void Table::Add_Player_to_Observe(Player &player)
 {
-	//player_statistics.insert(make_pair(&player, Player_Statistics {0,0}) );
-	cout << "Can't work :(\n";
+	/** Searches if the player was playing previously in another club. If not, then we have to start keeping track of him in our statistics. */
+	if(player_statistics.find(&player) == player_statistics.end())
+		player_statistics.insert(make_pair(&player, Player_Statistics {0,0}));
 }
 
 
