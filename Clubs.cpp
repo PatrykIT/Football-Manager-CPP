@@ -380,10 +380,8 @@ int Club::Sell_Player()
 	Transfers::get()->free_players.push_back(players[player_to_sell]);
 	_budget += players[player_to_sell]->Get_Value();
 
-	string information = "Sold ";
-	information.append(players[player_to_sell]->name).append(" ").append(players[player_to_sell]->surname).append(" for: ").
-			append(to_string(players[player_to_sell]->Get_Value())).append("$"); //ex: Sold Patrick Cyrklaff for: 7999$
-
+	string information = "Sold " + players[player_to_sell]->name + " " + players[player_to_sell]->surname + " for: " +
+			(to_string(players[player_to_sell]->Get_Value())) + "$"; //ex: Sold Patrick Cyrklaff for: 7999$
 
 	history.back().Save_History(*this, information);
 
