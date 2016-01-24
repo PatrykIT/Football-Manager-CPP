@@ -38,7 +38,6 @@ Club::~Club()
 		//free_players.push_back(players[i]);
 }
 
-
 void Club::Set_Tactic_Rating()
 {
 	double sum = 0;
@@ -89,7 +88,6 @@ double Club::Get_Tactic_Rating() const
 }
 
 
-
 int Club::Add_Player_to_Club(Player &player)
 {
 	if( players.size() < 23 )
@@ -109,8 +107,6 @@ int Club::Add_Player_to_Club(Player &player)
 
 	return 0;
 }
-
-
 
 
 void Club::List_Players() const
