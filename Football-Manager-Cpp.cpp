@@ -85,8 +85,6 @@ void Start()
  * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
  * Add threads.
- * Make class Transfer_Window. Only when it's open, we can buy players. After buying, we give signal to Table::player_statistics to observe new player.
- * Above is almost done, but static map player_statistics cannot be empty defined. Fix this bug.
  */
 
 
