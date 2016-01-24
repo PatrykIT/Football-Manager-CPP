@@ -3,7 +3,6 @@
 #include "Clubs.h"
 #include "Attributes.h"
 #include "History.h"
-#include "Calendar.h"
 
 using namespace std;
 
@@ -65,13 +64,9 @@ void Start()
 	table->Schedule_Season();
 
 	table->Play_Round();
-	table->Play_Round();
-	table->Play_Round();
+	//table->Play_Round();
+	//table->Play_Round();
 
-	club_2->Print_History();
-	club->Print_History();
-	club_3->Print_History();
-	club_4->Print_History();
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
 }
@@ -93,7 +88,6 @@ int main()
 	srand(time(NULL));
 	Start();
 
-	delete Calendar::get();
 	delete Transfers::get();
 
 	cout << "Bye bye." << endl;

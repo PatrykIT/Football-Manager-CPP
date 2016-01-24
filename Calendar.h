@@ -12,10 +12,9 @@ private:
 
 	std::vector<Table*> tables;
 	Calendar();
+	~Calendar();
 	Calendar(const Calendar &other);
 	Calendar& operator=(const Calendar& other);
-
-	static Calendar *calendar;
 
 	int hour, minute, seconde, day_of_a_week, day_of_a_month, month, year;
 
@@ -24,8 +23,7 @@ private:
 	void Add_Table(Table &table);
 
 public:
-	static Calendar *get();
-	~Calendar();
+	static Calendar &get();
 
 	void Print_Date() const;
 };

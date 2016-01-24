@@ -1,10 +1,7 @@
-#include <iostream>
 #include "Calendar.h"
-
 #include "Table.h"
 #include "Attributes.h"
 #include "Clubs.h"
-Calendar* Calendar::calendar = nullptr;
 
 
 void Calendar::Set_Hour() //Used by History class to save messages - it update's the time, without updating the date, because date is constantly modified by Travel_Calendar().
@@ -70,14 +67,12 @@ Calendar::Calendar()
 	seconde = my_date->tm_sec;
 }
 
-Calendar* Calendar::get()
-{
-	if(calendar == NULL)
-		calendar = new Calendar;
 
+Calendar& Calendar::get()
+{
+	static Calendar calendar;
 	return calendar;
 }
-
 
 Calendar::~Calendar()
 {
