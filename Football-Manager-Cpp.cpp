@@ -38,7 +38,7 @@ void Start()
 	{
 		players_3[i] = new Player;
 		club_3->Add_Player_to_Club(*players_3[i]);
-	} //ss
+	}
 
 	Club *club_4 = new Club;
 	struct Player *players_4[number_of_players];
