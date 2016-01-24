@@ -41,7 +41,7 @@ Table::Table()
 		matches[i] = (struct Pair_Clubs) {0}; // Match not played.  //C99. style! :)
 	}
 
-	Calendar::get()->Add_Table(*this);
+	Calendar::get().Add_Table(*this);
 	number_of_clubs = 0;
 	current_round = 0;
 }
@@ -380,7 +380,7 @@ void Table::Play_Round()
 		return;
 	}
 
-	Calendar::get()->Print_Date();
+	Calendar::get().Print_Date();
 	cout << "Round: " << current_round + 1 << endl;
 
 	int i;
@@ -430,7 +430,7 @@ void Table::Play_Round()
 
 	Print_Table();
 	++current_round;
-	Calendar::get()->Travel_Calendar(7);
+	Calendar::get().Travel_Calendar(7);
 
 	if(current_round == number_of_clubs - 1)
 		Season_Finished();
