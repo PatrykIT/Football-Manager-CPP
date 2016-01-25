@@ -56,8 +56,17 @@ private:
     	int goals_scored, assists;
     };
 
+    struct Club_Statistics
+    {
+    	int points;
+		unsigned int goals_scored, goals_conceded;
+		unsigned int matches_played;
+		unsigned int matches_won, matches_lost, matches_drawn;
+    };
+
     static std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
     static void Add_Player_to_Observe(Player &player); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
+    static std::map<Club*, Club_Statistics> club_statistics;
 
 public:
     Table();

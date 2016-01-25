@@ -8,6 +8,7 @@
 using namespace std;
 
 map<Player*, Table::Player_Statistics >Table::player_statistics;
+map<Club*, Table::Club_Statistics>Table::club_statistics;
 
 Table::Table()
 {
@@ -54,6 +55,7 @@ void Table::Add_Club_to_Table(Club *&club)
 		return;
 	}
 
+	club_statistics.insert(make_pair(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
 	clubs[number_of_clubs] = club;
     ++number_of_clubs;
 
@@ -78,8 +80,9 @@ void Table::Print_Table() const
     printf("\t\t\t|PTS|W|L|D|GS|GA|\n");
     for(int i = 0; i < number_of_clubs_in_ligue; ++i)
     {
-    	printf("%s %s [%d]\t|%d  |%d|%d|%d|%d |%d |\n", clubs[i]->club_name.c_str(), clubs[i]->city_name.c_str(), clubs[i]->_ID, clubs[i]->points,
-    			clubs[i]->matches_won, clubs[i]->matches_lost, clubs[i]->matches_drawn, clubs[i]->goals_scored, clubs[i]->goals_conceded);
+    	printf("%s %s [%d]\t|%d  |%d|%d|%d|%d |%d |\n", clubs[i]->club_name.c_str(), clubs[i]->city_name.c_str(), clubs[i]->_ID, club_statistics[clubs[i]].points,
+				club_statistics[clubs[i]].matches_won, club_statistics[clubs[i]].matches_lost, club_statistics[clubs[i]].matches_drawn,
+				club_statistics[clubs[i]].goals_scored, club_statistics[clubs[i]].goals_conceded);
 
     } cout << endl << endl << endl;
 }
@@ -287,13 +290,13 @@ void Table::Give_Walkover(const int i)
 	{
 		printf("Both clubs should give walkover, as they both cannot play.\nFor keeping it simple, walkover goes for the first team.\n");
 
-		round[current_round].match[i]->clubs_paired[0]->matches_won++;
-		round[current_round].match[i]->clubs_paired[0]->goals_scored += 3;
-		round[current_round].match[i]->clubs_paired[0]->points += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].matches_won++; round[current_round].match[i]->clubs_paired[0]->matches_won++;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].goals_scored += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].points += 3;
 
 
-		round[current_round].match[i]->clubs_paired[1]->matches_lost++;
-		round[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].matches_lost++; round[current_round].match[i]->clubs_paired[1]->matches_lost++;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].goals_conceded += 3;
 
 	}
 	else if(round[current_round].match[i]->clubs_paired[0]->Check_if_Allowed_to_Play() == 0) //If home club cannot play.
@@ -301,13 +304,13 @@ void Table::Give_Walkover(const int i)
 		printf("Home Club [%d] is giving a walkover to [%d].\n", round[current_round].match[i]->clubs_paired[0]->Get_ID(),
 				round[current_round].match[i]->clubs_paired[1]->Get_ID());
 
-		round[current_round].match[i]->clubs_paired[1]->matches_won++;
-		round[current_round].match[i]->clubs_paired[1]->goals_scored += 3;
-		round[current_round].match[i]->clubs_paired[1]->points += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].matches_won++; round[current_round].match[i]->clubs_paired[1]->matches_won++;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].goals_scored += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].points += 3;
 
 
-		round[current_round].match[i]->clubs_paired[0]->matches_lost++;
-		round[current_round].match[i]->clubs_paired[0]->goals_conceded += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].matches_lost++; round[current_round].match[i]->clubs_paired[0]->matches_lost++;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].goals_conceded += 3;
 
 		int money = round[current_round].match[i]->clubs_paired[0]->_budget / 2; //For every walkover, team has to give away half of a budget.
 		round[current_round].match[i]->clubs_paired[0]->_budget -= money;
@@ -319,13 +322,13 @@ void Table::Give_Walkover(const int i)
 		printf("Away Club [%d] is giving a walkover to [%d].\n", round[current_round].match[i]->clubs_paired[1]->Get_ID(),
 				round[current_round].match[i]->clubs_paired[0]->Get_ID());
 
-		round[current_round].match[i]->clubs_paired[0]->matches_won++;
-		round[current_round].match[i]->clubs_paired[0]->goals_scored += 3;
-		round[current_round].match[i]->clubs_paired[0]->points += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].matches_won++; round[current_round].match[i]->clubs_paired[0]->matches_won++;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].goals_scored += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[0]].points += 3;
 
 
-		round[current_round].match[i]->clubs_paired[1]->matches_lost++;
-		round[current_round].match[i]->clubs_paired[1]->goals_conceded += 3;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].matches_lost++; round[current_round].match[i]->clubs_paired[1]->matches_lost++;
+		club_statistics[round[current_round].match[i]->clubs_paired[1]].goals_conceded += 3;
 
 		int money = round[current_round].match[i]->clubs_paired[1]->_budget / 2;
 		round[current_round].match[i]->clubs_paired[1]->_budget -= money;
@@ -333,8 +336,8 @@ void Table::Give_Walkover(const int i)
 		round[current_round].match[i]->clubs_paired[0]->_budget += money;
 
 	}
-	++round[current_round].match[i]->clubs_paired[0]->matches_played;
-	++round[current_round].match[i]->clubs_paired[1]->matches_played;
+	club_statistics[round[current_round].match[i]->clubs_paired[0]].matches_played;
+	club_statistics[round[current_round].match[i]->clubs_paired[1]].matches_played;
 
 	round[current_round].match[i]->match_played = 1;
 }
@@ -656,14 +659,15 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	if (better_club == 1)
 	{
-		club_1.points += 3;
-		++club_1.matches_won;
-		++club_2.matches_lost;
+		club_statistics[&club_1].points += 3;
 
-		club_1.goals_scored += goals_scored_by_winner;
-		club_1.goals_conceded += goals_scored_by_loser;
-		club_2.goals_scored += goals_scored_by_loser;
-		club_2.goals_conceded += goals_scored_by_winner;
+		club_statistics[&club_1].matches_won++;	club_1.matches_won++;
+		club_statistics[&club_2].matches_lost++; club_2.matches_lost++;
+
+		club_statistics[&club_1].goals_scored += goals_scored_by_winner;
+		club_statistics[&club_1].goals_conceded += goals_scored_by_loser;
+		club_statistics[&club_2].goals_scored += goals_scored_by_loser;
+		club_statistics[&club_2].goals_conceded += goals_scored_by_winner;
 
 		Pick_Scorer(goals_scored_by_winner, club_1);
 		Pick_Scorer(goals_scored_by_loser, club_2);
@@ -680,14 +684,14 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	else if (better_club == 2)
 	{
-		club_2.points += 3;
-		++club_2.matches_won;
-		++club_1.matches_lost;
+		club_statistics[&club_2].points += 3;
+		club_statistics[&club_2].matches_won++; club_2.matches_won++;
+		club_statistics[&club_1].matches_lost++; club_1.matches_won++;
 
-		club_2.goals_scored += goals_scored_by_winner;
-		club_2.goals_conceded += goals_scored_by_loser;
-		club_1.goals_scored += goals_scored_by_loser;
-		club_1.goals_conceded += goals_scored_by_winner;
+		club_statistics[&club_2].goals_scored += goals_scored_by_winner;
+		club_statistics[&club_2].goals_conceded += goals_scored_by_loser;
+		club_statistics[&club_1].goals_scored += goals_scored_by_loser;
+		club_statistics[&club_1].goals_conceded += goals_scored_by_winner;
 
 		Pick_Scorer(goals_scored_by_winner, club_1);
 		Pick_Scorer(goals_scored_by_loser, club_2);
@@ -705,24 +709,24 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 	{
 		printf("\tThere was a draw! %d:%d\n", goals_scored_by_winner, goals_scored_by_winner);
 
-		club_1.points += 1;
-		club_2.points += 1;
+		club_statistics[&club_1].points += 1;
+		club_statistics[&club_2].points += 1;
 
 
-		club_1.goals_scored += goals_scored_by_winner;
-		club_1.goals_conceded += goals_scored_by_winner;
-		club_2.goals_scored += goals_scored_by_winner;
-		club_2.goals_conceded += goals_scored_by_winner;
+		club_statistics[&club_1].goals_scored += goals_scored_by_winner;
+		club_statistics[&club_1].goals_conceded += goals_scored_by_winner;
+		club_statistics[&club_2].goals_scored += goals_scored_by_winner;
+		club_statistics[&club_2].goals_conceded += goals_scored_by_winner;
 
 		Pick_Scorer(goals_scored_by_winner, club_1);
 		Pick_Scorer(goals_scored_by_winner, club_2);
 
-		++club_1.matches_drawn;
-		++club_2.matches_drawn;
+		club_statistics[&club_1].matches_drawn++; club_1.matches_drawn++;
+		club_statistics[&club_2].matches_drawn++; club_2.matches_drawn++;
 	}
 
-	++club_1.matches_played;
-	++club_2.matches_played;
+	club_statistics[&club_1].matches_played++;
+	club_statistics[&club_2].matches_played++;
 
 	club_1.Set_Attendancy();
 	club_2.Set_Attendancy();
@@ -830,7 +834,7 @@ void Table::Sort_Table()
 
 		for(int y = x; y < number_of_clubs; ++y)
 		{
-			if(clubs[index_of_max]->points < clubs[y]->points)
+			if(club_statistics[clubs[index_of_max]].points < club_statistics[clubs[y]].points)
 			{
 				index_of_max = y;
 			}

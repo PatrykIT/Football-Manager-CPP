@@ -27,9 +27,6 @@ private:
 	double _tactic_rating; //Tactic rating is an average from best 11 players on the pitch. It is to calculate match winning odds.
 	float _budget;
 
-	int points;
-	unsigned int goals_scored, goals_conceded;
-	unsigned int matches_played;
 	unsigned int matches_won, matches_lost, matches_drawn;
 
 	std::vector<Player*> attackers_in_first_squad;
