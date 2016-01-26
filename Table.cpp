@@ -61,7 +61,7 @@ void Table::Add_Club_to_Table(Club *&club)
 
     for(unsigned int i = 0; i < club->players.size(); ++i)
     {
-    	player_statistics.insert(make_pair(club->players.at(i), Player_Statistics {0,0}) );
+    	player_statistics.insert(make_pair(club->players.at(i), Player_Statistics {0,0, club}) );
     }
 }
 
@@ -819,6 +819,17 @@ void Table::Season_Finished()
 	Sort_Table();
 	Print_Table();
 
+	/* Finding top scorer: Search all teams, from up to down. Assign to each player, which position his team has in table. Hierarchy comes second.
+	 * If there are multiple players that have same amount of goals, then check which one has more assists.
+	 * So: 1 - Most goals. 2 - Most goals with most assists. 3 - Most goals, with most assists, from better club.*/
+
+	auto top_scorer = max_element(player_statistics.begin(), player_statistics.end(),
+			[] (const pair<Player*, Player_Statistics>& p1 , const pair<Player*, Player_Statistics>& p2)
+			{
+				return p1.second.goals_scored < p2.second.goals_scored;
+			});
+	cout << "Top scoring player: " << top_scorer->first->name << " " << top_scorer->first->surname << " with: "
+			<< top_scorer->second.goals_scored << " goals.\n";
 
 }
 
@@ -853,11 +864,16 @@ void Table::Print_Players_Statistics() const
 		printf("%s %s: %d goals and %d assists\n", it.first->name.c_str(), it.first->surname.c_str(), it.second.goals_scored, it.second.assists);
 }
 
-void Table::Add_Player_to_Observe(Player &player)
+void Table::Add_Player_to_Observe(Player &player, Club &club)
 {
-	/** Searches if the player was playing previously in another club. If not, then we have to start keeping track of him in our statistics. */
-	if(player_statistics.find(&player) == player_statistics.end())
-		player_statistics.insert(make_pair(&player, Player_Statistics {0,0}));
+	/**
+	 * Searches if the player was playing previously in another club. If not, then we have to start keeping track of him in our statistics.
+	 * If yes, then update the club he is playing right now.
+	 */
+	if (player_statistics.find(&player) == player_statistics.end())
+		player_statistics.insert(make_pair(&player, Player_Statistics {0,0, &club}));
+	else
+		player_statistics.find(&player)->second.club = &club;
 }
 
 

@@ -17,7 +17,7 @@ private:
 	static Transfers *transfers;
 	std::vector<Player*> free_players; //free agents - players without clubs, ready to be bought.
 
-	void Player_Bought(Player &player);
+	void Player_Bought(Player &player, Club &club) const;
 
 public:
 	static Transfers* get();

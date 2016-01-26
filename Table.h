@@ -54,6 +54,7 @@ private:
     struct Player_Statistics
     {
     	int goals_scored, assists;
+    	Club *club; //so table knows for which club player is currently playing.
     };
 
     struct Club_Statistics
@@ -65,7 +66,7 @@ private:
     };
 
     static std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
-    static void Add_Player_to_Observe(Player &player); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
+    static void Add_Player_to_Observe(Player &player, Club &club); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
     static std::map<Club*, Club_Statistics> club_statistics;
 
 public:

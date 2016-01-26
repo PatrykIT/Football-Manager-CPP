@@ -4,6 +4,7 @@
 #include "Attributes.h"
 #include "History.h"
 
+#include <chrono>
 using namespace std;
 
 
@@ -76,7 +77,6 @@ void Start()
  * Dokończyć  Schedule_Rounds().
  * Dokończyć choice = 2 w Play_Round() - zrobić dogrywanie meczy w przyszłym czasie.
  * Transform to smart pointers.
- * Try to change colours in console.
  * Make it user - friendly (dialogues etc).
  * Finish Season_Finished() - create top goalscorers etc.
  * Add threads.
@@ -85,12 +85,16 @@ void Start()
 
 int main()
 {
+	auto start_time = chrono::high_resolution_clock::now();
 	srand(time(NULL));
 	Start();
 
 	delete Transfers::get();
 
+
+	auto end_time = chrono::high_resolution_clock::now();
 	cout << "Bye bye." << endl;
+	cout << "Running time: " <<  chrono::duration_cast<chrono::seconds>(end_time - start_time).count() << " sec." << endl;
 	return 0;
 }
 

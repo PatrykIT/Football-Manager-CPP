@@ -316,7 +316,7 @@ int Club::Buy_Player()
 				{
 
 					_budget = _budget - transfer->free_players[i]->Get_Value();
-					Transfers::get()->Player_Bought(*transfer->free_players[i]); //Inform transfer list that we're buying from it.
+					Transfers::get()->Player_Bought(*transfer->free_players[i], *this); //Inform transfer list that we're buying from it.
 					transfer->free_players.erase(transfer->free_players.begin() + i); //Remove player from transfer list.
 
 					cout << "Player bought. Current budget: " << _budget << "$" << endl;

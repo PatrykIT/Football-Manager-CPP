@@ -34,7 +34,7 @@ Transfers::~Transfers()
 	}
 }
 
-void Transfers::Player_Bought(Player &player)
+void Transfers::Player_Bought(Player &player, Club &club) const
 {
-	Table::Add_Player_to_Observe(player);
+	Table::Add_Player_to_Observe(player, club);
 }
