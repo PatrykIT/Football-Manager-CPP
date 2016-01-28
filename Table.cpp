@@ -397,7 +397,7 @@ void Table::Play_Round()
 	if(Check_if_Round_Played(&index_of_match_not_played) == -1)
 	{
 		printf("\n\tRound not played fully!\n");
-		printf("Enter choice:\n1) Buy player to set tactic or something like that:D\n2) Play rest of the matches in future.\n3) Give walkover.\nYour choice: \t");
+		printf("Enter choice:\n1) Buy player.\n2) Play rest of the matches in future.\n3) Give walkover.\nYour choice: \t");
 
 		int choice;
 		cin >> choice;
