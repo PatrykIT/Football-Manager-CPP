@@ -823,14 +823,98 @@ void Table::Season_Finished()
 	 * If there are multiple players that have same amount of goals, then check which one has more assists.
 	 * So: 1 - Most goals. 2 - Most goals with most assists. 3 - Most goals, with most assists, from better club.*/
 
-	auto top_scorer = max_element(player_statistics.begin(), player_statistics.end(),
-			[] (const pair<Player*, Player_Statistics>& p1 , const pair<Player*, Player_Statistics>& p2)
-			{
-				return p1.second.goals_scored < p2.second.goals_scored;
-			});
-	cout << "Top scoring player: " << top_scorer->first->name << " " << top_scorer->first->surname << " with: "
-			<< top_scorer->second.goals_scored << " goals.\n";
+	map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
+	map<Player*, Player_Statistics> top_assisters;
 
+	map<Player*, Player_Statistics>::iterator largest = player_statistics.begin();
+
+	for(map<Player*, Player_Statistics>::iterator it = player_statistics.begin().operator++(); it != player_statistics.end(); ++it)
+	{
+		if(it->second.goals_scored > largest->second.goals_scored)
+		{
+			top_scorers.clear(); //Clear previous top scorers, because there's someone better :)
+			top_scorers.insert(*it);
+			largest = it;
+		}
+		else if (it->second.goals_scored == largest->second.goals_scored)
+			top_scorers.insert(*it);
+	}
+
+	if (top_scorers.size() > 1) //If there is more footballers that have the same goal number, check which one has most assists.
+	{
+		cout << "There is more than one player with most goals!" << endl;
+
+		largest = top_scorers.begin();
+		top_assisters.insert(*largest);
+
+		for(map<Player*, Player_Statistics>::iterator it = top_scorers.begin().operator ++(); it != top_scorers.end(); ++it)
+		{
+			if(largest->second.assists < it->second.assists)
+			{
+				top_assisters.clear(); //Clear previous top assissters, because there's someone better.
+				top_assisters.insert(*it);
+				largest = it;
+			}
+			else if(largest->second.assists == it->second.assists)
+				top_assisters.insert(*it);
+		}
+		if (top_assisters.size() > 1) //If we have players with same amount of goals AND same amount of assists, then we need to check which club they play for, is higher in league.
+		{
+			cout << "There are players with same amount of goals, and assists, looking for better club." << endl;
+
+			map<Club*, int> club_hierarchy; //int is a position in league.
+			for(int i = 0; i < number_of_clubs_in_ligue; ++i)
+		    {
+		    	club_hierarchy.insert(make_pair(clubs[i], i)); //the lower the number, the higher a team is in league.
+		    }
+
+			vector <Player*> players; //Vector to hold players from best team.
+
+			largest = top_assisters.begin();
+			players.push_back(largest->first);
+
+			for(map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
+			{
+				if(club_hierarchy.find(largest->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
+				{
+					players.clear();
+					players.push_back(it->first);
+					largest = it;
+				}
+				else if (club_hierarchy.find(largest->second.club)->second == club_hierarchy.find(it->second.club)->second)
+					players.push_back(it->first);
+			}
+			if (players.size() > 1) //If there are players with same amount of goals, same amount of assists, and from the same team.
+			{
+				cout << "We have ex aequo " << players.size() << " top scorers!" << endl;
+
+				for(auto const &player : players)
+				{
+					//MARK IN HISTORY AWARD!!
+					cout << player->name << " " << player->surname << " scored: " << player_statistics.find(player)->second.goals_scored <<
+							" goals." << endl;
+				}
+			}
+			else
+			{
+				//MARK IN HISTORY AWARD!!
+				cout << players.at(0)->name << " " << players[0]->surname << " scored: " << player_statistics.find(players.at(0))->second.goals_scored <<
+						" goals. Same amount of goals, same amount of assists, better club." << endl;
+			}
+		}
+		else
+		{
+			//MARK IN HISTORY AWARD!!
+			cout << top_assisters.begin()->first->name << " " << top_assisters.begin()->first->surname << " scored: " <<
+					top_assisters.begin()->second.goals_scored << " goals. Same amount of goals, more assists." << endl;
+		}
+	}
+	else
+	{
+		//MARK IN HISTORY AWARD!!
+		cout << top_scorers.begin()->first->name << " " << top_scorers.begin()->first->surname << " scored: " <<
+				top_scorers.begin()->second.goals_scored << endl;
+	}
 }
 
 
