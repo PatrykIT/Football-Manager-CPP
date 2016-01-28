@@ -65,9 +65,9 @@ void Start()
 	table->Schedule_Season();
 
 	table->Play_Round();
-	//table->Play_Round();
-	//table->Play_Round();
-
+	table->Play_Round();
+	table->Play_Round();
+cout << endl << endl;table->Print_Players_Statistics();
 	delete club; delete club_2; delete club_3; delete club_4;
 	delete table;
 }
