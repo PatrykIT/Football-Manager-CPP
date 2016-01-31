@@ -818,6 +818,7 @@ void Table::Season_Finished()
 	cout << "Season is finished!" << endl;
 	Sort_Table();
 	Print_Table();
+	std::string message;
 
 	/* Finding top scorer: Search all teams, from up to down. Assign to each player, which position his team has in table. Hierarchy comes second.
 	 * If there are multiple players that have same amount of goals, then check which one has more assists.
@@ -825,44 +826,40 @@ void Table::Season_Finished()
 
 	map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
 	map<Player*, Player_Statistics> top_assisters;
+	map<Player*, Player_Statistics>::iterator best = player_statistics.begin();
 
-	map<Player*, Player_Statistics>::iterator largest = player_statistics.begin();
-
-	for(map<Player*, Player_Statistics>::iterator it = player_statistics.begin().operator++(); it != player_statistics.end(); ++it)
+	for(map<Player*, Player_Statistics>::iterator player = player_statistics.begin().operator++(); player != player_statistics.end(); ++player)
 	{
-		if(it->second.goals_scored > largest->second.goals_scored)
+		if(player->second.goals_scored > best->second.goals_scored)
 		{
 			top_scorers.clear(); //Clear previous top scorers, because there's someone better :)
-			top_scorers.insert(*it);
-			largest = it;
+			top_scorers.insert(*player);
+			best = player;
 		}
-		else if (it->second.goals_scored == largest->second.goals_scored)
-			top_scorers.insert(*it);
+		else if (player->second.goals_scored == best->second.goals_scored)
+			top_scorers.insert(*player);
 	}
 
 	if (top_scorers.size() > 1) //If there is more footballers that have the same goal number, check which one has most assists.
 	{
-		cout << "There is more than one player with most goals!" << endl;
+		best = top_scorers.begin();
+		top_assisters.insert(*best);
 
-		largest = top_scorers.begin();
-		top_assisters.insert(*largest);
-
-		for(map<Player*, Player_Statistics>::iterator it = top_scorers.begin().operator ++(); it != top_scorers.end(); ++it)
+		for(map<Player*, Player_Statistics>::iterator player = top_scorers.begin().operator ++(); player != top_scorers.end(); ++player)
 		{
-			if(largest->second.assists < it->second.assists)
+			if(player->second.assists > best->second.assists)
 			{
 				top_assisters.clear(); //Clear previous top assissters, because there's someone better.
-				top_assisters.insert(*it);
-				largest = it;
+				top_assisters.insert(*player);
+				best = player;
 			}
-			else if(largest->second.assists == it->second.assists)
-				top_assisters.insert(*it);
+			else if(best->second.assists == player->second.assists)
+				top_assisters.insert(*player);
 		}
 		if (top_assisters.size() > 1) //If we have players with same amount of goals AND same amount of assists, then we need to check which club they play for, is higher in league.
 		{
-			cout << "There are players with same amount of goals, and assists, looking for better club." << endl;
-
 			map<Club*, int> club_hierarchy; //int is a position in league.
+
 			for(int i = 0; i < number_of_clubs_in_ligue; ++i)
 		    {
 		    	club_hierarchy.insert(make_pair(clubs[i], i)); //the lower the number, the higher a team is in league.
@@ -870,51 +867,62 @@ void Table::Season_Finished()
 
 			vector <Player*> players; //Vector to hold players from best team.
 
-			largest = top_assisters.begin();
-			players.push_back(largest->first);
+			best = top_assisters.begin();
+			players.push_back(best->first);
 
 			for(map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
 			{
-				if(club_hierarchy.find(largest->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
+				if(club_hierarchy.find(best->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
 				{
 					players.clear();
 					players.push_back(it->first);
-					largest = it;
+					best = it;
 				}
-				else if (club_hierarchy.find(largest->second.club)->second == club_hierarchy.find(it->second.club)->second)
+				else if (club_hierarchy.find(best->second.club)->second == club_hierarchy.find(it->second.club)->second)
 					players.push_back(it->first);
 			}
 			if (players.size() > 1) //If there are players with same amount of goals, same amount of assists, and from the same team.
 			{
 				cout << "We have ex aequo " << players.size() << " top scorers!" << endl;
+				message += "Golden Shoe Award was won by: " + to_string(players.size()) + " players ex aequo. Winners:\n";
 
 				for(auto const &player : players)
 				{
-					//MARK IN HISTORY AWARD!!
-					cout << player->name << " " << player->surname << " scored: " << player_statistics.find(player)->second.goals_scored <<
-							" goals." << endl;
+					message += player->name + " " + player->surname + "\n";
 				}
+
+				message += "All scored: " + to_string( player_statistics.find(players[0])->second.goals_scored) + "\n";
 			}
 			else
 			{
-				//MARK IN HISTORY AWARD!!
-				cout << players.at(0)->name << " " << players[0]->surname << " scored: " << player_statistics.find(players.at(0))->second.goals_scored <<
-						" goals. Same amount of goals, same amount of assists, better club." << endl;
+				message = players.at(0)->name + " " + players[0]->surname + " won Golden Shoe Award";
+				message = History::Save_History(message);
+				message += "\nHe scored " + to_string(player_statistics.find(players.at(0))->second.goals_scored) +
+						" goals, having ex aequo same amount of goals and assists, winning by playing for a club that finished higher.\n";
 			}
 		}
 		else
 		{
-			//MARK IN HISTORY AWARD!!
-			cout << top_assisters.begin()->first->name << " " << top_assisters.begin()->first->surname << " scored: " <<
-					top_assisters.begin()->second.goals_scored << " goals. Same amount of goals, more assists." << endl;
+			message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
+			message = History::Save_History(message);
+			message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals, winning by having more assists.\n";
 		}
 	}
 	else
 	{
-		//MARK IN HISTORY AWARD!!
-		cout << top_scorers.begin()->first->name << " " << top_scorers.begin()->first->surname << " scored: " <<
-				top_scorers.begin()->second.goals_scored << endl;
+		message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
+		message = History::Save_History(message);
+		message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals.\n";
 	}
+
+	history.emplace_back(message);
+
+
+
+
+
+
+	Print_History();
 }
 
 
@@ -954,6 +962,7 @@ void Table::Add_Player_to_Observe(Player &player, Club &club)
 	 * Searches if the player was playing previously in another club. If not, then we have to start keeping track of him in our statistics.
 	 * If yes, then update the club he is playing right now.
 	 */
+
 	if (player_statistics.find(&player) == player_statistics.end())
 		player_statistics.insert(make_pair(&player, Player_Statistics {0,0, &club}));
 	else
@@ -962,7 +971,11 @@ void Table::Add_Player_to_Observe(Player &player, Club &club)
 
 
 
-
+void Table::Print_History() const
+{
+	for(auto const &story : history)
+		cout << story << endl;
+}
 
 
 

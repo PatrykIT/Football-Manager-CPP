@@ -1,8 +1,10 @@
 #ifndef TABLE_H_
 #define TABLE_H_
+#include "History.h"
 
 #include <array>
 #include <map>
+#include <vector>
 
 #define number_of_clubs_in_ligue 4
 
@@ -14,6 +16,7 @@ class Table
 private:
 	friend class Calendar; //for giving access to clubs
 	friend class Transfers; //for helper function
+	friend class History; //So we can save history about things that happened in league throughout the game.
 
 	Table(const Table& other);
     Table& operator=(const Table& other);
@@ -68,6 +71,7 @@ private:
     static std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
     static void Add_Player_to_Observe(Player &player, Club &club); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
     static std::map<Club*, Club_Statistics> club_statistics;
+    std::vector<std::string> history;
 
 public:
     Table();
@@ -79,6 +83,7 @@ public:
     void Print_Rounds() const;
     void Play_Round();
     void Print_Players_Statistics() const;
+    void Print_History() const;
 
 };
 
