@@ -25,7 +25,6 @@ Club::Club(int budget) :_ID(Club::_instance_number++),
 	players.reserve(23);
 
 	history.reserve(50);
-	history.emplace_back("");
 }
 
 Club::~Club()
@@ -64,7 +63,7 @@ void Club::Print_History() const
 	cout << "\n\t --- Club History ---" << endl;
 
 	for(unsigned int i = 0; i < history.size(); ++i)
-		cout << history[i].message << endl;
+		cout << history[i] << endl;
 
 	cout << endl << endl;
 }
@@ -100,7 +99,7 @@ int Club::Add_Player_to_Club(Player &player)
 	string information = "Bought ";
 	information.append(player.name).append(" ").append(player.surname);
 
-	history.back().Save_History(*this, information);
+	history.emplace_back(History::Save_History(information));
 
 	return 0;
 }
@@ -132,7 +131,6 @@ void Club::List_Players() const
 }
 
 
-bool Compare_Overall (const Player* a, const Player* b) { return a->Get_Overall() > b->Get_Overall(); }
 
 int Club::Set_Tactics()
 {
@@ -142,7 +140,7 @@ int Club::Set_Tactics()
 		return -1;
 	}
 
-	sort(players.begin(), players.end(), Compare_Overall); //Ordering players from best to worse.
+	sort(players.begin(), players.end(), [] (const Player* a, const Player* b) { return a->Get_Overall() > b->Get_Overall(); });
 
 //---------------------------------------------------------------------SETTING BEST FORMATION && ASSIGNING BEST PLAYERS TO THER POSITION ON THE PITCH------------------------------------------------------
 	attackers_in_first_squad.clear(); midfilders_in_first_squad.clear(); defenders_in_first_squad.clear();
@@ -376,7 +374,7 @@ int Club::Sell_Player()
 	string information = "Sold " + players[player_to_sell]->name + " " + players[player_to_sell]->surname + " for: " +
 			(to_string(players[player_to_sell]->Get_Value())) + "$"; //ex: Sold Patrick Cyrklaff for: 7999$
 
-	history.back().Save_History(*this, information);
+	history.emplace_back(History::Save_History(information));
 
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.

@@ -36,7 +36,7 @@ private:
 	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are laid out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
-	std::vector<History> history;
+	std::vector<std::string> history;
 
 	Stadium stadium;
 	unsigned int _attendance;

@@ -2,19 +2,12 @@
 #include "Clubs.h"
 #include "Calendar.h"
 
-void History::Save_History(Club &club, std::string message) const
+std::string History::Save_History(std::string message)
 {
-	/**
-	 * Appends whole string (description of what happened + date) to a history object in club.
-	 */
-
-	std::string date = Append_Date();
-	club.history.back().message.append(message);
-	club.history.back().message.append(date);
-	club.history.emplace_back("");	//Make place for the next message.
+	message.append(Append_Date()); //Check if move ctors working here!
+	return message;
 }
-
-std::string History::Append_Date() const
+std::string History::Append_Date()
 {
 	/**
 	 * This function adds a date in string format looking like: " on a day 07.12.2015 22:30:15 ".
