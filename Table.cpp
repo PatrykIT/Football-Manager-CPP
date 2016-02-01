@@ -671,7 +671,6 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 		Pick_Scorer(goals_scored_by_winner, club_1);
 		Pick_Scorer(goals_scored_by_loser, club_2);
-		cin.get();
 
 		club_1.Update_Players_Morale(1);
 		club_2.Update_Players_Morale(0);
@@ -695,7 +694,6 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 		Pick_Scorer(goals_scored_by_winner, club_1);
 		Pick_Scorer(goals_scored_by_loser, club_2);
-		cin.get();
 
 		club_2.Update_Players_Morale(1);
 		club_1.Update_Players_Morale(0);
@@ -724,6 +722,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 		club_statistics[&club_1].matches_drawn++; club_1.matches_drawn++;
 		club_statistics[&club_2].matches_drawn++; club_2.matches_drawn++;
 	}
+	cin.get();
 
 	club_statistics[&club_1].matches_played++;
 	club_statistics[&club_2].matches_played++;
