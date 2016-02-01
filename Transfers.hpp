@@ -1,6 +1,9 @@
 #ifndef TRANSFERS_HPP_
 #define TRANSFERS_HPP_
+
 #include <vector>
+#include <atomic>
+#include <mutex>
 
 class Club;
 class Player;
@@ -15,6 +18,7 @@ private:
 	Transfers& operator=(const Transfers& other);
 
 	static Transfers *transfers;
+	static std::mutex transfer_mutex;
 	std::vector<Player*> free_players; //free agents - players without clubs, ready to be bought.
 
 	void Player_Bought(Player &player, Club &club) const;

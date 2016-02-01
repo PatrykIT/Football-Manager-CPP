@@ -2,17 +2,37 @@
 #include "Table.h"
 #include "Attributes.h"
 
+
 Transfers* Transfers::transfers = nullptr;
+std::mutex Transfers::transfer_mutex;
 
 Transfers* Transfers::get()
 {
-	if(transfers == nullptr)
+	/**
+	 * Uses Double Checked Locking Pattern. 'transfers' should be of type std::atomic<Transfers*>, but it created a Seg Fault - don't know why, maybe compiler issues?
+	 * http://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/ (Used the version with memory barriers for educational purposes)
+	 * http://www.aristeia.com/Papers/DDJ_Jul_Aug_2004_revised.pdf
+	 *
+	 * The first barrier must prevent downwards migration of Singleton's construction (by another thread);
+	 * the second barrier must prevent upwards migration of 'transfers' initialization. These are called "acquire" and "release" operations.
+	 */
+
+	Transfers *tmp = transfers;
+	std::atomic_thread_fence(std::memory_order_acquire);
+
+	if(tmp == nullptr)
 	{
-		transfers = new Transfers;
+		std::lock_guard<std::mutex> my_lock (transfer_mutex);
+		tmp = transfers;
 
+		if(tmp == nullptr)
+		{
+			tmp = new Transfers;
+			std::atomic_thread_fence(std::memory_order_release);
+			transfers = tmp;
+		}
 	}
-
-	return transfers;
+	return tmp;
 }
 
 Transfers::Transfers()
