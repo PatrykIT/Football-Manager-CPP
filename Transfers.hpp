@@ -2,7 +2,6 @@
 #define TRANSFERS_HPP_
 
 #include <vector>
-#include <atomic>
 #include <mutex>
 
 class Club;

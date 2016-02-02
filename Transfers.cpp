@@ -1,7 +1,7 @@
 #include "Transfers.hpp"
 #include "Table.h"
 #include "Attributes.h"
-
+#include <atomic>
 
 Transfers* Transfers::transfers = nullptr;
 std::mutex Transfers::transfer_mutex;
@@ -34,6 +34,18 @@ Transfers* Transfers::get()
 	}
 	return tmp;
 }
+
+/**
+ * OR:
+ * std::once_flag initFlag;
+ *
+ * void init (){ instance = new Transfers; }
+ *
+ * Transfers & getInstance (){
+ * 	std::call_once (initFlag, init);
+ * 	return *instance;
+ * }
+ */
 
 Transfers::Transfers()
 {
