@@ -55,7 +55,7 @@ void Table::Add_Club_to_Table(Club *&club)
 		return;
 	}
 
-	club_statistics.insert(make_pair(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
+	club_statistics.insert(map<Club*, Club_Statistics>::value_type(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
 	clubs[number_of_clubs] = club;
     ++number_of_clubs;
 
@@ -861,7 +861,7 @@ void Table::Season_Finished()
 
 			for(int i = 0; i < number_of_clubs_in_ligue; ++i)
 		    {
-		    	club_hierarchy.insert(make_pair(clubs[i], i)); //the lower the number, the higher a team is in league.
+		    	club_hierarchy.emplace(clubs[i], i);//the lower the number, the higher a team is in league.
 		    }
 
 			vector <Player*> players; //Vector to hold players from best team.
@@ -963,7 +963,7 @@ void Table::Add_Player_to_Observe(Player &player, Club &club)
 	 */
 
 	if (player_statistics.find(&player) == player_statistics.end())
-		player_statistics.insert(make_pair(&player, Player_Statistics {0,0, &club}));
+		player_statistics.emplace(&player, Player_Statistics {0,0, &club});
 	else
 		player_statistics.find(&player)->second.club = &club;
 }
