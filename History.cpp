@@ -2,6 +2,10 @@
 #include "Clubs.h"
 #include "Calendar.h"
 
+#include <atomic>
+
+std::mutex History::date_mutex;
+
 std::string History::Save_History(std::string message)
 {
 	message.append(Append_Date()); //Check if move ctors working here!
@@ -12,6 +16,9 @@ std::string History::Append_Date()
 	/**
 	 * This function adds a date in string format looking like: " on a day 07.12.2015 22:30:15 ".
 	 */
+
+	std::lock_guard<std::mutex> lock(date_mutex);
+
 	Calendar::get().Set_Hour();
 
 	std::string calendar_string = "";

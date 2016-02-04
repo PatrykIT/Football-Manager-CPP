@@ -5,6 +5,7 @@
 #include <array>
 #include <map>
 #include <vector>
+#include <mutex>
 
 #define number_of_clubs_in_ligue 4
 
@@ -15,7 +16,7 @@ class Table
 {
 private:
 	friend class Calendar; //for giving access to clubs
-	friend class Transfers; //for helper function
+	friend class Transfers; //for helper function Add_Player_to_Observe(Player &player, Club &club);
 	friend class History; //So we can save history about things that happened in league throughout the game.
 
 	Table(const Table& other);
@@ -33,6 +34,7 @@ private:
 		int matches_played; //if matches_played == number of clubs in league / 2, means whole round was played.
 	} *round;
 
+	std::mutex club_array;
 	std::array<Club*, number_of_clubs_in_ligue> clubs;
 
 	void Play_Match(Club &club_1, Club &club_2);
@@ -43,6 +45,7 @@ private:
     void Give_Walkover(const int i);
     void Season_Finished();
     void Sort_Table();
+
 
     bool Table_Full() const;
     int Check_if_Round_Played(int *index_of_match_not_played) const;

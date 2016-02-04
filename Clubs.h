@@ -3,6 +3,7 @@
 
 #include "Stadium.h"
 #include <vector>
+#include <mutex>
 
 class History;
 class Player;
@@ -14,7 +15,7 @@ class Club
 {
 private:
 	friend class Calendar; //for Year_Passed()
-	friend class Table; //So we can change points, match played etc.
+	friend class Table; //So we can change matches played etc.
 	friend class History; //So we can save history about things that happened in club throughout the game.
 
 	Club(const Club& other);
@@ -33,9 +34,11 @@ private:
 	std::vector<Player*> midfilders_in_first_squad;
 	std::vector<Player*> defenders_in_first_squad;
 
+	std::mutex players_vector;
 	std::vector<Player*> players;
 	int tactic[3]; //Indicates how players are laid out in the pitch. For example: '433' means 4 - 3 - 3. //Available tactics: 4 - 3 - 3  || 4 - 4 - 2 || 4 - 5 - 1 || 3 - 4 - 3 || 5 - 4 - 1
 
+	std::mutex history_mutex;
 	std::vector<std::string> history;
 
 	Stadium stadium;
@@ -50,10 +53,13 @@ private:
 	void Improve_Skills_After_Match(bool won);
 	void Update_Players_Morale(bool result);
 	void Year_Passed(); //When New Year comes, class Calendar should make club's aware with calling this function.
+
 	void Improve_Skills_New_Year(Player *&player, int position);
 	void Decline_Skills_New_Year(Player *&player, int position);
 
 	int Get_ID() const;
+
+	static std::mutex transfer_list; //because class Transfers is reachable by all clubs.
 	int Buy_Player();
 	int Sell_Player();
 

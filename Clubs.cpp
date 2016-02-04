@@ -7,6 +7,7 @@
 using namespace std;
 
 int Club::_instance_number = 0;
+mutex Club::transfer_list;
 
 Club::Club(int budget) :_ID(Club::_instance_number++),
 		_allowed_to_play (false), //Can not play yet. It has to have at least 10 outfield players, and players in each formation.
@@ -86,6 +87,7 @@ double Club::Get_Tactic_Rating() const
 
 int Club::Add_Player_to_Club(Player &player)
 {
+	unique_lock<mutex> lock (players_vector);
 	if( players.size() < 23 )
 	{
 		players.push_back(&player);
@@ -95,10 +97,12 @@ int Club::Add_Player_to_Club(Player &player)
 		printf ("There is already 23 players, cannot add new player.\n");
 		return -1;
 	}
+	lock.unlock();
 
 	string information = "Bought ";
 	information.append(player.name).append(" ").append(player.surname);
 
+	lock_guard<mutex> lock_history (history_mutex);
 	history.emplace_back(History::Save_History(information));
 
 	return 0;
@@ -314,7 +318,7 @@ int Club::Buy_Player()
 				{
 
 					_budget = _budget - transfer->free_players[i]->Get_Value();
-					Transfers::get()->Player_Bought(*transfer->free_players[i], *this); //Inform transfer list that we're buying from it.
+					transfer->Player_Bought(*transfer->free_players[i], *this); //Inform transfer list that we're buying from it.
 					transfer->free_players.erase(transfer->free_players.begin() + i); //Remove player from transfer list.
 
 					cout << "Player bought. Current budget: " << _budget << "$" << endl;
@@ -342,6 +346,10 @@ int Club::Buy_Player()
 
 int Club::Sell_Player()
 {
+	/**
+	 * Asks user which player he wants to sell from squad. Then, locks the mutex, copies player pointer to transfer_list vector,
+	 * saves information to club history, and removes pointer from internal vector<players>.
+	 */
 	if (players.size() < 12)
 	{
 		cout << "Only " << players.size() << " in squad. Cannot sell." << endl;
@@ -367,19 +375,20 @@ int Club::Sell_Player()
 	}
 	while (confirm != 'Y' && confirm != 'y');
 
+	unique_lock<mutex> lock (transfer_list);
 
 	Transfers::get()->free_players.push_back(players[player_to_sell]);
 	_budget += players[player_to_sell]->Get_Value();
 
 	string information = "Sold " + players[player_to_sell]->name + " " + players[player_to_sell]->surname + " for: " +
 			(to_string(players[player_to_sell]->Get_Value())) + "$"; //ex: Sold Patrick Cyrklaff for: 7999$
-
 	history.emplace_back(History::Save_History(information));
 
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.
-
 	cout << "Player sold." << endl;
+
+	lock.unlock();
 
 	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
 		Set_Tactics();

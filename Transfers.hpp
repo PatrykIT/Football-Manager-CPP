@@ -16,8 +16,9 @@ private:
 	Transfers(const Transfers &other);
 	Transfers& operator=(const Transfers& other);
 
-	static Transfers *transfers;
 	static std::mutex transfer_mutex;
+
+	static Transfers *transfers;
 	std::vector<Player*> free_players; //free agents - players without clubs, ready to be bought.
 
 	void Player_Bought(Player &player, Club &club) const;

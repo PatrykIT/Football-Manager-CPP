@@ -55,6 +55,8 @@ void Table::Add_Club_to_Table(Club *&club)
 		return;
 	}
 
+	lock_guard<mutex> lock(club_array);
+
 	club_statistics.insert(map<Club*, Club_Statistics>::value_type(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
 	clubs[number_of_clubs] = club;
     ++number_of_clubs;
@@ -89,6 +91,14 @@ void Table::Print_Table() const
 
 void Table::Schedule_Season() //Pairs every club ID with every club ID.
 {
+	static bool Season_Scheduled = false;
+	if(Season_Scheduled)
+	{
+		cout << "Season already scheduled." << endl;
+		return;
+	}
+
+
 	cout << endl << "Scheduling season: " << endl;
 	if(!Table_Full())
 	{
@@ -137,8 +147,8 @@ void Table::Schedule_Season() //Pairs every club ID with every club ID.
 	 * So: a=1, x=2. Merge {1-2}. ++x. Merge {1-3}. ++x. Merge {1-4}. Next ->	++a, x = last_val_of_x + 1. So: a=2, x=3. Merge {2-3}. ++x. Merge {2-4}.
 	 * Next -> ++a, x = last_val + 1. So: a=3, x=4. Merge {3-4}.		DONE! ;)
 	 */
-
 	Schedule_Rounds();
+	Season_Scheduled = true;
 }
 
 void Table::Schedule_Rounds() //Not finished, right now only 4 clubs can be scheduled, will fix that later (it is easier to debug with only 4 teams than 20 ;) )
