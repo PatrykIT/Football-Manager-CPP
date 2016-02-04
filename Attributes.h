@@ -1,6 +1,7 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 #include <iostream>
+#include <atomic>
 
 /* NOTE: This file should be named "Players.h" */
 class Club;
@@ -23,45 +24,45 @@ private:
 	{
 		struct Attacking_Attributes
 		{
-			int ball_control, dribbling, crossing, passing, first_touch, shooting, finishing, weak_foot;
+			std::atomic<int> ball_control, dribbling, crossing, passing, first_touch, shooting, finishing, weak_foot;
 			void Set_Overall();
 			double Get_Overall() const;
 		private:
-			double overall;
+			std::atomic<double> overall;
 		} attacking_attributes;
 
 		struct Defending_Attributes
 		{
-			int stand_tackle, slide_tackle, marking, interceptions;
+			std::atomic<int> stand_tackle, slide_tackle, marking, interceptions;
 			void Set_Overall();
 			double Get_Overall() const;
 		private:
-			double overall;
+			std::atomic<double> overall;
 		} defending_attributes;
 
 		struct Psyhical_Attributes
 		{
-			int accelaration, agility, strength, stamina;
+			std::atomic<int> accelaration, agility, strength, stamina;
 			void Set_Overall();
 			double Get_Overall() const;
 		private:
-			double overall;
+			std::atomic<double> overall;
 		} psyhical_attributes;
 
 		struct Mental_Attributes
 		{
-			int aggression, concetration, pressure_handling, work_rate, leadership, flair, game_reading;
+			std::atomic<int> aggression, concetration, pressure_handling, work_rate, leadership, flair, game_reading;
 			void Set_Overall();
 			double Get_Overall() const;
 		private:
-			double overall;
+			std::atomic<double> overall;
 		} mental_attributes;
 	} attributes;
 
 	struct Psyche
 	{
-		int morale; //Updated after playing match. In future: injures will also affect.
-		int form;
+		std::atomic<int> morale; //Updated after playing match. In future: injures will also affect.
+		std::atomic<int> form;
 
 	} psyche;
 
