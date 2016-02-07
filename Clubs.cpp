@@ -23,6 +23,10 @@ Club::Club(int budget) :_ID(Club::_instance_number++),
 	tactic[1] = -1;
 	tactic[2] = -1;
 
+	defenders_in_first_squad.reserve(5);
+	midfilders_in_first_squad.reserve(5);
+	attackers_in_first_squad.reserve(5);
+
 	players.reserve(23);
 
 	history.reserve(50);
@@ -223,17 +227,20 @@ void Club::Print_First_Squad() const
 	unsigned int i;
 	for(i = 0; i < defenders_in_first_squad.size(); ++i)
 	{
-		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->Get_Overall() << " (DEF)" << endl;
+		cout << "Player: " << defenders_in_first_squad[i]->name << " " << defenders_in_first_squad[i]->surname << " | Overall: " << defenders_in_first_squad[i]->Get_Overall()
+				<< " (DEF)" << endl;
 	}
 
 	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
 	{
-		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->Get_Overall() << " (MID)" << endl;
+		cout << "Player: " << midfilders_in_first_squad[i]->name << " " << midfilders_in_first_squad[i]->surname << " | Overall: " << midfilders_in_first_squad[i]->Get_Overall()
+				<< " (MID)" << endl;
 	}
 
 	for(i = 0; i < attackers_in_first_squad.size(); ++i)
 	{
-		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->Get_Overall() << " (ATT)" << endl;
+		cout << "Player: " << attackers_in_first_squad[i]->name << " " << attackers_in_first_squad[i]->surname << " | Overall: " << attackers_in_first_squad[i]->Get_Overall()
+				<< " (ATT)" << endl;
 	}
 
 	Print_Tactic_Rating();
@@ -245,8 +252,15 @@ void Club::Print_Whole_Squad() const
 	printf("\n---Whole Squad [%d]---\n", _ID);
 	for(unsigned int i = 0; i < players.size(); ++i)
 	{
-		cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " | Position: " << players[i]->Get_Position()
+		if(players[i]->Get_Position() == 1)
+			cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " (DEF)"
 				<< " | Value: " << players[i]->Get_Value() << "$" << endl;
+		else if(players[i]->Get_Position() == 2)
+			cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " (MID)"
+							<< " | Value: " << players[i]->Get_Value() << "$" << endl;
+		else if(players[i]->Get_Position() == 3)
+			cout << i <<": " << players[i]->name << " " << players[i]->surname << " | Overall: " << players[i]->Get_Overall() << " (ATT)"
+							<< " | Value: " << players[i]->Get_Value() << "$" << endl;
 	}
 
 }
@@ -590,7 +604,178 @@ void Club::Decline_Skills_New_Year(Player *&player, int position)
 }
 
 
+void Club::Set_Custom_Tactic()
+{
+	Print_Whole_Squad();
+	Print_Formation();
+	Print_First_Squad();
 
+	cout << "Do you want to swap players (from same position), or rearrange formation?\n1 or 2:\t";
+	int choice;
+	do
+	{
+		cin >> choice;
+	} while (choice != 1 && choice != 2);
+
+//-------------------------------------------------------------------CHOICE 1------------------------------------------------------------------------------------------------------------
+	if (choice == 1 ) //SWAPPING
+	{
+		int player1, player2;
+		do
+		{
+			cout << "Write numbers of players that you want to swap.\nRemember, they must play the same position.\n:\t" << endl;
+			cin >> player1 >> player2;
+			if(player1 > players.size() || player2 > players.size()) //If user gave number bigger than people in team.
+				continue;
+		} while(players.at(player1)->Get_Position() != players.at(player2)->Get_Position());
+
+		cout << "Changing " << players[player1]->name << " " << players[player1]->surname << " with " <<
+				players[player2]->name << " " << players[player2]->surname << "." << endl;
+
+		swap(players[player1], players[player2]); //Swapping players in the whole squad.
+
+		switch(players[player1]->Get_Position())
+		{
+			case 1:
+			{
+					auto player_iter = find(defenders_in_first_squad.begin(), defenders_in_first_squad.end(), players[player2]); /* Searching by player2, because it is a number,
+					not really a player. So when we swapped players, the second number is the position where original player is now(the one that was swapped to 'weaker' player) */
+					if(player_iter != defenders_in_first_squad.end()) //If player swapped, previously was in first team
+					{
+						defenders_in_first_squad.erase(player_iter); //Remove old player from first squad.
+						defenders_in_first_squad.push_back(players[player1]); //Add new player to first squad.
+					}
+					break;
+			}
+			case 2:
+			{
+				auto player_iter = find(midfilders_in_first_squad.begin(), midfilders_in_first_squad.end(), players[player2]);
+				if(player_iter != midfilders_in_first_squad.end())
+				{
+					midfilders_in_first_squad.erase(player_iter);
+					midfilders_in_first_squad.push_back(players[player1]);
+				}
+				break;
+			}
+			case 3:
+			{
+				auto player_iter = find(attackers_in_first_squad.begin(), attackers_in_first_squad.end(), players[player2]);
+				if(player_iter != attackers_in_first_squad.end())
+				{
+					attackers_in_first_squad.erase(player_iter);
+					attackers_in_first_squad.push_back(players[player1]);
+				}
+				break;
+			}
+		}
+
+	}
+//-------------------------------------------------------------------CHOICE 2------------------------------------------------------------------------------------------------------------
+	else if (choice == 2) //Changing formation
+	{
+		tactic[0] = 0; //Zero out formation, to create new.
+		tactic[1] = 0;
+		tactic[2] = 0;
+
+		int nr_defs, nr_mids, nr_att;
+		bool formation_changed = false;
+		while(!formation_changed)
+		{
+			do
+			{
+				cout << "What formation would you like to play? Enter 3 numbers:\t";
+				cin >> nr_defs >> nr_mids >> nr_att;
+			} while ( (nr_defs < 3 || nr_defs > 5) || (nr_mids < 3 || nr_mids > 5) || (nr_att < 1 || nr_att > 3) ||
+					nr_defs + nr_mids + nr_att != 10);
+
+			/* Checking if there is enough players in squad for this tactic. */
+			int nr_of_defs = 0, nr_of_mids = 0, nr_of_atts = 0;
+
+			for(auto it = players.begin(); it != players.end(); ++it)
+			{
+				switch ( (*it)->Get_Position() )
+				{
+					case 1:
+						++nr_of_defs;
+						break;
+					case 2:
+						++nr_of_mids;
+						break;
+					case 3:
+						++nr_of_atts;
+						break;
+				}
+			}
+			if (nr_of_defs - nr_defs >= 0 && nr_of_mids - nr_mids >= 0 && nr_of_atts - nr_att >= 0) //If we have enough players for each formation.
+			{
+				tactic[0] = nr_defs;
+				tactic[1] = nr_mids;
+				tactic[2] = nr_att;
+
+				defenders_in_first_squad.clear();
+				midfilders_in_first_squad.clear();
+				attackers_in_first_squad.clear();
+				//-------------------------------------------------PICKING DEFENDERS------------------------------------------
+				cout << "Pick: " << nr_defs << " defenders from 'Whole Squad' listing.\n";
+				for(int i = 0; i < nr_defs; ++i)
+				{
+					int defender_nr;
+					cin >> defender_nr;
+					if(defender_nr > players.size() || players.at(defender_nr)->Get_Position() != 1)
+					{
+						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
+						continue;
+					}
+					defenders_in_first_squad.push_back(players[defender_nr]);
+				}
+				//-------------------------------------------------PICKING MIDFIELDERS------------------------------------------
+				cout << "Pick: " << nr_mids << " midfielders from 'Whole Squad' listing.\n";
+				for(int i = 0; i < nr_mids; ++i)
+				{
+					int midfielder_nr;
+					cin >> midfielder_nr;
+					if(midfielder_nr > players.size() || players.at(midfielder_nr)->Get_Position() != 2)
+					{
+						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
+						continue;
+					}
+					midfilders_in_first_squad.push_back(players[midfielder_nr]);
+				}
+				//-------------------------------------------------PICKING ATTACKERS------------------------------------------
+				cout << "Pick: " << nr_att << " attackers from 'Whole Squad' listing.\n";
+				for(int i = 0; i < nr_att; ++i)
+				{
+					int attacker_nr;
+					cin >> attacker_nr;
+					if(attacker_nr > players.size() || players.at(attacker_nr)->Get_Position() != 3)
+					{
+						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
+						continue;
+					}
+					attackers_in_first_squad.push_back(players[attacker_nr]);
+				}
+			}
+			else
+			{
+				cout << "Lacking players to set this tactic, precisely:\n";
+				if (nr_of_defs - nr_defs < 0)
+					cout << "Not enough defenders.\n";
+				if (nr_of_mids - nr_mids < 0)
+					cout << "Not enough midfielders.\n";
+				if (nr_of_atts - nr_att < 0)
+					cout << "Not enough attackers.\n"; cout << endl << endl;
+				continue;
+			}
+			formation_changed = true;
+			Set_Tactic_Rating();
+		}
+	}
+
+	Print_Whole_Squad();
+	Print_Formation();
+	Print_First_Squad();
+
+}
 
 
 

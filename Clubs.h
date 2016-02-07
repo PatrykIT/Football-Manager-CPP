@@ -79,6 +79,7 @@ public:
 
 	int Add_Player_to_Club(Player &player);
 	int Set_Tactics();
+	void Set_Custom_Tactic();
 
 	double Get_Tactic_Rating() const;
 };
