@@ -337,7 +337,8 @@ int Club::Buy_Player()
 
 					cout << "Player bought. Current budget: " << _budget << "$" << endl;
 					Set_Tactics();
-					return 0; //Exit infinite loop
+					
+					return 0;
 				}
 				else
 				{
@@ -389,9 +390,10 @@ int Club::Sell_Player()
 	}
 	while (confirm != 'Y' && confirm != 'y');
 
-	unique_lock<mutex> lock (transfer_list);
-
+	unique_lock<mutex> lock (transfer_list); //Make sure no one accesses vector in transfer list.
 	Transfers::get()->free_players.push_back(players[player_to_sell]);
+	lock.unlock();
+	
 	_budget += players[player_to_sell]->Get_Value();
 
 	string information = "Sold " + players[player_to_sell]->name + " " + players[player_to_sell]->surname + " for: " +
@@ -401,8 +403,6 @@ int Club::Sell_Player()
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.
 	cout << "Player sold." << endl;
-
-	lock.unlock();
 
 	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
 		Set_Tactics();

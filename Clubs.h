@@ -59,7 +59,7 @@ private:
 
 	int Get_ID() const;
 
-	static std::mutex transfer_list; //because class Transfers is reachable by all clubs.
+	static std::mutex transfer_list; //static because class Transfers is reachable by all clubs.
 	int Buy_Player();
 	int Sell_Player();
 
