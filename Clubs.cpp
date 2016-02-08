@@ -323,7 +323,8 @@ int Club::Buy_Player()
 
 					cout << "Player bought. Current budget: " << _budget << "$" << endl;
 					Set_Tactics();
-					return 0; //Exit infinite loop
+					
+					return 0;
 				}
 				else
 				{
