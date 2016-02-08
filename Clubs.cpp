@@ -295,7 +295,7 @@ int Club::Buy_Player()
 
 	printf("\t--- Current budget: %f$ ---\n", _budget);
 
-
+	lock_guard<mutex> lock (transfer_list);
 	for(unsigned int i = 0; i < transfer->free_players.size(); ++i)
 	{
 		if (transfer->free_players.at(i)->Get_Position() == position_to_buy)
@@ -632,7 +632,7 @@ void Club::Set_Custom_Tactic()
 		cout << "Changing " << players[player1]->name << " " << players[player1]->surname << " with " <<
 				players[player2]->name << " " << players[player2]->surname << "." << endl;
 
-		swap(players[player1], players[player2]); //Swapping players in the whole squad.
+		swap(players[player1], players[player2]); //Swapping players in the 'whole squad' container.
 
 		switch(players[player1]->Get_Position())
 		{
@@ -679,6 +679,7 @@ void Club::Set_Custom_Tactic()
 
 		int nr_defs, nr_mids, nr_att;
 		bool formation_changed = false;
+
 		while(!formation_changed)
 		{
 			do
@@ -688,7 +689,7 @@ void Club::Set_Custom_Tactic()
 			} while ( (nr_defs < 3 || nr_defs > 5) || (nr_mids < 3 || nr_mids > 5) || (nr_att < 1 || nr_att > 3) ||
 					nr_defs + nr_mids + nr_att != 10);
 
-			/* Checking if there is enough players in squad for this tactic. */
+			//-------------------------------Checking if there is enough players in squad for this tactic.------------------------------
 			int nr_of_defs = 0, nr_of_mids = 0, nr_of_atts = 0;
 
 			for(auto it = players.begin(); it != players.end(); ++it)
@@ -706,7 +707,8 @@ void Club::Set_Custom_Tactic()
 						break;
 				}
 			}
-			if (nr_of_defs - nr_defs >= 0 && nr_of_mids - nr_mids >= 0 && nr_of_atts - nr_att >= 0) //If we have enough players for each formation.
+			//-------------------------------If there are enough players for each formation.-----------------------------------------------
+			if (nr_of_defs - nr_defs >= 0 && nr_of_mids - nr_mids >= 0 && nr_of_atts - nr_att >= 0)
 			{
 				tactic[0] = nr_defs;
 				tactic[1] = nr_mids;
@@ -715,7 +717,7 @@ void Club::Set_Custom_Tactic()
 				defenders_in_first_squad.clear();
 				midfilders_in_first_squad.clear();
 				attackers_in_first_squad.clear();
-				//-------------------------------------------------PICKING DEFENDERS------------------------------------------
+				//-------------------------------------------------PICKING DEFENDERS-----------------------------------------
 				cout << "Pick: " << nr_defs << " defenders from 'Whole Squad' listing.\n";
 				for(int i = 0; i < nr_defs; ++i)
 				{
@@ -728,7 +730,7 @@ void Club::Set_Custom_Tactic()
 					}
 					defenders_in_first_squad.push_back(players[defender_nr]);
 				}
-				//-------------------------------------------------PICKING MIDFIELDERS------------------------------------------
+				//-------------------------------------------------PICKING MIDFIELDERS----------------------------------------
 				cout << "Pick: " << nr_mids << " midfielders from 'Whole Squad' listing.\n";
 				for(int i = 0; i < nr_mids; ++i)
 				{
@@ -755,6 +757,7 @@ void Club::Set_Custom_Tactic()
 					attackers_in_first_squad.push_back(players[attacker_nr]);
 				}
 			}
+			//-------------------------------If there was not enough of players for some formation.------------------------------------------
 			else
 			{
 				cout << "Lacking players to set this tactic, precisely:\n";
@@ -764,6 +767,12 @@ void Club::Set_Custom_Tactic()
 					cout << "Not enough midfielders.\n";
 				if (nr_of_atts - nr_att < 0)
 					cout << "Not enough attackers.\n"; cout << endl << endl;
+				cout << "Would you like to set another formation, or exit?\n0 for exit, other for continue:\t" << endl;
+				int exit;
+				cin >> exit;
+				if (exit == 0)
+					return;
+
 				continue;
 			}
 			formation_changed = true;
