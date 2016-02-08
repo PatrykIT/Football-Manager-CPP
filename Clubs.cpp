@@ -375,8 +375,8 @@ int Club::Sell_Player()
 	}
 	while (confirm != 'Y' && confirm != 'y');
 
-	unique_lock<mutex> lock (transfer_list);
-	Transfers::get()->free_players.push_back(players[player_to_sell]); //Make sure no one accesses vector in transfer list.
+	unique_lock<mutex> lock (transfer_list); //Make sure no one accesses vector in transfer list.
+	Transfers::get()->free_players.push_back(players[player_to_sell]);
 	lock.unlock();
 	
 	_budget += players[player_to_sell]->Get_Value();
