@@ -36,7 +36,6 @@ Club::~Club()
 {
 	for(unsigned int i = 0; i < players.size(); ++i)
 		Transfers::get()->free_players.push_back(players[i]); //When deleting the club, this adds it's players to transfer list (makes them free agents).
-		//free_players.push_back(players[i]);
 }
 
 void Club::Set_Tactic_Rating()
@@ -267,6 +266,17 @@ void Club::Print_Whole_Squad() const
 
 int Club::Buy_Player()
 {
+	/**
+	 * Checks whether squad is full. If so, asks user if he want's to sell somebody, and calls Sell_Player() if yes.
+	 * Asks user which position he is looking for.
+	 * Gives mutual exclusion to tamper with transfer list.
+	 * Searches whole transfer list, printing players that match criteria.
+	 * Asks user to pick particular player.
+	 * Checks whether budget allows to buy. If not, then asks user if he want's to sell somebody.
+	 * Transfers player from transfer list vector, to club.players vector, erasing him from the former.
+	 *
+	 */
+
 	Transfers *transfer =  Transfers::get();
 
 	if (players.size() >= 23)
@@ -283,81 +293,129 @@ int Club::Buy_Player()
 	}
 
 	Print_Positions_Number();
-
-	int position_to_buy;
-	cout << endl << "What position would you like to buy? 1 - Def. 2 - Mid. 3 - Att." << endl <<"Choice: \t";
-
-	do
-	{
-		cin >> position_to_buy;
-	}
-	while(position_to_buy < 1 && position_to_buy > 3);
-
 	printf("\t--- Current budget: %f$ ---\n", _budget);
 
-	lock_guard<mutex> lock (transfer_list);
-	for(unsigned int i = 0; i < transfer->free_players.size(); ++i)
+	while(1)
 	{
-		if (transfer->free_players.at(i)->Get_Position() == position_to_buy)
+		int position_to_buy;
+
+		cout << endl << "What position would you like to buy? 1 - Def. 2 - Mid. 3 - Att." << endl <<"Choice: \t";
+
+		do
 		{
-			cout << endl << "Found: " << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname
-					<< ". His overall: " << transfer->free_players[i]->Get_Overall() <<"%" << endl; transfer->free_players[i]->Print_Value();
-			cout << "Would you like to buy him, or look for other option?" << endl << "Y or N: \t";
-			char buy; cin >> buy;
+			cin >> position_to_buy;
+		}
+		while(position_to_buy < 1 && position_to_buy > 3);
 
-			if (buy == 'Y' || buy == 'y')
+		lock_guard<mutex> lock (transfer_list);
+		bool position_found = false; // To indicate whether there is at least one player available.
+
+		for(unsigned int i = 0; i < transfer->free_players.size(); ++i)
+		{
+			if (transfer->free_players.at(i)->Get_Position() == position_to_buy)
 			{
-				if (_budget < transfer->free_players[i]->Get_Value())
+				cout << endl << i << ": " << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname
+						<< ". His overall: " << transfer->free_players[i]->Get_Overall() <<"%\t" << transfer->free_players[i]->Get_Age() << " years old.\n";
+				transfer->free_players[i]->Print_Value();
+
+				position_found = true;
+			}
+		}
+		if (!position_found)
+		{
+			cout << "There is currently no one playing this position in transfer list. Would you like to look for another position, or exit? 0 for exit:\t" << endl;
+			int choice; cin >> choice;
+
+			if(choice == 0)
+				return -1;
+			else
+				continue;
+		}
+
+		cout << "Pick number of a player you'd like to buy:\t";
+		int number;
+		bool good_position;
+
+		do
+		{
+			good_position = true;
+
+			cin >> number;
+			if(number < 0 || number >= transfer->free_players.size())
+			{
+				cout << "Number out of range! Enter again:\t";
+			}
+			else if(transfer->free_players.at(number)->Get_Position() != position_to_buy)
+			{
+				cout << "Entered player plays in different position. Enter again:\t";
+				good_position = false;
+			}
+		}
+		while(number < 0 || number >= transfer->free_players.size() || !good_position);
+
+		/* We now have a player picked, now we have to check whether budget allows us to buy. */
+
+		if (_budget < transfer->free_players[number]->Get_Value())
+		{
+			printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y), buy another player (N), or exit?\nY | N | E:\t", _budget);
+
+			char choice;
+			cin >> choice;
+			if (choice == 'y' || choice == 'Y')
+			{
+				const int ret = Sell_Player();
+
+				if(ret != 0 || _budget < transfer->free_players[number]->Get_Value())
 				{
-					printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y) or keep looking (N)?\nY or N:\t", _budget);
-
-					char sell;
-					cin >> sell;
-					if (sell == 'y' || sell == 'Y')
-					{
-						const int ret = Sell_Player();
-
-						if (ret == 0 && _budget >= transfer->free_players[i]->Get_Value())
-							{} //Player sold, we can afford another player. Continue with the flow of the program, in order to buy player. (Didn't want to repeat lines, so I just put empty statement here, it will land in Add_Player_to_Club() anyways.)
-						else
-							continue;
-					}
-					else //means keep looking
-						continue;
-				}
-
-				const int ret = Add_Player_to_Club(*transfer->free_players[i]);
-
-				if(ret == 0)
-				{
-
-					_budget = _budget - transfer->free_players[i]->Get_Value();
-					transfer->Player_Bought(*transfer->free_players[i], *this); //Inform transfer list that we're buying from it.
-					transfer->free_players.erase(transfer->free_players.begin() + i); //Remove player from transfer list.
-
-					cout << "Player bought. Current budget: " << _budget << "$" << endl;
-					Set_Tactics();
-					
-					return 0;
-				}
-				else
-				{
-					cout << "Cannot add new player." << endl;
-					return -1;
+					cout << "Failed to meet 2 terms.\n";
+					cout << "Do you want to keep searching, or exit? Y or N:\t";
+					char choice; cin >> choice;
+					if (choice == 'y' || choice == 'Y')
+						continue; //Restart loop, in order to look for another player.
+					else
+						return -1;
 				}
 			}
+			else if(choice == 'e' || choice == 'E') //If user wants to buy another player, then restart the loop.
+				return -1;
+			else
+				continue;
+		}
+
+		/* Coming here, means everything is good, and player can be bought */
+
+		const int ret = Add_Player_to_Club(*transfer->free_players[number]);
+
+		if(ret == 0)
+		{
+			_budget = _budget - transfer->free_players[number]->Get_Value();
+
+			transfer->Player_Bought(*transfer->free_players[number], *this); //Inform transfer list that we're buying from it.
+			transfer->free_players.erase(transfer->free_players.begin() + number); //Remove player from transfer list.
+
+			cout << "Player bought. Current budget: " << _budget << "$" << endl;
+
+			cout << "Would you like to pick his place in the team, or you want the best available tactic?\n1 for non-automation:\t";
+
+			int choice; cin >> choice;
+
+			if (choice == 1)
+				Set_Custom_Tactic();
+			else
+				Set_Tactics();
+
+			return 0;
 		}
 		else
 		{
-			cout << "Searching.." << endl;
-			cout << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname << "  | Position: "
-					<< transfer->free_players[i]->Get_Position() << " | Value: " <<  transfer->free_players[i]->Get_Value() << "$" << endl;
+			cout << "Cannot add new player." << endl;
+			return -1;
 		}
 	}
 
-	cout << "Searched whole transfer list. You haven't decided. Exiting transfer list." << endl;
-	return -1;
+	return 0;
 }
+
 
 int Club::Sell_Player()
 {
@@ -405,7 +463,15 @@ int Club::Sell_Player()
 	cout << "Player sold." << endl;
 
 	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
-		Set_Tactics();
+	{
+		cout << "Would you like to pick tactic by youself or you want the best available tactic?\n1 for non-automation:\t";
+		int choice;
+		cin >> choice;
+		if (choice == 1)
+			Set_Custom_Tactic();
+		else
+			Set_Tactics();
+	}
 
 	return 0; //successfully sold a player.
 }
@@ -757,7 +823,7 @@ void Club::Set_Custom_Tactic()
 					attackers_in_first_squad.push_back(players[attacker_nr]);
 				}
 			}
-			//-------------------------------If there was not enough of players for some formation.------------------------------------------
+			//-------------------------------If there was not enough of players for some formation.----------------------------------------
 			else
 			{
 				cout << "Lacking players to set this tactic, precisely:\n";
@@ -780,11 +846,96 @@ void Club::Set_Custom_Tactic()
 		}
 	}
 
+	Allow_Playing();
+
 	Print_Whole_Squad();
 	Print_Formation();
 	Print_First_Squad();
-
 }
+
+void Club::Interface_Message()
+{
+	printf("1: \t\t +++++ %s %s [%d] +++++ \n", club_name.c_str(), city_name.c_str(), _ID);
+	printf("1: \t ----- Print_Tactic_Rating ----- \n");
+	printf("2: \t ----- Print_History -----\n");
+	printf("3: \t ----- Print_Formation -----\n");
+	printf("4: \t ----- Print_First_Squad ----- \n");
+	printf("5: \t ----- Print_Whole_Squad -----\n");
+	printf("6: \t ----- List_Players -----\n");
+	printf("7: \t ----- Print number of players in each formation. -----\n");
+	printf("8: \t ----- Set_Custom_Tactic -----\n");
+	printf("9: \t ----- Buy_Player -----\n");
+	printf("10: \t ----- Sell_Player -----\n");
+	printf("100: \t ----- Print Key Bindings -----\n");
+	printf("0: EXIT\n");
+}
+
+
+void Club::User_Interface()
+{
+	Interface_Message();
+
+
+	int choice = -1;
+
+	while(choice != 0)
+	{
+		cout << "Enter number:\t "; cin >> choice; cout << endl;
+
+		switch(choice)
+		{
+		case 1:
+			Print_Tactic_Rating();
+			break;
+		case 2:
+			Print_History();
+			break;
+		case 3:
+			Print_Formation();
+			break;
+		case 4:
+			Print_First_Squad();
+			break;
+		case 5:
+			Print_Whole_Squad();
+			break;
+		case 6:
+			List_Players();
+			break;
+		case 7:
+			Print_Positions_Number();
+			break;
+		case 8:
+			Set_Custom_Tactic();
+			break;
+		case 9:
+			Buy_Player();
+			break;
+		case 10:
+			Sell_Player();
+			break;
+		case 100:
+			Interface_Message();
+			break;
+
+		default:
+			if(choice != 0)
+				cout << "Wrong number! Please try again.\n";
+			break;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
