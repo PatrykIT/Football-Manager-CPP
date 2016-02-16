@@ -45,6 +45,8 @@ private:
     void Give_Walkover(const int i);
     void Season_Finished();
     void Sort_Table();
+    void Interface_Message();
+    void Play_Round();
 
 
     bool Table_Full() const;
@@ -84,9 +86,10 @@ public:
     void Schedule_Season();
     void Print_Table() const;
     void Print_Rounds() const;
-    void Play_Round();
     void Print_Players_Statistics() const;
     void Print_History() const;
+    void Print_Date() const;
+    void User_Interface();
 
 };
 

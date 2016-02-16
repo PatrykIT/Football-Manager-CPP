@@ -442,6 +442,7 @@ void Table::Play_Round()
 	}
 
 	Print_Table();
+
 	++current_round;
 	Calendar::get().Travel_Calendar(7);
 
@@ -985,6 +986,72 @@ void Table::Print_History() const
 	for(auto const &story : history)
 		cout << story << endl;
 }
+
+void Table::Interface_Message()
+{
+	printf("1: \t ----- Print_Table ----- \n");
+	printf("2: \t ----- Print_Rounds ----- \n");
+	printf("3: \t ----- Play_Round ----- \n");
+	printf("4: \t ----- Print_Players_Statistics ----- \n");
+	printf("5: \t ----- Print_History ----- \n");
+	printf("6: \t ----- Print Date ----- \n");
+	printf("100: \t ----- Print Key Bindings -----\n");
+	printf("0: EXIT\n");
+}
+
+
+void Table::User_Interface()
+{
+	Interface_Message();
+
+	int choice = -1;
+
+	while(choice != 0)
+	{
+		cout << "Enter number:\t "; cin >> choice; cout << endl;
+
+		switch(choice)
+		{
+		case 1:
+			Print_Table();
+			break;
+		case 2:
+			Print_Rounds();
+			break;
+		case 3:
+			Play_Round();
+			break;
+		case 4:
+			Print_Players_Statistics();
+			break;
+		case 5:
+			Print_History();
+			break;
+		case 6:
+			Print_Date();
+			break;
+		case 100:
+			Interface_Message();
+			break;
+
+		default:
+			if(choice != 0)
+				cout << "Wrong number! Please try again.\n";
+			break;
+		}
+	}
+
+}
+
+void Table::Print_Date() const
+{
+	Calendar::get().Print_Date();
+}
+
+
+
+
+
 
 
 
