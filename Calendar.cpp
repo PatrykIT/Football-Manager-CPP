@@ -47,6 +47,8 @@ void Calendar::Travel_Calendar(int days)
 	}
 	else
 		day_of_a_month += days;
+
+	Set_Hour();
 }
 
 
