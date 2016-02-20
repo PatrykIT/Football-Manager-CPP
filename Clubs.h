@@ -59,6 +59,7 @@ private:
 	void Update_Players_Morale(bool result);
 	void Year_Passed(); //When New Year comes, class Calendar should make club's aware with calling this function.
 	void Interface_Message();
+	int Check_User_Input(std::string) const;
 
 	void Improve_Skills_New_Year(Player *&player, int position);
 	void Decline_Skills_New_Year(Player *&player, int position);

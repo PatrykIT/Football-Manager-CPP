@@ -274,19 +274,18 @@ int Club::Buy_Player()
 	 * Asks user to pick particular player.
 	 * Checks whether budget allows to buy. If not, then asks user if he want's to sell somebody.
 	 * Transfers player from transfer list vector, to club.players vector, erasing him from the former.
-	 *
+	 * Returns -1 in failure, 0 for success.
 	 */
 
 	Transfers *transfer =  Transfers::get();
 
 	if (players.size() >= 23)
 	{
-		cout << "Squad is full. Cannot add another player." << endl;
+		cout << "Squad is full. Cannot add another player. Would you like to sell? Y or N:\t" << endl;
 
-		cout << "Would you like to sell? Y or N:\t";
-		char confirm;
-		cin >> confirm;
-		if (confirm == 'y' || confirm == 'Y')
+		string confirm; cin >> confirm;
+
+		if (confirm == "y" || confirm == "Y")
 			Sell_Player();
 		else
 			return -1;
@@ -297,22 +296,31 @@ int Club::Buy_Player()
 
 	while(1)
 	{
-		int position_to_buy;
+		bool proper_input = false;
+		string position_to_buy;
 
-		cout << endl << "What position would you like to buy? 1 - Def. 2 - Mid. 3 - Att." << endl <<"Choice: \t";
-
-		do
+		while(!proper_input)
 		{
+			cout << endl << "What position would you like to buy? 1 - Def. 2 - Mid. 3 - Att." << endl <<"Choice: \t";
 			cin >> position_to_buy;
+
+			/* ------ Checking if user gave appropriate input. ------ */
+			if(Check_User_Input(position_to_buy) != 0)
+				continue;
+			else if(stoi(position_to_buy) < 1 || stoi(position_to_buy) > 3)
+				continue;
+			else
+				proper_input = true;
 		}
-		while(position_to_buy < 1 && position_to_buy > 3);
+
+		/* ------------------------------------------------ SEARCHING WHOLE TRANSFER LIST FOR PLAYERS IN GIVEN POSITION ------------------------------------------------ */
 
 		lock_guard<mutex> lock (transfer_list);
 		bool position_found = false; // To indicate whether there is at least one player available.
 
 		for(unsigned int i = 0; i < transfer->free_players.size(); ++i)
 		{
-			if (transfer->free_players.at(i)->Get_Position() == position_to_buy)
+			if (transfer->free_players.at(i)->Get_Position() == stoi(position_to_buy))
 			{
 				cout << endl << i << ": " << transfer->free_players[i]->name << " "<< transfer->free_players[i]->surname
 						<< ". His overall: " << transfer->free_players[i]->Get_Overall() <<"%\t" << transfer->free_players[i]->Get_Age() << " years old.\n";
@@ -320,48 +328,77 @@ int Club::Buy_Player()
 
 				position_found = true;
 			}
+
 		}
+
+		/* ------------------------------------------------ IF THERE IS NO PLAYERS PLAYING AT GIVEN POSITION ON TRANSFER LIST ------------------------------------------------ */
+
 		if (!position_found)
 		{
-			cout << "There is currently no one playing this position in transfer list. Would you like to look for another position, or exit? 0 for exit:\t" << endl;
-			int choice; cin >> choice;
+			proper_input = false;
+			string choice;
 
-			if(choice == 0)
+			while(!proper_input)
+			{
+				cout << "There is currently no one playing this position in transfer list. Would you like to look for another position, or exit? 0 for exit:\t" << endl;
+				cin >> choice;
+
+				/* ------ Checking if user gave appropriate input. ------ */
+				if(Check_User_Input(choice) != 0)
+					continue;
+				else
+					proper_input = true;
+			}
+			if(stoi(choice) == 0)
 				return -1;
 			else
 				continue;
 		}
 
-		cout << "Pick number of a player you'd like to buy:\t";
+		/* ------------------------------------------------ PICKING A PLAYER FROM LISTED PLAYERS ------------------------------------------------ */
+
 		int number;
 		bool good_position;
-
 		do
 		{
+			cout << "Pick number of a player you'd like to buy:\t";
 			good_position = true;
 
 			cin >> number;
+
+			if(!cin.good())
+			{
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+				good_position = false;
+				continue;
+			}
+
 			if(number < 0 || number >= transfer->free_players.size())
 			{
-				cout << "Number out of range! Enter again:\t";
-			}
-			else if(transfer->free_players.at(number)->Get_Position() != position_to_buy)
-			{
-				cout << "Entered player plays in different position. Enter again:\t";
+				cout << "Number out of range!";
 				good_position = false;
+				continue;
+			}
+			else if(transfer->free_players.at(number)->Get_Position() != stoi(position_to_buy))
+			{
+				cout << "Entered player plays in different position.";
+				good_position = false;
+				continue;
 			}
 		}
-		while(number < 0 || number >= transfer->free_players.size() || !good_position);
+		while(!good_position);
 
-		/* We now have a player picked, now we have to check whether budget allows us to buy. */
+		/* ------------------------------------------------ WE NOW HAVE A PLAYER PICKED. NOW WE HAVE TO CHECK WHETHER BUDGET ALLOWS US TO BUY ------------------------------------------------ */
 
 		if (_budget < transfer->free_players[number]->Get_Value())
 		{
 			printf("I am sorry. There is not enough money in the budget (%f$). Would you like to sell someone (Y), buy another player (N), or exit?\nY | N | E:\t", _budget);
 
-			char choice;
-			cin >> choice;
-			if (choice == 'y' || choice == 'Y')
+			string choice; cin >> choice;
+
+			if (choice == "y" || choice == "Y")
 			{
 				const int ret = Sell_Player();
 
@@ -369,20 +406,22 @@ int Club::Buy_Player()
 				{
 					cout << "Failed to meet 2 terms.\n";
 					cout << "Do you want to keep searching, or exit? Y or N:\t";
-					char choice; cin >> choice;
-					if (choice == 'y' || choice == 'Y')
+
+					string choice; cin >> choice;
+
+					if (choice == "y" || choice == "Y")
 						continue; //Restart loop, in order to look for another player.
 					else
 						return -1;
 				}
 			}
-			else if(choice == 'e' || choice == 'E') //If user wants to buy another player, then restart the loop.
+			else if(choice == "e" || choice == "E") //If user wants to buy another player, then restart the loop.
 				return -1;
 			else
 				continue;
 		}
 
-		/* Coming here, means everything is good, and player can be bought */
+		/* ------------------------------------------------ BUYING PLAYER ------------------------------------------------ */
 
 		const int ret = Add_Player_to_Club(*transfer->free_players[number]);
 
@@ -395,11 +434,11 @@ int Club::Buy_Player()
 
 			cout << "Player bought. Current budget: " << _budget << "$" << endl;
 
-			cout << "Would you like to pick his place in the team, or you want the best available tactic?\n1 for non-automation:\t";
+			cout << "Would you like to pick his place in the team, or you want the best available tactic?\n1 for custom tactic:\t";
 
-			int choice; cin >> choice;
+			string choice; cin >> choice;
 
-			if (choice == 1)
+			if (stoi (choice) == 1)
 				Set_Custom_Tactic();
 			else
 				Set_Tactics();
@@ -412,8 +451,6 @@ int Club::Buy_Player()
 			return -1;
 		}
 	}
-
-	return 0;
 }
 
 
@@ -421,8 +458,10 @@ int Club::Sell_Player()
 {
 	/**
 	 * Asks user which player he wants to sell from squad. Then, locks the mutex, copies player pointer to transfer_list vector,
-	 * saves information to club history, and removes pointer from internal vector<players>.
+	 * Saves information to club history, and removes pointer from internal vector<players>.
+	 * Returns -1 for failure, 0 for success.
 	 */
+
 	if (players.size() < 12)
 	{
 		cout << "Only " << players.size() << " in squad. Cannot sell." << endl;
@@ -432,7 +471,9 @@ int Club::Sell_Player()
 	Print_Whole_Squad();
 
 	int player_to_sell;
-	char confirm;
+	string confirm;
+
+	/* ------------------------------------------------ PICKING PLAYER TO SELL ------------------------------------------------ */
 
 	do
 	{
@@ -440,13 +481,23 @@ int Club::Sell_Player()
 		{
 			cout << endl << "Which player would you like to sell?\nNr:\t ";
 			cin >> player_to_sell;
+			if(!cin.good())
+			{
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+				player_to_sell = -1;
+				continue;
+			}
 		}
 		while (player_to_sell < 0 || player_to_sell > players.size() - 1);
 
 		cout << "You chose: " << players[player_to_sell]->name << " " << players[player_to_sell]->surname << endl << "Are you sure you want this player sold? Y or N" << endl;
 		cin >> confirm;
 	}
-	while (confirm != 'Y' && confirm != 'y');
+	while (confirm != "Y" && confirm != "y");
+
+	/* ------------------------------------------------ ADDING PLAYER TO TRANSFER LIST ------------------------------------------------ */
 
 	unique_lock<mutex> lock (transfer_list); //Make sure no one accesses vector in transfer list.
 	Transfers::get()->free_players.push_back(players[player_to_sell]);
@@ -454,20 +505,26 @@ int Club::Sell_Player()
 	
 	_budget += players[player_to_sell]->Get_Value();
 
+	/* ------------------------------------------------ SAVING INFORMATION ABOUT SOLD PLAYER IN CLUB HISTORY ------------------------------------------------ */
+
 	string information = "Sold " + players[player_to_sell]->name + " " + players[player_to_sell]->surname + " for: " +
 			(to_string(players[player_to_sell]->Get_Value())) + "$"; //ex: Sold Patrick Cyrklaff for: 7999$
 	history.emplace_back(History::Save_History(information));
+
+	/* ------------------------------------------------ REMOVING PLAYER FROM CLUB ------------------------------------------------ */
 
 	swap(players[player_to_sell], players[players.size() -1]); //Swap the last player with sold player to put him in last position.
 	players.pop_back(); //Delete sold player from vector.
 	cout << "Player sold." << endl;
 
+	/* ------------------------------------------------ OPTIONALLY, SETTING TACTIC ------------------------------------------------ */
+
 	if(_allowed_to_play) //If club was allowed to play, means this might have changed with selling a player. If the club was not allowed to play, selling another won't help in setting tactic :)
 	{
-		cout << "Would you like to pick tactic by youself or you want the best available tactic?\n1 for non-automation:\t";
-		int choice;
-		cin >> choice;
-		if (choice == 1)
+		cout << "Would you like to pick tactic by yourself or you want the best available tactic?\n1 for non-automation:\t";
+		string choice; cin >> choice;
+
+		if (stoi (choice) == 1)
 			Set_Custom_Tactic();
 		else
 			Set_Tactics();
@@ -550,10 +607,14 @@ void Club::Improve_Skills_After_Match(bool won)
 
 void Club::Update_Players_Morale(bool result)
 {
-	unsigned int i;
+	/**
+	 * @result - if true, then club won a game, and morale goes up ;
+	 * if false, then club lost a game, and morale goes down
+	 */
+
 	if (result == true)
 	{
-		for(i = 0; i < players.size(); ++i)
+		for(unsigned int i = 0; i < players.size(); ++i)
 		{
 			players[i]->psyche.morale += 10;
 
@@ -563,7 +624,7 @@ void Club::Update_Players_Morale(bool result)
 	}
 	else
 	{
-		for(i = 0; i < players.size(); ++i)
+		for(unsigned int i = 0; i < players.size(); ++i)
 		{
 			players[i]->psyche.morale -= 10;
 
@@ -576,6 +637,10 @@ void Club::Update_Players_Morale(bool result)
 
 void Club::Year_Passed()
 {
+	/**
+	 * With each passing year, players skills change.
+	 */
+
 	for(unsigned int i = 0; i < players.size(); ++i)
 	{
 		if(players[i]->_age < 24)
@@ -672,6 +737,13 @@ void Club::Decline_Skills_New_Year(Player *&player, int position)
 
 void Club::Set_Custom_Tactic()
 {
+	/**
+	 * Allows user to pick his squad and formation.
+	 * Gives 2 options:
+	 * 	a) Swap players (for example: player from bench comes in for player from first squad)
+	 * 	b) Creating new formation, with own picked players.
+	 */
+
 	Print_Whole_Squad();
 	Print_Formation();
 	Print_First_Squad();
@@ -681,6 +753,13 @@ void Club::Set_Custom_Tactic()
 	do
 	{
 		cin >> choice;
+		if(!cin.good())
+		{
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+			choice = -1;
+		}
 	} while (choice != 1 && choice != 2);
 
 //-------------------------------------------------------------------CHOICE 1------------------------------------------------------------------------------------------------------------
@@ -691,8 +770,17 @@ void Club::Set_Custom_Tactic()
 		{
 			cout << "Write numbers of players that you want to swap.\nRemember, they must play the same position.\n:\t" << endl;
 			cin >> player1 >> player2;
+
+			if(!cin.good())
+			{
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				player1 = -1;	player2 = -1;
+			}
+
 			if(player1 > players.size() || player2 > players.size()) //If user gave number bigger than people in team.
 				continue;
+
 		} while(players.at(player1)->Get_Position() != players.at(player2)->Get_Position());
 
 		cout << "Changing " << players[player1]->name << " " << players[player1]->surname << " with " <<
@@ -752,6 +840,14 @@ void Club::Set_Custom_Tactic()
 			{
 				cout << "What formation would you like to play? Enter 3 numbers:\t";
 				cin >> nr_defs >> nr_mids >> nr_att;
+
+				if(!cin.good())
+				{
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					nr_defs = -1; nr_mids = -1; nr_att = -1;
+				}
+
 			} while ( (nr_defs < 3 || nr_defs > 5) || (nr_mids < 3 || nr_mids > 5) || (nr_att < 1 || nr_att > 3) ||
 					nr_defs + nr_mids + nr_att != 10);
 
@@ -783,12 +879,19 @@ void Club::Set_Custom_Tactic()
 				defenders_in_first_squad.clear();
 				midfilders_in_first_squad.clear();
 				attackers_in_first_squad.clear();
-				//-------------------------------------------------PICKING DEFENDERS-----------------------------------------
+				//----------------------------------------- PICKING DEFENDERS -----------------------------------------
 				cout << "Pick: " << nr_defs << " defenders from 'Whole Squad' listing.\n";
 				for(int i = 0; i < nr_defs; ++i)
 				{
-					int defender_nr;
-					cin >> defender_nr;
+					int defender_nr;	cin >> defender_nr;
+
+					if(!cin.good())
+					{
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						defender_nr = -1;
+					}
+
 					if(defender_nr > players.size() || players.at(defender_nr)->Get_Position() != 1)
 					{
 						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
@@ -796,12 +899,19 @@ void Club::Set_Custom_Tactic()
 					}
 					defenders_in_first_squad.push_back(players[defender_nr]);
 				}
-				//-------------------------------------------------PICKING MIDFIELDERS----------------------------------------
+				//----------------------------------------- PICKING MIDFIELDERS -----------------------------------------
 				cout << "Pick: " << nr_mids << " midfielders from 'Whole Squad' listing.\n";
 				for(int i = 0; i < nr_mids; ++i)
 				{
-					int midfielder_nr;
-					cin >> midfielder_nr;
+					int midfielder_nr;	cin >> midfielder_nr;
+
+					if(!cin.good())
+					{
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						midfielder_nr = -1;
+					}
+
 					if(midfielder_nr > players.size() || players.at(midfielder_nr)->Get_Position() != 2)
 					{
 						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
@@ -809,12 +919,19 @@ void Club::Set_Custom_Tactic()
 					}
 					midfilders_in_first_squad.push_back(players[midfielder_nr]);
 				}
-				//-------------------------------------------------PICKING ATTACKERS------------------------------------------
+				//----------------------------------------- PICKING ATTACKERS -----------------------------------------
 				cout << "Pick: " << nr_att << " attackers from 'Whole Squad' listing.\n";
 				for(int i = 0; i < nr_att; ++i)
 				{
-					int attacker_nr;
-					cin >> attacker_nr;
+					int attacker_nr;	cin >> attacker_nr;
+
+					if(!cin.good())
+					{
+						cin.clear();
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						attacker_nr = -1;
+					}
+
 					if(attacker_nr > players.size() || players.at(attacker_nr)->Get_Position() != 3)
 					{
 						--i; //If number was bigger than size of squad, or picked player plays in other position, then restart this iteration.
@@ -823,7 +940,7 @@ void Club::Set_Custom_Tactic()
 					attackers_in_first_squad.push_back(players[attacker_nr]);
 				}
 			}
-			//-------------------------------If there was not enough of players for some formation.----------------------------------------
+			/* ------------------------------------------------------- IF THERE WAS NOT ENOUGH PLAYERS FOR SOME FORMATION ------------------------------------------------------- */
 			else
 			{
 				cout << "Lacking players to set this tactic, precisely:\n";
@@ -833,13 +950,21 @@ void Club::Set_Custom_Tactic()
 					cout << "Not enough midfielders.\n";
 				if (nr_of_atts - nr_att < 0)
 					cout << "Not enough attackers.\n"; cout << endl << endl;
+
 				cout << "Would you like to set another formation, or exit?\n0 for exit, other for continue:\t" << endl;
-				int exit;
-				cin >> exit;
+				int exit;	cin >> exit;
+
+				if(!cin.good())
+				{
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					return;
+				}
+
 				if (exit == 0)
 					return;
-
-				continue;
+				else
+					continue;
 			}
 			formation_changed = true;
 			Set_Tactic_Rating();
@@ -880,7 +1005,16 @@ void Club::User_Interface()
 
 	while(choice != 0)
 	{
-		cout << "Enter number:\t "; cin >> choice; cout << endl;
+		cout << "Enter number:\t "; cin >> choice;
+
+		if(!cin.good())
+		{
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			choice = -1;
+		}
+
+		cout << endl;
 
 		switch(choice)
 		{
@@ -929,7 +1063,19 @@ void Club::User_Interface()
 
 
 
+int Club::Check_User_Input(std::string number) const
+{
+	/**
+	 * Checks if given number is a single digit. Using string, as it is more 'idiot-proof', so less chance of crashing when input is very awkward.
+	 */
 
+	if(number.length() > 1)
+		return -1;
+	else if (!isdigit(number[0]))
+		return -1;
+	else
+		return 0;
+}
 
 
 
