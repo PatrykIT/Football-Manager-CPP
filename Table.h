@@ -4,6 +4,7 @@
 
 #include <array>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <mutex>
 
@@ -15,7 +16,7 @@ class Player;
 class Table
 {
 private:
-	friend class Calendar; //for giving access to clubs
+	friend class Calendar; //for allowing Table, to call Calendar, which calls clubs to make them aware that New Year came.
 	friend class Transfers; //for helper function Add_Player_to_Observe(Player &player, Club &club);
 	friend class History; //So we can save history about things that happened in league throughout the game.
 
@@ -47,6 +48,7 @@ private:
     void Sort_Table();
     void Interface_Message();
     void Play_Round();
+    static void Add_Player_to_Observe(Player &player, Club &club); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
 
 
     bool Table_Full() const;
@@ -73,9 +75,8 @@ private:
 		unsigned int matches_won, matches_lost, matches_drawn;
     };
 
-    static std::map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
-    static void Add_Player_to_Observe(Player &player, Club &club); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
-    static std::map<Club*, Club_Statistics> club_statistics;
+    static std::unordered_map<Player*, Player_Statistics> player_statistics; //Might as well used reference_wrapper from C++11 for Player*
+    static std::unordered_map<Club*, Club_Statistics> club_statistics;
     std::vector<std::string> history;
 
 public:

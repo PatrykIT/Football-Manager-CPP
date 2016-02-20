@@ -7,8 +7,8 @@
 
 using namespace std;
 
-map<Player*, Table::Player_Statistics >Table::player_statistics;
-map<Club*, Table::Club_Statistics>Table::club_statistics;
+unordered_map<Player*, Table::Player_Statistics >Table::player_statistics;
+unordered_map<Club*, Table::Club_Statistics>Table::club_statistics;
 
 Table::Table()
 {
@@ -464,7 +464,7 @@ void Table::Pick_Assister(Player *&player, Club &club)
 	 * *&player is the player that scored a goal, so he can not have an assist.
 	 */
 
-	map<Player*, Player_Statistics>::iterator it;
+	unordered_map<Player*, Player_Statistics>::iterator it;
 	//-----------Chance of assisting--------------------
 	int attackers_chance_assisting = rand() % 2,
 		midfielders_chance_assisting = rand() % 3,
@@ -573,7 +573,7 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 	 * Also calls Pick_Assister() for each goal.
 	 */
 
-	map<Player*, Player_Statistics>::iterator it;
+	unordered_map<Player*, Player_Statistics>::iterator it;
 
 	for(int i = 0; i < goals_scored; ++i) //For each goal scored, we rand a person scoring it, and assisting.
 	{
@@ -834,11 +834,11 @@ void Table::Season_Finished()
 	 * If there are multiple players that have same amount of goals, then check which one has more assists.
 	 * So: 1 - Most goals. 2 - Most goals with most assists. 3 - Most goals, with most assists, from better club.*/
 
-	map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
-	map<Player*, Player_Statistics> top_assisters;
-	map<Player*, Player_Statistics>::iterator best = player_statistics.begin();
+	unordered_map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
+	unordered_map<Player*, Player_Statistics> top_assisters;
+	unordered_map<Player*, Player_Statistics>::iterator best = player_statistics.begin();
 
-	for(map<Player*, Player_Statistics>::iterator player = player_statistics.begin().operator++(); player != player_statistics.end(); ++player)
+	for(unordered_map<Player*, Player_Statistics>::iterator player = player_statistics.begin().operator++(); player != player_statistics.end(); ++player)
 	{
 		if(player->second.goals_scored > best->second.goals_scored)
 		{
@@ -855,7 +855,7 @@ void Table::Season_Finished()
 		best = top_scorers.begin();
 		top_assisters.insert(*best);
 
-		for(map<Player*, Player_Statistics>::iterator player = top_scorers.begin().operator ++(); player != top_scorers.end(); ++player)
+		for(unordered_map<Player*, Player_Statistics>::iterator player = top_scorers.begin().operator ++(); player != top_scorers.end(); ++player)
 		{
 			if(player->second.assists > best->second.assists)
 			{
@@ -880,7 +880,7 @@ void Table::Season_Finished()
 			best = top_assisters.begin();
 			players.push_back(best->first);
 
-			for(map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
+			for(unordered_map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
 			{
 				if(club_hierarchy.find(best->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
 				{
