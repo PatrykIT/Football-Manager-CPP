@@ -6,6 +6,18 @@
 
 std::mutex History::date_mutex;
 
+History::History() : message ("")
+{}
+
+History::History(std::string message) : message(message)
+{}
+
+History::History(History&& other) : message (std::move(other.message))
+{}
+
+History::History(History &other) : message (other.message)
+{}
+
 std::string History::Save_History(std::string message)
 {
 	message.append(Append_Date()); //Check if move ctors working here!
@@ -51,14 +63,3 @@ std::string History::Append_Date()
 	return date;
 }
 
-History::History() : message ("")
-{}
-
-History::History(std::string message) : message(message)
-{}
-
-History::History(History&& other) : message (std::move(other.message))
-{}
-
-History::History(History &other) : message (other.message)
-{}
