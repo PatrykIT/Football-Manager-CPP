@@ -3,7 +3,6 @@
 #include "History.h"
 
 #include <array>
-#include <map>
 #include <unordered_map>
 #include <vector>
 #include <mutex>
@@ -44,11 +43,12 @@ private:
 	void Print_Assister(Player *&player);
     void Schedule_Rounds();
     void Give_Walkover(const int i);
-    void Season_Finished();
     void Sort_Table();
     void Interface_Message();
     void Play_Round();
     static void Add_Player_to_Observe(Player &player, Club &club); //starts counting statistics to player_statistics when player is bought. Called only by Transfer class.
+    void Season_Finished();
+    void Pick_Top_Scorer();
 
 
     bool Table_Full() const;
