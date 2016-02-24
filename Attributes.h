@@ -20,6 +20,8 @@ private:
 	void _Set_Value();
 	void _Set_Overall();
 
+	void Interface_Message();
+
 	struct Attributes
 	{
 		struct Attacking_Attributes
@@ -79,13 +81,17 @@ public:
 
 	void Print_Attributes() const;
 	void Print_Value() const;
+	void Print_Position() const;
 
 	int Get_Age() const;
 	int Get_Position() const;
 	int Get_Morale() const;
+	int Get_Form() const;
 
 	double Get_Overall() const;
 	double Get_Value() const;
+
+	void User_Interface();
 };
 
 #endif /* ATTRIBUTES_H_ */

@@ -106,35 +106,20 @@ void Player::Print_Attributes() const
 {
 	printf("\n");
 	//------------------------------------------ATTACKING----------------------------------------------------
-	/*printf("Ball Control: %d\nDribbling: %d\nCrossing: %d\nPassing: %d\nFirst Touch: %d\nShooting: %d\nFinishing: %d\nWeak Foot: %d\n",
-			attributes.attacking_attributes.ball_control, attributes.attacking_attributes.crossing, attributes.attacking_attributes.dribbling, attributes.attacking_attributes.finishing,
-			attributes.attacking_attributes.first_touch, attributes.attacking_attributes.passing, attributes.attacking_attributes.shooting, attributes.attacking_attributes.weak_foot);
-	printf("Attacking overall: %.2f%\n", attributes.attacking_attributes.overall); //%.2f    print as floating point, 2 characters after decimal point
 
-	printf("Defending overall: %.2f%\n",attributes.defending_attributes.overall);
+	printf(" --- ATTACKING --- \n");
+	printf("Ball Control: %d\nDribbling: %d\nCrossing: %d\nPassing: %d\nFirst Touch: %d\nShooting: %d\nFinishing: %d\nWeak Foot: %d\n",
+			attributes.attacking_attributes.ball_control.load(), attributes.attacking_attributes.crossing.load(), attributes.attacking_attributes.dribbling.load(), attributes.attacking_attributes.finishing.load(),
+			attributes.attacking_attributes.first_touch.load(), attributes.attacking_attributes.passing.load(), attributes.attacking_attributes.shooting.load(), attributes.attacking_attributes.weak_foot.load());
 
-	printf("Mental overall: %.2f%\n", attributes.mental_attributes.overall);
+	printf("Attacking overall: %.2f%\n", attributes.attacking_attributes.Get_Overall()); //%.2f    print as floating point, 2 characters after decimal point
 
-	printf("Physical overall: %.2f\n", attributes.psyhical_attributes.overall); */
+	printf("Defending overall: %.2f%\n",attributes.defending_attributes.Get_Overall());
 
-	printf("Overall: %.2f%\n", _overall);
+	printf("Mental overall: %.2f%\n", attributes.mental_attributes.Get_Overall());
 
-	switch (_position)
-	{
-	case 1:
-		printf("Defender.\n");
-		break;
-	case 2:
-		printf("Midfilder.\n");
-		break;
-	case 3:
-		printf("Striker.\n");
-		break;
-	default:
-		printf("POSITION NOT SET!\n");
-		break;
-	}
-	printf("\n");
+	printf("Physical overall: %.2f\n", attributes.psyhical_attributes.Get_Overall());
+
 }
 
 void Player::_Set_Value()
@@ -170,6 +155,11 @@ double Player::Get_Value() const
 int Player::Get_Morale() const
 {
 	return psyche.morale;
+}
+
+int Player::Get_Form() const
+{
+	return psyche.form;
 }
 
 void Player::_Set_Overall()
@@ -247,8 +237,88 @@ double Player::Attributes::Psyhical_Attributes::Get_Overall() const
 	return overall;
 }
 
+void Player::Interface_Message()
+{
+	printf("\t\t\t\t +++++ %s %s [%d years] +++++ \n", name.c_str(), surname.c_str(), _age);
+	printf("1: \t ----- Print Attributes ----- \n");
+	printf("2: \t ----- Print Position----- \n");
+	printf("3: \t ----- Print Morale-----\n");
+	printf("4: \t ----- Print Form-----\n");
+	printf("5: \t ----- Print Overall -----\n");
+	printf("6: \t ----- Print Value -----\n");
+	printf("100: \t ----- Print Key Bindings -----\n");
+	printf("0: EXIT\n");
+}
 
 
+void Player::User_Interface()
+{
+	Interface_Message();
+
+	int choice = -1;
+
+	while(choice != 0)
+	{
+		std::cout << "\nEnter number:\t "; std::cin >> choice;
+
+		if(!std::cin.good())
+		{
+			std::cin.clear();
+			choice = -1;
+		}
+
+		std::cout << std::endl;
+
+		switch(choice)
+		{
+		case 1:
+			Print_Attributes();
+			break;
+		case 2:
+			Print_Position();
+			break;
+		case 3:
+			std::cout << Get_Morale() << "\n";
+			break;
+		case 4:
+			std::cout << Get_Form() << "\n";
+			break;
+		case 5:
+			std::cout << Get_Overall() << "\n";
+			break;
+		case 6:
+			Print_Value();
+			break;
+		case 100:
+			Interface_Message();
+			break;
+
+		default:
+			if(choice != 0)
+				std::cout << "Wrong number! Please try again.\n";
+			break;
+		}
+	}
+}
+
+void Player::Print_Position() const
+{
+	switch (_position)
+	{
+	case 1:
+		printf("Defender.\n");
+		break;
+	case 2:
+		printf("Midfielder.\n");
+		break;
+	case 3:
+		printf("Striker.\n");
+		break;
+	default:
+		printf("POSITION NOT SET!\n");
+		break;
+	}
+}
 
 
 
