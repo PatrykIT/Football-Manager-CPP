@@ -49,6 +49,10 @@ Table::Table()
 
 void Table::Add_Club_to_Table(Club *&club)
 {
+	/**
+	 * Adds club to table, and starts counting statistics of it's player.
+	 */
+
 	if(Table_Full())
 	{
 		printf("Table full. Cannot add another club.\n");
@@ -57,7 +61,7 @@ void Table::Add_Club_to_Table(Club *&club)
 
 	lock_guard<mutex> lock(club_array);
 
-	club_statistics.insert(map<Club*, Club_Statistics>::value_type(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
+	club_statistics.insert(unordered_map<Club*, Club_Statistics>::value_type(club, Club_Statistics{0, 0, 0, 0, 0, 0, 0}));
 	clubs[number_of_clubs] = club;
     ++number_of_clubs;
 
@@ -250,8 +254,6 @@ bool Table::Table_Full() const
 {
 	return (number_of_clubs == number_of_clubs_in_ligue);
 }
-
-
 
 
 int Table::Check_if_Round_Played(int *index_of_match_not_played) const
@@ -465,11 +467,13 @@ void Table::Pick_Assister(Player *&player, Club &club)
 	 */
 
 	unordered_map<Player*, Player_Statistics>::iterator it;
+
 	//-----------Chance of assisting--------------------
 	int attackers_chance_assisting = rand() % 2,
 		midfielders_chance_assisting = rand() % 3,
 		defenders_chance_assisting = rand() % 1;
 
+	/* ATTACKER ASSISTS */
 	if(attackers_chance_assisting > midfielders_chance_assisting && attackers_chance_assisting > defenders_chance_assisting )
 	{
 		int player_that_assisted = rand() % club.attackers_in_first_squad.size(); //Out of attackers, we rand which one assisted.
@@ -487,6 +491,8 @@ void Table::Pick_Assister(Player *&player, Club &club)
 			}
 			Print_Assister(club.attackers_in_first_squad[player_that_assisted]);
 		}
+
+		/* IF THE SAME ATTACKER SCORED A GOAL, THEN HE CAN NOT HAVE AN ASSISTS. IT GOES TO FIRST MIDFIELDER */
 		else
 		{
 			it = player_statistics.find(club.midfilders_in_first_squad.at(0)); //In case we randed the same player that scored, we'll give a midfielder an assist.
@@ -501,6 +507,8 @@ void Table::Pick_Assister(Player *&player, Club &club)
 			Print_Assister(club.midfilders_in_first_squad[0]);
 		}
 	}
+
+	/* MIDFIELDER ASSISTS */
 	else if(midfielders_chance_assisting > defenders_chance_assisting)
 	{
 		int player_that_assisted = rand() % club.midfilders_in_first_squad.size();
@@ -518,6 +526,8 @@ void Table::Pick_Assister(Player *&player, Club &club)
 			}
 			Print_Assister(club.midfilders_in_first_squad[player_that_assisted]);
 		}
+
+		/* IF THE SAME MIDFIELDER SCORED A GOAL, THEN HE CAN NOT HAVE AN ASSISTS. IT GOES TO FIRST ATTACKER */
 		else
 		{
 			it = player_statistics.find(club.attackers_in_first_squad.at(0));
@@ -532,6 +542,8 @@ void Table::Pick_Assister(Player *&player, Club &club)
 			Print_Assister(club.attackers_in_first_squad[0]);
 		}
 	}
+
+	/* DEFENDER ASSISTS */
 	else
 	{
 		int player_that_assisted = rand() % club.defenders_in_first_squad.size();
@@ -549,6 +561,8 @@ void Table::Pick_Assister(Player *&player, Club &club)
 			}
 			Print_Assister(club.defenders_in_first_squad[player_that_assisted]);
 		}
+
+		/* IF THE SAME DEFENDER SCORED A GOAL, THEN HE CAN NOT HAVE AN ASSISTS. IT GOES TO FIRST MIDFIELDER */
 		else
 		{
 			it = player_statistics.find(club.midfilders_in_first_squad.at(0));
@@ -582,7 +596,7 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 			midfielders_chance = rand() % 2,
 			defenders_chance = rand() % 1;
 
-
+		/* ATTACKER SCORED */
 		if (attackers_chance > midfielders_chance && attackers_chance > defenders_chance)
 		{
 			int player_that_scored = rand() % club_1.attackers_in_first_squad.size(); //Out of attackers, we rand which one scored.
@@ -600,6 +614,8 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 			Pick_Assister(club_1.attackers_in_first_squad[player_that_scored], club_1);
 
 		}
+
+		/* MIDFIELDER SCORED */
 		else if(midfielders_chance > defenders_chance)
 		{
 			int player_that_scored = rand() % club_1.midfilders_in_first_squad.size();
@@ -616,6 +632,8 @@ void Table::Pick_Scorer(int goals_scored, Club &club_1)
 					club_1.midfilders_in_first_squad.at(player_that_scored)->surname.c_str(), club_1.club_name.c_str(), club_1.city_name.c_str());
 			Pick_Assister(club_1.midfilders_in_first_squad[player_that_scored], club_1);
 		}
+
+		/* DEFENDER SCORED */
 		else
 		{
 			int player_that_scored = rand() % club_1.defenders_in_first_squad.size();
@@ -639,6 +657,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 {
 	printf("\nNow playing: %s %s [%d] vs %s %s [%d]\n", club_1.club_name.c_str(), club_1.city_name.c_str(), club_1.Get_ID(),
 			club_2.club_name.c_str(), club_2.city_name.c_str(), club_2.Get_ID());
+
 	cout << "Attendance: " << club_1._attendance << " at " << club_1.stadium.stadium_name << "." << endl;
 
 //-------------------------------------- Check if match can be played --------------------------------------------------
@@ -746,7 +765,7 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 	club_1._budget += club_1._ticket_prices * club_1._attendance;
 
-	int match_index = Find_Index_of_Pair_In_Round(club_1, club_2);
+	int match_index = Find_Index_of_Pair_In_Round(club_1, club_2); //Looking for index to mark this match as played.
 
 	if(match_index == -1)
 	{
@@ -763,6 +782,10 @@ void Table::Play_Match(Club &club_1, Club &club_2)
 
 int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 {
+	/**
+	 * Based on squad ratings, and morale of players.
+	 */
+
 	cout << "Ratings of clubs: " << club_1.Get_Tactic_Rating() << " || " << club_2.Get_Tactic_Rating() << endl;
 
 	int sum_of_morale_club1 = 0, sum_of_morale_club2 = 0;
@@ -826,112 +849,10 @@ int Table::Calculate_Match_Winning_Odds(Club &club_1, Club &club_2) const
 void Table::Season_Finished()
 {
 	cout << "Season is finished!" << endl;
+
 	Sort_Table();
 	Print_Table();
-	std::string message;
-
-	/* Finding top scorer: Search all teams, from up to down. Assign to each player, which position his team has in table. Hierarchy comes second.
-	 * If there are multiple players that have same amount of goals, then check which one has more assists.
-	 * So: 1 - Most goals. 2 - Most goals with most assists. 3 - Most goals, with most assists, from better club.*/
-
-	unordered_map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
-	unordered_map<Player*, Player_Statistics> top_assisters;
-	unordered_map<Player*, Player_Statistics>::iterator best = player_statistics.begin();
-
-	for(unordered_map<Player*, Player_Statistics>::iterator player = player_statistics.begin().operator++(); player != player_statistics.end(); ++player)
-	{
-		if(player->second.goals_scored > best->second.goals_scored)
-		{
-			top_scorers.clear(); //Clear previous top scorers, because there's someone better :)
-			top_scorers.insert(*player);
-			best = player;
-		}
-		else if (player->second.goals_scored == best->second.goals_scored)
-			top_scorers.insert(*player);
-	}
-
-	if (top_scorers.size() > 1) //If there is more footballers that have the same goal number, check which one has most assists.
-	{
-		best = top_scorers.begin();
-		top_assisters.insert(*best);
-
-		for(unordered_map<Player*, Player_Statistics>::iterator player = top_scorers.begin().operator ++(); player != top_scorers.end(); ++player)
-		{
-			if(player->second.assists > best->second.assists)
-			{
-				top_assisters.clear(); //Clear previous top assissters, because there's someone better.
-				top_assisters.insert(*player);
-				best = player;
-			}
-			else if(best->second.assists == player->second.assists)
-				top_assisters.insert(*player);
-		}
-		if (top_assisters.size() > 1) //If we have players with same amount of goals AND same amount of assists, then we need to check which club they play for, is higher in league.
-		{
-			map<Club*, int> club_hierarchy; //int is a position in league.
-
-			for(int i = 0; i < number_of_clubs_in_ligue; ++i)
-		    {
-		    	club_hierarchy.emplace(clubs[i], i);//the lower the number, the higher a team is in league.
-		    }
-
-			vector <Player*> players; //Vector to hold players from best team.
-
-			best = top_assisters.begin();
-			players.push_back(best->first);
-
-			for(unordered_map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
-			{
-				if(club_hierarchy.find(best->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
-				{
-					players.clear();
-					players.push_back(it->first);
-					best = it;
-				}
-				else if (club_hierarchy.find(best->second.club)->second == club_hierarchy.find(it->second.club)->second)
-					players.push_back(it->first);
-			}
-			if (players.size() > 1) //If there are players with same amount of goals, same amount of assists, and from the same team.
-			{
-				cout << "We have ex aequo " << players.size() << " top scorers!" << endl;
-				message += "Golden Shoe Award was won by: " + to_string(players.size()) + " players ex aequo. Winners:\n";
-
-				for(auto const &player : players)
-				{
-					message += player->name + " " + player->surname + "\n";
-				}
-
-				message += "All scored: " + to_string( player_statistics.find(players[0])->second.goals_scored) + "\n";
-			}
-			else
-			{
-				message = players.at(0)->name + " " + players[0]->surname + " won Golden Shoe Award";
-				message = History::Save_History(message);
-				message += "\nHe scored " + to_string(player_statistics.find(players.at(0))->second.goals_scored) +
-						" goals, having ex aequo same amount of goals and assists, winning by playing for a club that finished higher.\n";
-			}
-		}
-		else
-		{
-			message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
-			message = History::Save_History(message);
-			message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals, winning by having more assists.\n";
-		}
-	}
-	else
-	{
-		message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
-		message = History::Save_History(message);
-		message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals.\n";
-	}
-
-	history.emplace_back(message);
-
-
-
-
-
-
+	Pick_Top_Scorer();
 	Print_History();
 }
 
@@ -941,6 +862,7 @@ void Table::Sort_Table()
 	/**
 	 * Sorts clubs in table by their points.
 	 */
+
 	for(int x = 0; x < number_of_clubs; ++x)
 	{
 		int index_of_max = x;
@@ -995,6 +917,7 @@ void Table::Interface_Message()
 	printf("4: \t ----- Print_Players_Statistics ----- \n");
 	printf("5: \t ----- Print_History ----- \n");
 	printf("6: \t ----- Print Date ----- \n");
+	printf("7: \t ----- Print History ----- \n");
 	printf("100: \t ----- Print Key Bindings -----\n");
 	printf("0: EXIT\n");
 }
@@ -1008,7 +931,7 @@ void Table::User_Interface()
 
 	while(choice != 0)
 	{
-		cout << "Enter number:\t "; cin >> choice; cout << endl;
+		cout << "\nEnter number:\t "; cin >> choice; cout << endl;
 
 		switch(choice)
 		{
@@ -1030,6 +953,9 @@ void Table::User_Interface()
 		case 6:
 			Print_Date();
 			break;
+		case 7:
+			Print_History();
+			break;
 		case 100:
 			Interface_Message();
 			break;
@@ -1049,9 +975,125 @@ void Table::Print_Date() const
 }
 
 
+void Table::Pick_Top_Scorer()
+{
+	std::string message;
+
+	/* Finding top scorer: Search all teams, from up to down. Assign to each player, which position his team has in table. Hierarchy comes second.
+	 * If there are multiple players that have same amount of goals, then check which one has more assists.
+	 * So: 1 - Most goals. 2 - Most goals with most assists. 3 - Most goals, with most assists, from better club.*/
 
 
+	unordered_map<Player*, Player_Statistics> top_scorers; // Players with same amount of goals.
+	unordered_map<Player*, Player_Statistics> top_assisters;
+	unordered_map<Player*, Player_Statistics>::iterator best = player_statistics.begin();
 
+	/* SEARCHING FOR A PLAYER THAT SCORED MOST GOALS */
+	for(unordered_map<Player*, Player_Statistics>::iterator player = player_statistics.begin().operator++(); player != player_statistics.end(); ++player)
+	{
+		if(player->second.goals_scored > best->second.goals_scored)
+		{
+			top_scorers.clear(); //Clear previous top scorers, because there's someone better :)
+			top_scorers.insert(*player);
+			best = player;
+		}
+
+		/* IF THERE IS MULTIPLE PLAYERS WITH EQUALLY MOST GOALS */
+		else if (player->second.goals_scored == best->second.goals_scored)
+			top_scorers.insert(*player);
+	}
+
+	/* IF THERE IS MORE THAN ONE FOOTBALLER WITH MOST GOALS, CHECK WHICH ONE HAS MORE ASSISTS */
+	if (top_scorers.size() > 1)
+	{
+		best = top_scorers.begin();
+		top_assisters.insert(*best);
+
+		for(unordered_map<Player*, Player_Statistics>::iterator player = top_scorers.begin().operator ++(); player != top_scorers.end(); ++player)
+		{
+			if(player->second.assists > best->second.assists)
+			{
+				top_assisters.clear(); //Clear previous top assissters, because there's someone better.
+				top_assisters.insert(*player);
+				best = player;
+			}
+			else if(best->second.assists == player->second.assists)
+				top_assisters.insert(*player);
+		}
+
+		/* IF THERE IS MORE THAN ONE PLAYER WHO HAS MOST GOALS, AND SAME AMOUNT OF ASSISTS, CHECK WHICH ONE PLAYS FOR A BETTER TEAM */
+		if (top_assisters.size() > 1)
+		{
+			unordered_map<Club*, int> club_hierarchy; //int is a position in league.
+
+			/* MARK TEAMS, FROM BEST TO WORSE */
+			for(int i = 0; i < number_of_clubs_in_ligue; ++i)
+		    {
+		    	club_hierarchy.emplace(clubs[i], i); //the lower the number, the higher a team is in league.
+		    }
+
+			vector <Player*> players; //Vector to hold players from best team.
+
+			best = top_assisters.begin();
+			players.push_back(best->first);
+
+			for(unordered_map<Player*, Player_Statistics>::iterator it = top_assisters.begin().operator ++(); it != top_assisters.end(); ++it)
+			{
+				/* SEARCH FOR A PLAYER WITH MOST GOALS, MOST ASSISTS, AND BETTER TEAM */
+				if(club_hierarchy.find(best->second.club)->second > club_hierarchy.find(it->second.club)->second) // > (greater than), because better team = lower number
+				{
+					players.clear();
+					players.push_back(it->first);
+					best = it;
+				}
+				/* IF THERE IS MULTIPLE PLAYERS FROM SAME TEAM */
+				else if (club_hierarchy.find(best->second.club)->second == club_hierarchy.find(it->second.club)->second)
+					players.push_back(it->first);
+			}
+
+			/* -------- PLAYERS THAT HAD SAME AMOUNT OF GOALS, ASSISTS, AND PLAYED FOR THE SAME TEAM -------- */
+			if (players.size() > 1)
+			{
+				cout << "We have ex aequo " << players.size() << " top scorers!" << endl;
+				message += "Golden Shoe Award was won by: " + to_string(players.size()) + " players ex aequo. Winners:\n";
+
+				for(auto const &player : players)
+				{
+					message += player->name + " " + player->surname + "\n";
+				}
+
+				message += "All scored: " + to_string( player_statistics.find(players[0])->second.goals_scored) + "\n";
+			}
+
+			/* -------- PLAYER THAT HAD SAME AMOUNT OF GOALS, SAME AMOUNT OF ASSISTS, BUT PLAYED FOR A BETTER TEAM -------- */
+			else
+			{
+				message = players.at(0)->name + " " + players[0]->surname + " won Golden Shoe Award";
+				message = History::Save_History(message);
+				message += "\nHe scored " + to_string(player_statistics.find(players.at(0))->second.goals_scored) +
+						" goals, having ex aequo same amount of goals and assists, winning by playing for a club that finished higher.\n";
+			}
+		}
+
+		/* -------- PLAYER THAT HAD SAME AMOUNT OF GOALS, BUT MORE ASSISTS -------- */
+		else
+		{
+			message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
+			message = History::Save_History(message);
+			message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals, winning by having more assists.\n";
+		}
+	}
+
+	/* -------- PLAYER THAD HAD THE MOST GOALS -------- */
+	else
+	{
+		message = top_scorers.begin()->first->name + " " + top_scorers.begin()->first->surname + " won Golden Shoe Award";
+		message = History::Save_History(message);
+		message += "\nHe scored " + to_string(top_scorers.begin()->second.goals_scored) + " goals.\n";
+	}
+
+	history.emplace_back(message);
+}
 
 
 
