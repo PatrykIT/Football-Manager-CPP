@@ -6,6 +6,17 @@
 Transfers* Transfers::transfers = nullptr;
 std::mutex Transfers::transfer_mutex;
 
+Transfers::Transfers()
+{
+	free_players.reserve(30);
+
+	for(unsigned j = 0; j < free_players.capacity(); ++j)
+	{
+		//free_players[j] = new Player;
+		free_players.emplace_back(new Player);
+	}
+}
+
 Transfers* Transfers::get()
 {
 	/**
@@ -47,16 +58,6 @@ Transfers* Transfers::get()
  * }
  */
 
-Transfers::Transfers()
-{
-	free_players.reserve(30);
-
-	for(unsigned j = 0; j < free_players.capacity(); ++j)
-	{
-		//free_players[j] = new Player;
-		free_players.emplace_back(new Player);
-	}
-}
 
 Transfers::~Transfers()
 {
