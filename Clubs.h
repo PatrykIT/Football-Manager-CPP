@@ -58,13 +58,14 @@ private:
 	void Improve_Skills_After_Match(bool won);
 	void Update_Players_Morale(bool result);
 	void Year_Passed(); //When New Year comes, class Calendar should make club's aware with calling this function.
-	void Interface_Message();
-	int Check_User_Input(std::string) const;
+	void Interface_Message() const;
+	void Stadium_Interface();
 
 	void Improve_Skills_New_Year(Player *&player, int position);
 	void Decline_Skills_New_Year(Player *&player, int position);
 
 	int Get_ID() const;
+	int Check_User_Input(std::string) const;
 
 public:
 	explicit Club(int budget = (10000.000 + (rand() / (RAND_MAX / (99999.999 - 10000.000))))); //values 1000.0000 - 99999.999 $

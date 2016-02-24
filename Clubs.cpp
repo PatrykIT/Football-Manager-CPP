@@ -90,6 +90,10 @@ double Club::Get_Tactic_Rating() const
 
 int Club::Add_Player_to_Club(Player &player)
 {
+	/**
+	 * Adds player to club, and saves history.
+	 */
+
 	unique_lock<mutex> lock (players_vector);
 	if( players.size() < 23 )
 	{
@@ -118,21 +122,8 @@ void Club::List_Players() const
 	for (unsigned i = 0 ; i < players.size(); ++i)
 	{
 		printf("%s %s\nOverall: %.2f%\n", players[i]->name.c_str(), players[i]->surname.c_str(), players[i]->Get_Overall());
-		switch (players[i]->Get_Position())
-			{
-			case 1:
-				printf("Defender.\n");
-				break;
-			case 2:
-				printf("Midfilder.\n");
-				break;
-			case 3:
-				printf("Striker.\n");
-				break;
-			default:
-				printf("POSITION NOT SET!\n");
-				break;
-			}
+		players[i]->Print_Position();
+
 		printf("\n");
 	}
 }
@@ -162,7 +153,6 @@ int Club::Set_Tactics()
 				{} //can not have two max of positions, because the third one would not get a place.
 			else
 			{
-				//defenders_in_first_squad[number_of_defenders_in_first_squad] = players[i]; //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
 				defenders_in_first_squad.push_back(players[i]);  //For example, a third best player is the first best as a defender. We are binding his index in whole team "players[3]", to the index of a defenders "defender[1]".
 			}
 
@@ -559,9 +549,7 @@ void Club::Set_Attendancy()
 
 void Club::Improve_Skills_After_Match(bool won)
 {
-
-	unsigned int i;
-	for(i = 0; i < defenders_in_first_squad.size(); ++i)
+	for(unsigned int i = 0; i < defenders_in_first_squad.size(); ++i)
 	{
 		++defenders_in_first_squad[i]->attributes.defending_attributes.interceptions;
 		++defenders_in_first_squad[i]->attributes.defending_attributes.marking;
@@ -573,7 +561,7 @@ void Club::Improve_Skills_After_Match(bool won)
 		defenders_in_first_squad[i]->_Set_Overall();
 	}
 
-	for(i = 0; i < midfilders_in_first_squad.size(); ++i)
+	for(unsigned int i = 0; i < midfilders_in_first_squad.size(); ++i)
 	{
 		++midfilders_in_first_squad[i]->attributes.mental_attributes.pressure_handling;
 		if (won) //extra improving for winners.
@@ -587,7 +575,7 @@ void Club::Improve_Skills_After_Match(bool won)
 		midfilders_in_first_squad[i]->_Set_Overall();
 	}
 
-	for(i = 0; i < attackers_in_first_squad.size(); ++i)
+	for(unsigned int i = 0; i < attackers_in_first_squad.size(); ++i)
 	{
 		++attackers_in_first_squad[i]->attributes.attacking_attributes.ball_control;
 		++attackers_in_first_squad[i]->attributes.attacking_attributes.first_touch;
@@ -978,34 +966,73 @@ void Club::Set_Custom_Tactic()
 	Print_First_Squad();
 }
 
-void Club::Interface_Message()
+void Club::Interface_Message() const
 {
-	printf("1: \t\t +++++ %s %s [%d] +++++ \n", club_name.c_str(), city_name.c_str(), _ID);
-	printf("1: \t ----- Print_Tactic_Rating ----- \n");
-	printf("2: \t ----- Print_History -----\n");
-	printf("3: \t ----- Print_Formation -----\n");
-	printf("4: \t ----- Print_First_Squad ----- \n");
-	printf("5: \t ----- Print_Whole_Squad -----\n");
+	printf("\t\t\t\t +++++ %s %s [%d] +++++ \n", club_name.c_str(), city_name.c_str(), _ID);
+	printf("1: \t ----- Print Tactic Rating ----- \n");
+	printf("2: \t ----- Print History -----\n");
+	printf("3: \t ----- Print Formation -----\n");
+	printf("4: \t ----- Print First Squad ----- \n");
+	printf("5: \t ----- Print Whole Squad -----\n");
 	printf("6: \t ----- List_Players -----\n");
 	printf("7: \t ----- Print number of players in each formation. -----\n");
-	printf("8: \t ----- Set_Custom_Tactic -----\n");
-	printf("9: \t ----- Buy_Player -----\n");
-	printf("10: \t ----- Sell_Player -----\n");
+	printf("8: \t ----- Set Custom_Tactic -----\n");
+	printf("9: \t ----- Buy Player -----\n");
+	printf("10: \t ----- Sell Player -----\n");
+	printf("11: \t ----- Access Player -----\n");
+	printf("12: \t ----- Print History -----\n");
+	printf("13: \t ----- Access Stadium -----\n");
+	printf("14: \t ----- Ticket Prices-----\n");
 	printf("100: \t ----- Print Key Bindings -----\n");
 	printf("0: EXIT\n");
 }
 
+void Club::Stadium_Interface()
+{
+	printf("\t\t\t\t +++++ %s +++++ \n", stadium.stadium_name.c_str());
+	printf("1: \t ----- Print Capacity ----- \n");
+	printf("0: \t ----- EXIT ----- \n");
+
+	int choice = -1;
+
+		while(choice != 0)
+		{
+			std::cout << "\nEnter number:\t "; std::cin >> choice;
+
+
+			if(!std::cin.good())
+			{
+				std::cin.clear();
+				choice = -1;
+			}
+
+			std::cout << std::endl;
+
+			switch(choice)
+			{
+			case 1:
+				std::cout << stadium.Get_Capacity() << "\n";
+				break;
+			case 0:
+				return;
+
+			default:
+				if(choice != 0)
+					std::cout << "Wrong number! Please try again.\n";
+				break;
+			}
+		}
+}
 
 void Club::User_Interface()
 {
 	Interface_Message();
 
-
 	int choice = -1;
 
 	while(choice != 0)
 	{
-		cout << "Enter number:\t "; cin >> choice;
+		cout << "\nEnter number:\t "; cin >> choice;
 
 		if(!cin.good())
 		{
@@ -1047,6 +1074,33 @@ void Club::User_Interface()
 			break;
 		case 10:
 			Sell_Player();
+			break;
+		case 11:
+		{
+			std::cout << "Enter player number to access:\t";
+			int nr; cin >> nr;
+
+			if(cin.good() && nr < players.size() && nr >= 0)
+				players[nr]->User_Interface();
+			else
+			{
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				nr = -1;
+			}
+			break;
+
+		}
+		case 12:
+			Print_History();
+			break;
+		case 13:
+		{
+			Stadium_Interface();
+			break;
+		}
+		case 14:
+			cout << _ticket_prices <<" $" << endl;
 			break;
 		case 100:
 			Interface_Message();
