@@ -29,9 +29,9 @@ Table::Table()
 	catch (const bad_alloc&)
 	{
 		delete []matches;
-		delete []round;
 		for(int x = i; x >= 0; --x)
 			delete round[x].match;
+		delete []round;
 
 		throw;
 	}
